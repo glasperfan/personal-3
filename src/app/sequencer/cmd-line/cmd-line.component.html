@@ -1,0 +1,17 @@
+<div class="console">
+  <div class="history">
+    <div class="cmd prev" *ngFor="let cmd of cmdHistory">
+      <div>{{prompt}} {{cmd.text}}</div>
+      <div>{{cmd.result}}</div>
+    </div>
+  </div>
+  <div class="cmd current">
+    <span class="prompt">{{prompt}}</span>
+    <input
+    type="text"
+    [(ngModel)]="currentCmd.text"
+    (keyup.enter)="submit()"
+    />
+    <span class="cursor"></span>
+  </div>
+</div>
