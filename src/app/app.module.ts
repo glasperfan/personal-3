@@ -5,22 +5,22 @@ import { HttpModule } from '@angular/http';
 import { ROUTES } from 'app/app.routes';
 
 import { AppComponent } from './app.component';
-import { SequencerComponent } from 'app/sequencer/sequencer/sequencer.component';
-import { CmdLineComponent } from './sequencer/cmd-line/cmd-line.component';
-import { SidebarComponent } from './sequencer/sidebar/sidebar.component';
+import { SequencerComponent } from 'app/sequencer/components/sequencer/sequencer.component';
+import { CmdLineComponent } from 'app/sequencer/components/cmd-line/cmd-line.component';
+import { SidebarComponent } from 'app/sequencer/components/sidebar/sidebar.component';
 
 @NgModule({
-  declarations: [
-    AppComponent,
-    SequencerComponent,
-    CmdLineComponent,
-    SidebarComponent
-  ],
   imports: [
     BrowserModule,
     FormsModule,
     HttpModule,
     ROUTES
+  ],
+  declarations: [
+    AppComponent,
+    SequencerComponent,
+    CmdLineComponent,
+    SidebarComponent
   ],
   providers: [],
   bootstrap: [AppComponent]

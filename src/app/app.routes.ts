@@ -1,6 +1,6 @@
 import { Routes, RouterModule } from '@angular/router';
 import { AppComponent } from './app.component';
-import { SequencerComponent } from 'app/sequencer/sequencer/sequencer.component';
+import { SequencerComponent } from 'app/sequencer/components/sequencer/sequencer.component';
 
 export const routes: Routes = [
     {

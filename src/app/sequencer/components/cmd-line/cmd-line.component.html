@@ -8,6 +8,7 @@
   <div class="cmd current">
     <span class="prompt">{{prompt}}</span>
     <input
+    #input
     type="text"
     [(ngModel)]="currentCmd.text"
     (keyup.enter)="submit()"
@@ -15,3 +16,4 @@
     <span class="cursor"></span>
   </div>
 </div>
+<div class="extra-space" (click)=inputFocus()></div>

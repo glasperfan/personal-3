@@ -1,0 +1,40 @@
+:host {
+    height: 100%;
+    min-width: 200px;
+    background-color: #292929;
+
+    .navbar {
+      background-color: #393939;
+      display: flex;
+
+      .nav-selection {
+        padding: 8px 5px 5px;
+        flex-grow: 1;
+        text-align: center;
+        border-left: 1px solid #0563a9;
+        transition: background-color 200ms ease-out;
+
+        /* Active */
+        &.selected {
+          background-color: #0176cc;
+        }
+
+        /* Hover */
+        &:hover:not(.active) {
+          background-color: #073c63;
+        }
+
+        img {
+          width: 16px;
+        }
+      }
+    }
+
+    .content {
+      padding: 12px;
+
+      .sidebar {
+          color: #DDD;
+      }
+    }
+}
