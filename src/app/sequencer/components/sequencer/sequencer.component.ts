@@ -1,4 +1,6 @@
 import { Component } from '@angular/core';
+import { PianoMidi } from 'app/sequencer/sounds/Piano';
+import { IMidi } from 'app/sequencer/models/IMidi';
 
 @Component({
   selector: 'p3-sequencer',
@@ -8,6 +10,13 @@ import { Component } from '@angular/core';
 })
 export class SequencerComponent {
 
-  constructor() { }
+  constructor() {
+
+  }
 
 }
+
+export let MIDI: IMidi = {
+  piano: PianoMidi
+};
+

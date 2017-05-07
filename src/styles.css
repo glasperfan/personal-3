@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700,800');
+
 /* Full page app */
 html {
   height: 100%;
@@ -7,7 +9,7 @@ body {
   width: 100%;
   height: 100%;
   color: #000000;
-  font-family: 'Courier New, Courier, monospace';
+  font-family: 'Open Sans', sans-serif;
 }
 
 /* Remove padding and margin */
@@ -17,9 +19,30 @@ body {
     border: 0;
 }
 
-clear {
-    clear:both;
+a:link {
+    /* Applies to all unvisited links */
+    text-decoration:  none;
+    color:            black;
 }
+
+a:visited {
+    /* Applies to all visited links */
+    text-decoration:  none;
+    color:            black;
+}
+
+a:hover   {
+    /* Applies to links under the pointer */
+    text-decoration:  underline;
+    color:            black;
+}
+
+a:active  {
+    /* Applies to activated links */
+    text-decoration:  underline;
+    color: black;
+}
+
 
 .right {
     float: right;

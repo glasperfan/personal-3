@@ -1,0 +1,36 @@
+@content-width: 600px;
+
+:host {
+  .nav {
+    display: flex;
+    justify-content: flex-start;
+    align-content: center;
+    margin: 5px 5%;
+    line-height: 48px;
+    height: 48px;
+
+    .title {
+      font-size: 1.5em;
+      margin-right: 30px;
+
+      &:hover {
+        text-decoration: none;
+      }
+    }
+
+
+    .link {
+      margin: 0 15px;
+    }
+  }
+
+  .content {
+    min-height: 100%;
+    width: @content-width;
+    margin: 0 auto;
+
+    img {
+      width: @content-width;
+    }
+  }
+}
