@@ -21,25 +21,23 @@ body {
 
 a:link {
     /* Applies to all unvisited links */
-    text-decoration:  none;
-    color:            black;
+    text-decoration: none;
+    color: #149ae8;
+    transition: color 0.2s ease-in-out;
 }
 
 a:visited {
     /* Applies to all visited links */
-    text-decoration:  none;
-    color:            black;
+    color:#149ae8;
 }
 
 a:hover   {
     /* Applies to links under the pointer */
-    text-decoration:  underline;
-    color:            black;
+    color:#44baff;
 }
 
 a:active  {
     /* Applies to activated links */
-    text-decoration:  underline;
     color: black;
 }
 
@@ -50,4 +48,18 @@ a:active  {
 
 .left {
     float: left;
+}
+
+.center {
+  text-align: center;
+}
+
+.flex {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+.flex.top {
+  align-items: baseline;
 }

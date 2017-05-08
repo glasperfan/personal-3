@@ -10,6 +10,8 @@ import { FooterComponent } from 'app/components/footer/footer.component';
 import { SequencerComponent } from 'app/sequencer/components/sequencer/sequencer.component';
 import { CmdLineComponent } from 'app/sequencer/components/cmd-line/cmd-line.component';
 import { SidebarComponent } from 'app/sequencer/components/sidebar/sidebar.component';
+import { TerminalComponent } from './components/terminal/terminal.component';
+import { ProgramService } from 'app/services/program.service';
 
 @NgModule({
   imports: [
@@ -24,9 +26,10 @@ import { SidebarComponent } from 'app/sequencer/components/sidebar/sidebar.compo
     FooterComponent,
     SequencerComponent,
     CmdLineComponent,
-    SidebarComponent
+    SidebarComponent,
+    TerminalComponent
   ],
-  providers: [],
+  providers: [ ProgramService ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

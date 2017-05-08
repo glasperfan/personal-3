@@ -1,36 +1,90 @@
-@content-width: 600px;
+@frame-width: 740px;
 
 :host {
-  .nav {
-    display: flex;
-    justify-content: flex-start;
-    align-content: center;
-    margin: 5px 5%;
-    line-height: 48px;
-    height: 48px;
+  .frame {
+    max-width: @frame-width;
+    margin: 0 auto;
 
-    .title {
-      font-size: 1.5em;
-      margin-right: 30px;
+    .nav {
+      height: 36px;
+      line-height: 36px;
+      margin: 36px 0 72px;
+      font-weight: 400;
 
-      &:hover {
-        text-decoration: none;
+      a {
+        color: black;
+      }
+
+      .title {
+        flex-grow: 1;
+        font-size: 26px;
+      }
+
+      .link {
+        margin-left: 25px;
       }
     }
 
+    .content {
 
-    .link {
-      margin: 0 15px;
-    }
-  }
+      p {
+        line-height: 26px;
+        margin: 36px 0;
 
-  .content {
-    min-height: 100%;
-    width: @content-width;
-    margin: 0 auto;
+        &.top {
+          margin-top: 15px;
+        }
+      }
 
-    img {
-      width: @content-width;
+      img {
+        max-width: @frame-width;
+        margin: 0 auto;
+        display: block;
+      }
+
+      .profile_pic {
+        width: 420px;
+        border-radius: 100%;
+      }
+
+      .caption {
+        font-size: 0.75em;
+        font-weight: 100;
+        font-style: italic;
+        text-align: center;
+        color: #666;
+        margin-top: 5px;
+      }
+
+      .header {
+        font-weight: bold;
+        font-size: 24px;
+      }
+
+      .divider {
+        margin: 64px 0 48px;
+        height: 1px;
+        border-bottom: 1px dashed #ccc;
+      }
+
+      .item {
+        overflow: hidden;
+        margin: 15px 0;
+
+        .line {
+          overflow: hidden;
+          margin-bottom: 5px;
+        }
+
+        .organization {
+          font-weight: 400;
+        }
+
+        .date, .location {
+          font-size: 0.85em;
+          color: #666;
+        }
+      }
     }
   }
 }

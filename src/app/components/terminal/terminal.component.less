@@ -1,0 +1,67 @@
+:host {
+  width: 100%;
+  background-color: #242424;
+  color: #DDD;
+  font-family: Courier New, Courier, monospace;
+  font-size: 16px;
+  font-weight: 200;
+  display: block;
+  min-height: 300px;
+
+  .console {
+    padding: 10px;
+
+    .line {
+      height: 24px;
+      line-height: 24px;
+    }
+
+    @text-indent: 10px;
+    .cmd.current {
+      .prompt {
+        margin-left: @text-indent;
+      }
+
+      .openMessage {
+        align-items: flex-start;
+      }
+
+      input, .message {
+        flex-grow: 1;
+        overflow: auto;
+        margin-left: @text-indent;
+        background-color: #242424;
+      }
+
+      .message {
+        .console-btn {
+          cursor: pointer;
+        }
+      }
+
+      textarea {
+        width: 100%;
+        resize: vertical;
+        background-color: #383838;
+        min-height: 125px;
+      }
+
+      input, textarea {
+        outline: none;
+        color: #DDD;
+        font-family: Courier New, Courier, monospace;
+        font-size: 16px;
+        .line;
+
+        &::selection {
+          color: #26ce3e;
+          background: #DDD;
+        }
+      }
+    }
+  }
+
+  .extra-space {
+    height: 100%;
+  }
+}

@@ -1,9 +1,53 @@
-<div class="nav">
-  <a class="title" [href]="title.route">{{navTitle}}</a>
-  <a class="link" *ngFor="let link of links" [href]="link.route">{{link.name}}</a>
-</div>
-<div class="content">
-  <p>Hi! I'm a musician and software engineer, enthralled by everything in the union, and specifically the intersection, of these two fields. By day, I work on Microsoft's cloud-based machine learning platform. By night, I transcribe tunes from Kind of Blue, predict the weather in Redmond, and train for triathlons.</p>
-  <img src="assets/profile.jpg" />
+<div class="frame">
+  <div class="nav flex">
+    <a class="title" [href]="title.route">{{navTitle}}</a>
+    <a class="link" *ngFor="let link of links" [href]="link.route">{{link.name}}</a>
+  </div>
+  <div class="flex top">
+    <div class="content">
+
+      <div class="header" id="home">Home</div>
+      <p class="top">I'm a musician and software engineer, enthralled by everything in the union, and specifically the intersection, of these two fields. By day, I work as a software engineer in Seattle. I'm a full-stack developer at <a href="https://azure.microsoft.com/en-us/" target="_blank">Microsoft</a>, working on Azure's machine learning platform. By night, I transcribe tunes from Kind of Blue and train for triathlons.</p>
+      <p>I graduated from Harvard with a joint concentration in Computer Science and Music.</p>
+      <p>If you would like to get in touch with me, please use the robot-proof message system below.</p>
+
+      <img class="profile_pic" src="assets/profile_2.jpg" />
+      <div class="caption">Troms&#248;, Norway. 2016.</div>
+
+      <div class="divider"></div>
+
+      <div class="header" id="about">About</div>
+      <p class="top">I'm now living in the Northwest, and I keep busy with a million little projects. Statistically, there's a good chance one of them is a million-dollar project. You can see the results from some of them <a href="#content">below</a>.
+      <p>I'm participating in as many duathlons, triathlons, and long-distance cycling events as I can possibly fit in. The BMC Time Machine SLR02 is a natural extension of my being. Goals for 2017 include an olympic triathlon and 2500 miles of cycling. You can check <a href="http://strava.com/athletes/zabriskie" target="_blank">Strava</a> to see how I'm doing.</p>
+      <p>I also spent 4 years at Harvard playing piano with the <a href="https://www.hastypudding.org/" target="_blank">Hasty Pudding Theatricals</a>, and I arranged and orchestrated starting as a sophmore. I continue to orchestrate extensively as an alumnus.</p>
+      <p>I continue to do freelance work both as a web developer and as pianist for almost any rehearsal or occasion. Please reach out if you'd like to hire me!</p>
+
+      <div class="divider"></div>
+
+      <div class="header" id="work">Work</div>
+      <div class="item" *ngFor="let role of roles">
+        <div class="line">
+          <a class="organization left" [href]="role.link">{{role.organization}}</a>
+          <div class="position right">{{role.position}}</div>
+        </div>
+        <div class="line">
+          <div class="date left">{{role.dates}}</div>
+          <div class="location right">{{role.location}}</div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="header" id="content">Content</div>
+      <p>Coming soon!</p>
+
+      <div class="divider"></div>
+
+      <div class="header" id="contact">Contact</div>
+      <p>Type <em>email</em> and follow the prompts.</p>
+      <p3-terminal></p3-terminal>
+
+    </div>
+  </div>
 </div>
 <p3-footer></p3-footer>

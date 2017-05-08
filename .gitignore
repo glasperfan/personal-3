@@ -8,6 +8,10 @@
 # dependencies
 /node_modules
 
+# misc
+**/settings.js
+**/*.pem
+
 # IDEs and editors
 /.idea
 .project
