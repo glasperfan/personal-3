@@ -1,5 +1,4 @@
-import { ILink } from 'app/interfaces/ILink';
-import { IRole } from 'app/interfaces/IRole';
+import { ILink, IRole, ISection } from 'app/interfaces/Locals';
 
 export interface ILocals {
   About: {
@@ -23,6 +22,13 @@ export interface ILocals {
     Cringle: IRole;
     Cuthbert: IRole;
   };
+  Sections: {
+    Home: ISection;
+    About: ISection;
+    Work: ISection;
+    Content: ISection;
+    Contact: ISection;
+  }
 }
 
 export const Locals: ILocals = {
@@ -64,5 +70,45 @@ export const Locals: ILocals = {
       location: 'Cambridge, MA',
       link: 'https://github.com/cuthbertLab/music21'
     },
-  }
+  },
+  Sections: {
+    Home: {
+      header: 'Home',
+      elementId: 'home',
+      content: [
+        `I'm a musician and software engineer, enthralled by everything in the union, and specifically the intersection, of these two fields. By day, I work as a software engineer in Seattle. I'm a full-stack developer at <a href="https://azure.microsoft.com/en-us/" target="_blank">Microsoft</a>, working on Azure's machine learning platform. By night, I transcribe tunes from Kind of Blue and train for triathlons.`,
+        `I graduated from Harvard with a joint concentration in Computer Science and Music.`,
+        `If you would like to get in touch with me, please use the robot-proof message system below.`
+      ]
+    },
+    About: {
+      header: 'About',
+      elementId: 'about',
+      content: [
+        `I'm now living in the Northwest, and I keep busy with a million little projects. Statistically, there's a good chance one of them is a million-dollar project. You can see the results from some of them <a href="#content">below</a>.`,
+        `I'm participating in as many duathlons, triathlons, and long-distance cycling events as I can possibly fit in. The BMC Time Machine SLR02 is a natural extension of my being. Goals for 2017 include an olympic triathlon and 2500 miles of cycling. You can check <a href="http://strava.com/athletes/zabriskie" target="_blank">Strava</a> to see how I'm doing.`,
+        `I also spent 4 years at Harvard playing piano with the <a href="https://www.hastypudding.org/" target="_blank">Hasty Pudding Theatricals</a>, and I arranged and orchestrated starting as a sophmore. I continue to orchestrate extensively as an alumnus.`,
+        `I continue to do freelance work both as a web developer and as pianist for almost any rehearsal or occasion. Please reach out if you'd like to hire me!`
+      ]
+    },
+    Work: {
+      header: 'Work',
+      elementId: 'work',
+      content: []
+    },
+    Content: {
+      header: 'Content',
+      elementId: 'content',
+      content: [
+        `Coming soon!`
+      ],
+    },
+    Contact: {
+      header: 'Content',
+      elementId: 'content',
+      content: [
+        `Type <em>email</em> and follow the prompts.`
+      ],
+    }
+  },
 };
