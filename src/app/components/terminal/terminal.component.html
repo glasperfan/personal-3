@@ -1,27 +1,26 @@
 <div class="console">
 
   <div class="history">
-    <div class="cmd prev" *ngFor="let log of manager.logs">
+    <div class="cmd prev" *ngFor="let log of logs">
       <div class="line" *ngIf="log.text">{{log.text}}</div>
-      <div class="line" *ngIf="log.response">{{log.response}}</div>
+      <div class="line" *ngIf="log.message">{{log.message}}</div>
     </div>
   </div>
 
   <div class="cmd current">
-    <div class="line flex" [class.openMessage]="!manager.isInputCommand">
-      <span class="prefix"> {{manager.promptPrefix}} </span>
-      <span class="prompt" *ngIf="manager.prompt"> {{manager.prompt}} </span>
+    <div class="line flex" [class.openMessage]="!response?.requiresTextarea">
+      <span class="prefix"> {{promptPrefix}} </span>
+      <span class="prompt" *ngIf="response?.prompt"> {{response?.prompt}} </span>
       <input
-      #input
-      *ngIf="manager.isInputCommand"
+      #inputField
+      *ngIf="!response?.requiresTextarea"
       type="text"
-      [(ngModel)]="manager.response"
-      (keyup.enter)="manager.parse()"
+      [(ngModel)]="input"
+      (keyup.enter)="execute()"
       />
-      <div class="message" *ngIf="!manager.isInputCommand">
-        <textarea #message
-        [(ngModel)]="manager.response"></textarea>
-        <div class="console-btn" (click)="manager.parse(); inputFocus()">Submit</div>
+      <div class="message" *ngIf="response?.requiresTextarea">
+        <textarea [(ngModel)]="input"></textarea>
+        <div class="console-btn" (click)="execute(); inputFocus()">Submit</div>
     </div>
   </div>
 

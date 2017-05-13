@@ -11,7 +11,6 @@ import { SequencerComponent } from 'app/sequencer/components/sequencer/sequencer
 import { CmdLineComponent } from 'app/sequencer/components/cmd-line/cmd-line.component';
 import { SidebarComponent } from 'app/sequencer/components/sidebar/sidebar.component';
 import { TerminalComponent } from './components/terminal/terminal.component';
-import { ProgramService } from 'app/services/program.service';
 
 @NgModule({
   imports: [
@@ -29,7 +28,6 @@ import { ProgramService } from 'app/services/program.service';
     SidebarComponent,
     TerminalComponent
   ],
-  providers: [ ProgramService ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

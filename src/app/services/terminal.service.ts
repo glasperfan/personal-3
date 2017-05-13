@@ -1,62 +1,96 @@
 import { Observable, BehaviorSubject } from 'rxjs/Rx';
 import { Injectable } from '@angular/core';
-import { ProgramService } from 'app/services/program.service';
-import { Program } from 'app/models/Program';
+import { Http } from '@angular/http';
+import { IProgram, IResponse } from 'app/interfaces/IProgram';
 import { ICommand } from 'app/interfaces/ICommand';
 import { ILog } from 'app/interfaces/ILog';
-import { ErrorProgram } from 'app/models/ErrorProgram';
+import { EmailProgram } from "app/models/EmailProgram";
 
 @Injectable()
 export class TerminalService {
-  public currentProgram: Program;
-  private logs: ILog[];
-  private prompt: string;
-  private response: string;
-  private isInputCommand: boolean;
+  public currentProgram: IProgram;
+  public logs: ILog[];
+  private prevResponse: IResponse;
 
-  constructor(private _programService: ProgramService) {
+  constructor(private http: Http) {
     this.logs = [];
-    this.prompt = '';
-    this.isInputCommand = true;
   }
 
   public get promptPrefix(): string {
     return `$hz ${this.currentProgram ? '[' + this.currentProgram.id + '] ' : ''}> `;
   }
 
-  public parse(): void {
-    const input = this.response;
-    const program: Program = this.getProgram(input);
-    const currCommand: ICommand = program.currentNode;
-    const nextCommand: ICommand = program.execute(input); // first or next command
-    if (nextCommand.isFinal) {
-      this.logLastCommand(input, nextCommand.output ? nextCommand.output(input) : '', true);
-      this.currentProgram = undefined;
-      this.prompt = '';
-      this.response = '';
-      this.isInputCommand = true;
+  public execute(originalInput: string): Promise<IResponse> {
+    originalInput = originalInput || '';
+    const program: IProgram = this.getProgram(originalInput);
+    if (!originalInput && !program) {
+      this.logLastCommand(originalInput);
+      return Promise.resolve(undefined);
+    }
+    if (!program) {
+      const errorResponse: IResponse = {
+        isFinal: true,
+        message: (input: string) => `Command '${input}' not recognized.`
+      };
+      this.logLastCommand(originalInput, errorResponse.message(originalInput));
+      return Promise.resolve(errorResponse);
+    }
+    if (this.prevResponse) {
+      if (this.prevResponse.validator(originalInput)) {
+        this.prevResponse.onSuccess(originalInput);
+      } else {
+        this.logLastPrompt(originalInput, this.prevResponse);
+        return Promise.resolve(this.prevResponse);
+      }
     } else {
-      this.logLastCommand(input, currCommand.output ? currCommand.output(input) : '', false);
+      this.logLastCommand(originalInput);
       this.currentProgram = program;
-      this.prompt = nextCommand.prompt || '';
-      this.response = '';
-      this.isInputCommand = !nextCommand.isMultilineInput;
+    }
+    return program.execute(originalInput)
+      .then((response: IResponse) => {
+        if (response.isFinal) {
+          this.logLastPrompt(originalInput, response, this.prevResponse);
+          this.currentProgram = undefined;
+        } else if (this.prevResponse) {
+          this.logLastPrompt(originalInput, this.prevResponse);
+        }
+        this.prevResponse = response.isFinal ? undefined : response;
+        return Promise.resolve(response);
+      })
+  }
+
+  private getProgram(input: string): IProgram {
+    return this.currentProgram ? this.currentProgram : this.getProgramById(input);
+  }
+
+  public getProgramById(id: string): IProgram {
+    switch (id) {
+      case 'email':
+        return new EmailProgram(this.http);
+      default:
+        return undefined;
     }
   }
 
-  private getProgram(input: string): Program {
-    if (this.currentProgram) {
-      return this.currentProgram;
-    } else {
-      const matchingProgram = this._programService.getProgramById(input);
-      return matchingProgram ? matchingProgram : new ErrorProgram();
+  private logLastPrompt(lastInput: string, response: IResponse, prevResponse?: IResponse): void {
+    let message: string;
+    const hasValidator = !!response.message && !!response.validator && !!response.errorMessage;
+    if (hasValidator) {
+      message = response.validator(lastInput) ? response.message(lastInput) : response.errorMessage(lastInput);
+    } else if (response.message) {
+      message = response.message(lastInput);
     }
-  }
-
-  private logLastCommand(lastInput: string, response: string, isFinal: boolean): void {
+    let prompt: string = prevResponse ? prevResponse.prompt : response.prompt;
     this.logs.push({
-      text: this.promptPrefix + this.prompt + (this.isInputCommand ? lastInput : ''),
-      response: response
+      text: this.promptPrefix + prompt + (response.requiresTextarea ? '[text]' : lastInput),
+      message: message
+    });
+  }
+
+  private logLastCommand(lastInput: string, message?: string): void {
+    this.logs.push({
+      text: this.promptPrefix + lastInput,
+      message: message
     });
   }
 }

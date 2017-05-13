@@ -8,16 +8,16 @@ import { ILink, IRole, ISection } from 'app/interfaces/Locals';
   styleUrls: ['home.component.less']
 })
 export class HomeComponent {
-  private title: ILink;
-  private navTitle: string;
-  private links: ILink[];
-  private roles: IRole[];
+  public title: ILink;
+  public navTitle: string;
+  public links: ILink[];
+  public roles: IRole[];
   
-  private home: ISection;
-  private about: ISection;
-  private work: ISection;
-  private content: ISection;
-  private contact: ISection;
+  public home: ISection;
+  public about: ISection;
+  public work: ISection;
+  public content: ISection;
+  public contact: ISection;
 
   constructor() {
     this.title = Locals.Links.Title;

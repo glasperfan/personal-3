@@ -15,12 +15,12 @@ export interface User {
   styleUrls: ['./cmd-line.component.less']
 })
 export class CmdLineComponent implements AfterViewInit {
-  @ViewChildren('input') private inputs;
+  @ViewChildren('input') public inputs;
 
-  private cmdHistory: Command[];
-  private currentCmd: Command;
-  private user: User;
-  private prompt: string;
+  public cmdHistory: Command[];
+  public currentCmd: Command;
+  public user: User;
+  public prompt: string;
 
   constructor() {
     this.cmdHistory = [];
@@ -34,22 +34,22 @@ export class CmdLineComponent implements AfterViewInit {
     this.inputFocus();
   }
 
-  private submit() {
+  public submit() {
     const oldCmd: Command = Object.assign({}, this.currentCmd);
     this.execute(oldCmd);
     this.cmdHistory.push(oldCmd);
     this.currentCmd.text = '';
   }
 
-  private execute(cmd: Command): void {
+  public execute(cmd: Command): void {
     cmd.result = 'Error: command not found';
   }
 
-  private genPrompt(user: User): string {
+  public genPrompt(user: User): string {
     return `> \$${user.username} `;
   }
 
-  private inputFocus() {
+  public inputFocus() {
     this.inputs.first.nativeElement.focus();
   }
 }

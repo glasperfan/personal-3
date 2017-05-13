@@ -16,8 +16,8 @@ export interface NavSelection {
 })
 export class SidebarComponent {
 
-  private navSelections: NavSelection[];
-  private navSelection: NavSelection;
+  public navSelections: NavSelection[];
+  public navSelection: NavSelection;
 
   constructor() {
     this.navSelections = [

@@ -1,7 +1,7 @@
-import { Component, OnInit, ViewChildren } from '@angular/core';
+import { Component, OnInit, ViewChildren, AfterViewInit } from '@angular/core';
 import { TerminalService } from 'app/services/terminal.service';
-import { Program } from 'app/models/Program';
 import { ILog } from 'app/interfaces/ILog';
+import { IResponse } from 'app/interfaces/IProgram';
 
 /**
  * Email commands:
@@ -19,12 +19,41 @@ import { ILog } from 'app/interfaces/ILog';
   styleUrls: ['./terminal.component.less'],
   providers: [ TerminalService ]
 })
-export class TerminalComponent {
-  @ViewChildren('input') private inputs;
+export class TerminalComponent implements AfterViewInit {
+  @ViewChildren('input') public inputs;
+  public response: IResponse;
+  public input: string;
 
-  constructor(private manager: TerminalService) {}
+  constructor(public manager: TerminalService) {
+    this.input = '';
+  }
 
-  private inputFocus() {
-    setTimeout(() => this.inputs.first.nativeElement.focus(), 500);
+  ngAfterViewInit() {
+    this.inputFocus();
+  }
+
+  public get logs(): ILog[] {
+    return this.manager.logs;
+  }
+
+  public get promptPrefix(): string {
+    return this.manager.promptPrefix;
+  }
+
+  public execute(): void {
+    if (this.response) {
+      this.response.requiresTextarea = false; // clear for inputFocus()
+    }
+    this.manager.execute(this.input).then((response: IResponse) => {
+      this.response = Object.assign({}, response);
+      this.input = '';
+      this.inputFocus();
+    });
+  }
+
+  public inputFocus() {
+    if (this.inputs.first) {
+      setTimeout(() => this.inputs.first.nativeElement.focus(), 500);
+    }
   }
 }

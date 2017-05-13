@@ -1,135 +1,116 @@
 import { Http, Response } from '@angular/http';
-import { Program } from 'app/models/Program';
+import { Observable } from 'rxjs/Rx';
+import { IProgram, IResponse } from 'app/interfaces/IProgram';
 import { ICommand } from 'app/interfaces/ICommand';
 
-export class EmailProgram extends Program {
+export class EmailProgram implements IProgram {
   private senderName: string;
   private senderEmail: string;
   private senderMessage: string;
+  private isConfirmed: boolean;
+
+  public readonly id: string;
 
   constructor(private http: Http) {
-    super('email');
-    this.resetInfo();
-    super.init(this.genNameCommand());
+    this.id = 'email';
   }
 
-  public terminate() {
-    super.terminate();
-    this.resetInfo();
+  execute(input: string): Promise<IResponse> {
+    if (this.noDataAcquired() || !this.senderName) {
+      return Promise.resolve({
+        isFinal: false,
+        prompt: 'What is your first name? ',
+        message: (name: string) => `Nice name, ${this.capitalize(name)}.`,
+        errorMessage: (name: string) => `Try a name with just letters.`,
+        validator: this.isLettersAndSpaces,
+        onSuccess: (name: string) => this.senderName = name
+      });
+    }
+    if (!this.senderEmail) {
+      return Promise.resolve({
+        isFinal: false,
+        prompt: 'What is your email? ',
+        message: (email: string) => `${email}, got it.`,
+        errorMessage: (email: string) => `${email} doesn't look like an email to me...`,
+        validator: this.isEmail,
+        onSuccess: (email: string) => this.senderEmail = email
+      })
+    }
+    if (!this.senderMessage) {
+      return Promise.resolve({
+        isFinal: false,
+        requiresTextarea: true,
+        prompt: `Write a message below. `,
+        message: _ =>  `Message stored.`,
+        errorMessage: _ => `Empty messages not allowed.`,
+        validator: (message: string) => !!message.trim().length,
+        onSuccess: (message: string) => this.senderMessage = message
+      });
+    }
+    if (this.allDataAcquired() && typeof(this.isConfirmed) === 'undefined') {
+      return Promise.resolve({
+        isFinal: false,
+        prompt: 'Ready to send? ',
+        message: _ => undefined,
+        errorMessage: _ => `Try 'Y' or 'N'`,
+        validator: (input: string) => [ 'y', 'yes', 'n', 'no' ].includes(input.trim().toLowerCase()),
+        onSuccess: (input: string) => this.isConfirmed = [ 'y', 'yes' ].includes(input.trim().toLowerCase())
+      });
+    }
+    if (this.allDataAcquired() && this.isConfirmed) {
+      return this.send().toPromise();
+    }
+    if (this.allDataAcquired() && !this.isConfirmed) {
+      return Promise.resolve({
+        isFinal: true,
+        message: _ => `Okay! You can always type 'email' to start over.`
+      });
+    }
+    return undefined;
   }
 
-  private resetInfo() {
-    this.senderName = '';
-    this.senderEmail = '';
-    this.senderMessage = '';
+  private noDataAcquired(): boolean {
+    return !this.senderName && !this.senderEmail && !this.senderMessage;
   }
 
-  private send() {
-    this.http.post('http://localhost:6060/email', {
+  private allDataAcquired(): boolean {
+    return !!this.senderName && !!this.senderEmail && !!this.senderMessage;
+  }
+
+  private confirm(input: string): boolean {
+    input = input.trim().toLowerCase();
+    return input === 'y' || input === 'yes';
+  }
+
+  private send(): Observable<IResponse> {
+    return this.http.post('http://34.208.81.159:6060/email', {
       name: this.senderName,
       email: this.senderEmail,
       message: this.senderMessage
-    }).subscribe(
-      _ => console.log('Email successfully sent from server.'),
-      (error: any) => console.log(error)
-    );
-  }
-
-  private genInitCommand(): ICommand {
-    return {
-      isFinal: false,
-      execute: (input) => this.genEmailCommand()
-    };
-  }
-
-  private genNameCommand(): ICommand {
-    return {
-      prompt: 'What is your name? ',
-      isFinal: false,
-      output: (input) => input === this._id ? undefined : 'Nice name.',
-      execute: (name) => {
-        this.senderName = name;
-        return this.genEmailCommand();
-      }
-    };
-  }
-
-  private genEmailCommand(): ICommand {
-    return {
-      prompt: 'What is your email? ',
-      isFinal: false,
-      execute: (email) => {
-        if (this.isEmail(email)) {
-          this.senderEmail = email;
-          return this.genMessageCommand();
-        } else {
-          return this.genEmailCommand();
-        }
-      },
-      output: (email) => this.isEmail(email) ? undefined : 'Invalid email.'
-    };
-  }
-
-  private genMessageCommand(): ICommand {
-    return {
-      prompt: 'Enter a message below.',
-      output: _ => 'Message stored.',
-      isFinal: false,
-      isMultilineInput: true,
-      execute: (message) => {
-        this.senderMessage = message;
-        return this.genConfirmCommand();
-      }
-    };
-  };
-
-  private genConfirmCommand(): ICommand {
-    return {
-      prompt: 'Email ready to go. Send it? (Y/N) ',
-      isFinal: false,
-      execute: (input) => {
-        const response = (input as string).toLowerCase();
-        if (response === 'y') {
-          this.send();
-          return this.genSentCommand();
-        }
-        if (response === 'n') {
-          return this.genDeclinedCommand();
-        }
-        const repeatCommand: ICommand = this.genConfirmCommand();
-        repeatCommand.output = _ => `I didn't catch that. Try 'Y' or 'N'.`;
-        return repeatCommand;
-      }
-    };
-  }
-
-  private genSentCommand(): ICommand {
-    return {
+    })
+    .map(_ => <IResponse>{
+        isFinal: true,
+        message: _ => 'Email successfully sent :)',
+    })
+    .catch(_ => Observable.of(<IResponse>{
       isFinal: true,
-      output: _ => 'Email sent. :)',
-      execute: _ => undefined
-    };
+      message: _ => 'Oh no! Something went wrong... awkward.',
+    }));
   }
 
-  private genDeclinedCommand(): ICommand {
-    return {
-      isFinal: true,
-      output: _ => `Okay. You can always start a new email typing 'email' and pressing Enter.`,
-      execute: _ => undefined
-    };
-  }
-
-  private genErrorCommand(message: string): ICommand {
-    return {
-      output: _ => message,
-      isFinal: true,
-      execute:  undefined
-    };
+  private isLettersAndSpaces(name: string): boolean {
+    const re = /^[a-zA-Z\s]*$/;
+    return re.test(name);
   }
 
   private isEmail(email: string): boolean {
     const re = /\S+@\S+\.\S+/;
     return re.test(email);
+  }
+
+  private capitalize(str: string): string {
+    str = str.trim();
+    return str[0].toUpperCase() + str.slice(1);
   }
 
 }
