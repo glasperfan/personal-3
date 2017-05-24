@@ -12,7 +12,7 @@ export class HomeComponent {
   public navTitle: string;
   public links: ILink[];
   public roles: IRole[];
-  
+
   public home: ISection;
   public about: ISection;
   public work: ISection;
@@ -22,14 +22,14 @@ export class HomeComponent {
   constructor() {
     this.title = Locals.Links.Title;
     this.navTitle = Locals.Nav.Title;
-    
+
     this.links = [
       Locals.Links.About,
       Locals.Links.Work,
       Locals.Links.Content,
       Locals.Links.Contact
     ];
-    
+
     this.roles = [
       Locals.Work.Microsoft,
       Locals.Work.Cuthbert,

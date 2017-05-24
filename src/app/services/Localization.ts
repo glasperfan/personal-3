@@ -28,7 +28,7 @@ export interface ILocals {
     Work: ISection;
     Content: ISection;
     Contact: ISection;
-  }
+  };
 }
 
 export const Locals: ILocals = {

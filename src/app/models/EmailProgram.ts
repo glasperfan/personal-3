@@ -34,7 +34,7 @@ export class EmailProgram implements IProgram {
         errorMessage: (email: string) => `${email} doesn't look like an email to me...`,
         validator: this.isEmail,
         onSuccess: (email: string) => this.senderEmail = email
-      })
+      });
     }
     if (!this.senderMessage) {
       return Promise.resolve({
@@ -50,11 +50,11 @@ export class EmailProgram implements IProgram {
     if (this.allDataAcquired() && typeof(this.isConfirmed) === 'undefined') {
       return Promise.resolve({
         isFinal: false,
-        prompt: 'Ready to send? ',
+        prompt: 'Ready to send (Y/N)? ',
         message: _ => undefined,
         errorMessage: _ => `Try 'Y' or 'N'`,
-        validator: (input: string) => [ 'y', 'yes', 'n', 'no' ].includes(input.trim().toLowerCase()),
-        onSuccess: (input: string) => this.isConfirmed = [ 'y', 'yes' ].includes(input.trim().toLowerCase())
+        validator: (res: string) => [ 'y', 'yes', 'n', 'no' ].includes(res.trim().toLowerCase()),
+        onSuccess: (res: string) => this.isConfirmed = [ 'y', 'yes' ].includes(res.trim().toLowerCase())
       });
     }
     if (this.allDataAcquired() && this.isConfirmed) {
@@ -89,12 +89,12 @@ export class EmailProgram implements IProgram {
       message: this.senderMessage
     })
     .map(_ => <IResponse>{
-        isFinal: true,
-        message: _ => 'Email successfully sent :)',
+      isFinal: true,
+      message: __ => 'Email successfully sent :)',
     })
     .catch(_ => Observable.of(<IResponse>{
       isFinal: true,
-      message: _ => 'Oh no! Something went wrong... awkward.',
+      message: __ => 'Oh no! Something went wrong... awkward.',
     }));
   }
 
