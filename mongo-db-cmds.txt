@@ -1,0 +1,16 @@
+Mongo commands
+
+show dbs                                                    List all databases
+db                                                          Show current database
+use db_name                                                 Select a database
+
+CRUD
+
+db.users.save({ name: "Chris" })                            Create the collection users and a new document
+db.users.save([ { name: "Chris" }, { name: "Holly" }])      Bulk insert multiple documents
+db.users.find();                                            Return all documents in the collection
+db.users.find({ name: "Hugh" })                             Query for a specific field
+
+db.users.update({ name: 'Holly' },                          Update a single document
+  { name: 'Holly Lloyd' });
+

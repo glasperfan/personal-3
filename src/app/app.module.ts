@@ -2,8 +2,8 @@ import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
+import { WhimModule } from './whim/whim.module';
 import { ROUTES } from 'app/app.routes';
-
 import { AppComponent } from './app.component';
 import { HomeComponent } from 'app/components/home/home.component';
 import { FooterComponent } from 'app/components/footer/footer.component';
@@ -17,6 +17,7 @@ import { TerminalComponent } from './components/terminal/terminal.component';
     BrowserModule,
     FormsModule,
     HttpModule,
+    WhimModule.forRoot(),
     ROUTES
   ],
   declarations: [
