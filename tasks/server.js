@@ -9,7 +9,7 @@ const serverDir = path.join(srcDir, 'server');
 const whimServerDir = path.join(serverDir, 'whim');
 const whimServerJSDir = path.join(whimServerDir, 'js');
 
-const tsConfig = path.join(rootDir, 'tsconfig.json');
+const tsConfig = path.join(whimServerDir, 'tsconfig.json');
 var tsProject = ts.createProject(tsConfig);
 
 gulp.task('build-whim-server', function () {

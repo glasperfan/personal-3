@@ -1,0 +1,34 @@
+<div class="form-container">
+  <div class="form-title">Sign Up</div>
+  <form (ngSubmit)="signup()">
+    <div class="form-group">
+      <label for="first">First name</label>
+      <input type="text" name="first" class="form-control" [(ngModel)]="userInput.first" required>
+    </div>
+
+    <div class="form-group">
+      <label for="last">Last name</label>
+      <input type="text" name="last" class="form-control" [(ngModel)]="userInput.last" required>
+    </div>
+
+    <div class="form-group">
+      <label for="email">Email</label>
+      <input type="text" name="email" class="form-control" [(ngModel)]="userInput.email" required>
+    </div>
+
+    <div class="form-group">
+      <label for="passcode">Passcode</label>
+      <input type="password" name="passcode" class="form-control" [(ngModel)]="userInput.passcode" required maxlength="4" size="4">
+    </div>
+
+    <div class="form-control-desc">Choose a 4-digit passcode as your password.</div>
+
+    <div class="button-group">
+      <button type="submit">Sign Up</button>
+      <div class="nav-away-button" (click)="toLogin()">Log In</div>
+    </div>
+
+  </form>
+
+  <div class="process-message">{{processMessage}}</div>
+</div>

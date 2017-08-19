@@ -1,4 +1,4 @@
-import { IFriend, IUser } from '../../app/whim/models';
+import { IAddFriendArguments, IAddFriendsArguments, IFriend, IUser } from './models';
 import { DatabaseManager } from './database-mgr';
 import * as MongoDB from 'mongodb';
 import { v4 } from 'uuid';
@@ -12,65 +12,85 @@ export class FriendManager {
     this.dbMgr = dbMgr;
   }
 
-  getAllFriends(user: IUser): Promise<IFriend[]> {
-    return this.saveInitialFriends(user).then(res => {
-      const userCollection = this.getUserFriendCollection(user);
-      return userCollection.find({ userId: user.id }).toArray();
-    });
+  getAllFriends(userId: string): Promise<IFriend[]> {
+    return this.getUserFriendCollection(userId)
+      .find({ userId: userId }).toArray();
   }
 
-  getAvailableFriends(user: IUser): Promise<IFriend[]> {
-    return this.getAllFriends(user);
+  getAvailableFriends(userId: string): Promise<IFriend[]> {
+    return this.getUserFriendCollection(userId)
+      .find({ userId: userId, wasRemoved: false }).toArray();
   }
 
-  getRemovedFriends(user: IUser): Promise<IFriend[]> {
-    return Promise.resolve([]);
+  getRemovedFriends(userId: string): Promise<IFriend[]> {
+    return this.getUserFriendCollection(userId)
+      .find({ userId: userId, wasRemoved: true }).toArray();
   }
 
-  saveInitialFriends(user: IUser): Promise<MongoDB.InsertWriteOpResult> {
-    const userCollection = this.getUserFriendCollection(user);
-    return userCollection.insertMany(<IFriend[]>[
+  createFriends(args: IAddFriendsArguments): Promise<IFriend[]> {
+    const newFriends: IFriend[] = args.friends.map(friendArg => this.createFriend(args.userId, friendArg));
+    return this.getUserFriendCollection(args.userId)
+      .insertMany(newFriends).then(write => {
+        if (!!write.result.ok) {
+          return newFriends;
+        }
+        throw new Error(`FriendManager: could not create new friends.`);
+      });
+  }
+
+  saveInitialFriends(userId: string): Promise<MongoDB.InsertWriteOpResult> {
+    return this.getUserFriendCollection(userId).insertMany(<IFriend[]>[
       {
-        id: v4(),
+        _id: v4(),
         first: '321',
         last: 'Zabriskie',
-        userId: user.id,
+        userId: userId,
         wasRemoved: false
       },
       {
-        id: v4(),
+        _id: v4(),
         first: '231',
         last: 'Zabriskie',
-        userId: user.id,
+        userId: userId,
         wasRemoved: false
       },
       {
-        id: v4(),
+        _id: v4(),
         first: '12',
         last: 'Zabriskie',
-        userId: user.id,
+        userId: userId,
         wasRemoved: false
       },
       {
-        id: v4(),
+        _id: v4(),
         first: '23',
         last: 'Zabriskie',
-        userId: user.id,
+        userId: userId,
         wasRemoved: false
       }
     ]);
   }
 
-  private genUserCollectionToken(user: IUser) {
-    return `${this.collectionTokenPrefix}/${user.id}`;
+  private createFriend(userId: string, friendArg: IAddFriendArguments): IFriend {
+    return <IFriend>{
+      _id: v4(),
+      first: friendArg.first,
+      last: friendArg.last,
+      userId: userId,
+      wasRemoved: false
+    };
   }
 
-  private getUserCollection<T>(user: IUser): MongoDB.Collection<T> {
-    const token = this.genUserCollectionToken(user);
+  private genUserCollectionToken(userId: string) {
+    return `${this.collectionTokenPrefix}/${userId}`;
+  }
+
+  private getUserCollection<T>(userId: string): MongoDB.Collection<T> {
+    const token = this.genUserCollectionToken(userId);
     return this.dbMgr.getOrCreateCollection(token) as MongoDB.Collection<T>;
   }
 
-  private getUserFriendCollection(user: IUser): MongoDB.Collection<IFriend> {
-    return this.getUserCollection<IFriend>(user);
+  private getUserFriendCollection(userId: string): MongoDB.Collection<IFriend> {
+    return this.getUserCollection<IFriend>(userId);
   }
 }

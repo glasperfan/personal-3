@@ -1,4 +1,4 @@
-import { IFriend, IIdeaSelection, IMethod, IUser, IIdea } from '../../app/whim/models';
+import { IFriend, IIdeaSelection, IMethod, IUser, IIdea } from './models';
 import { DatabaseManager } from './database-mgr';
 import { FriendManager } from './friend-mgr';
 import { MethodManager } from './method-mgr';
@@ -15,14 +15,14 @@ export class IdeaGenerator {
     this.methodMgr = methodMgr;
   }
 
-  public getIdeasForToday(user: IUser): Promise<IIdeaSelection[]> {
-    return this.getIdeasForDate(user, new Date());
+  public getIdeasForToday(userId: string): Promise<IIdeaSelection[]> {
+    return this.getIdeasForDate(userId, new Date());
   }
 
-  public getIdeasForDate(user: IUser, date: Date, ideaCount: number = 4): Promise<IIdeaSelection[]> {
+  public getIdeasForDate(userId: string, date: Date, ideaCount: number = 4): Promise<IIdeaSelection[]> {
     // TODO: check for existing ideas
-    const getPossibleFriends = this.friendMgr.getAvailableFriends(user);
-    const getPossibleMethods = this.methodMgr.getMethodsForUser(user);
+    const getPossibleFriends = this.friendMgr.getAvailableFriends(userId);
+    const getPossibleMethods = this.methodMgr.getMethodsForUser(userId);
 
     return Promise.all([
       getPossibleFriends,
@@ -32,27 +32,27 @@ export class IdeaGenerator {
       const methods = result[1];
       const ideas: IIdeaSelection[] = new Array(ideaCount);
       for (let i = 0; i < ideaCount; i++) {
-        ideas[i] = this.generateIdea(user, friends, methods);
+        ideas[i] = this.generateIdea(userId, friends, methods);
       }
       return Promise.resolve(ideas);
     });
   }
 
-  private generateIdea(user: IUser, friends: IFriend[], methods: IMethod[]): IIdeaSelection {
+  private generateIdea(userId: string, friends: IFriend[], methods: IMethod[]): IIdeaSelection {
     const randomFriend: IFriend = this.randomSelectFromArray(friends);
     const randomMethod: IMethod = this.randomSelectFromArray(methods);
     const randomIdea: IIdea = {
-      id: v4(),
+      _id: v4(),
       person: randomFriend,
       method: randomMethod,
-      user: user
+      userId: userId
     };
     return this.createNewIdeaSelection(randomIdea);
   }
 
   private createNewIdeaSelection(idea: IIdea): IIdeaSelection {
     return {
-      id: v4(),
+      _id: v4(),
       date: new Date(),
       idea: idea
     };

@@ -1,0 +1,17 @@
+<div class="form-container">
+  <div class="form-title">Sign In</div>
+  <form (ngSubmit)="login()">
+
+    <div class="form-group">
+      <label for="passcode">Passcode</label>
+      <input type="password" name="passcode" class="form-control" [(ngModel)]="passcodeInput" required maxlength="4" size="4">
+    </div>
+
+    <div class="button-group">
+      <button type="submit">Log In</button>
+      <div class="nav-away-button" (click)="toLogin()">Different email?</div>
+    </div>
+  </form>
+
+  <div class="process-message">{{processMessage}}</div>
+</div>

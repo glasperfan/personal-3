@@ -10,5 +10,8 @@
   </div>
 
   <div class="fb-login-button" data-width="200" data-size="medium" data-button-type="continue_with" data-show-faces="false" data-auto-logout-link="false" data-use-continue-as="true"></div>
-  <p3-whim-ideas></p3-whim-ideas>
+  <p3-whim-passcode *ngIf="authStatus === AuthStatus.PasscodeRequired" (authStatusChange)="authChange($event)"></p3-whim-passcode>
+  <p3-whim-login *ngIf="authStatus === AuthStatus.LoginRequired" (authStatusChange)="authChange($event)"></p3-whim-login>
+  <p3-whim-signup *ngIf="authStatus === AuthStatus.Signup" (authStatusChange)="authChange($event)"></p3-whim-signup>
+  <p3-whim-ideas *ngIf="authStatus === AuthStatus.Authenticated"></p3-whim-ideas>
 </div>

@@ -16,63 +16,63 @@ export class IdeasComponent implements OnInit {
 
   constructor() {
 
-    const user: IUser = { id: v4() };
+    const user: IUser = { _id: v4(), first: 'Tree', last: 'Hemley', email: 'tree.hemley@gmail.com' };
     this.MOCK_IDEAS = [
       {
-        id: v4(),
+        _id: v4(),
         person: {
-          id: v4(),
+          _id: v4(),
           first: 'Maddie',
           last: 'Zabriskie',
-          userId: user.id,
+          userId: user._id,
           wasRemoved: false
         },
         method: {
           name: 'send an email to'
         },
-        user: user
+        userId: user._id
       },
       {
-        id: v4(),
+        _id: v4(),
         person: {
-          id: v4(),
+          _id: v4(),
           first: 'Kristen',
           last: 'Faulkner',
-          userId: user.id,
+          userId: user._id,
           wasRemoved: false
         },
         method: {
           name: 'video chat with'
         },
-        user: user
+        userId: user._id
       },
       {
-        id: v4(),
+        _id: v4(),
         person: {
-          id: v4(),
+          _id: v4(),
           first: 'Preston',
           last: 'Hedrick',
-          userId: user.id,
+          userId: user._id,
           wasRemoved: false
         },
         method: {
           name: 'send a care package to'
         },
-        user: user
+        userId: user._id
       },
       {
-        id: v4(),
+        _id: v4(),
         person: {
-          id: v4(),
+          _id: v4(),
           first: 'Forrest',
           last: 'Surles',
-          userId: user.id,
+          userId: user._id,
           wasRemoved: false
         },
         method: {
           name: 'send a quick message to'
         },
-        user: user
+        userId: user._id
       }
     ];
 

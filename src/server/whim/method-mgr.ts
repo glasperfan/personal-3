@@ -1,4 +1,4 @@
-import { IMethod, IUser } from '../../app/whim/models';
+import { IMethod, IUser } from './models';
 import { DatabaseManager } from './database-mgr';
 
 export class MethodManager {
@@ -18,7 +18,7 @@ export class MethodManager {
     ];
   }
 
-  getMethodsForUser(user: IUser): Promise<IMethod[]> {
+  getMethodsForUser(userId: string): Promise<IMethod[]> {
     return Promise.resolve(this.defaultMethods);
   }
 }

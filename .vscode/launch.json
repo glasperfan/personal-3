@@ -1,0 +1,24 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Launch Program",
+      "program": "${workspaceRoot}/src/server/whim/js/app.js"
+    },
+    {
+      "type": "node",
+      "request": "attach",
+      "name": "Attach to localhost:3000",
+      "port": 3000
+    },
+    {
+      "name": "Launch Chrome with ng serve",
+      "type": "chrome",
+      "request": "launch",
+      "url": "http://localhost:4200/#",
+      "webRoot": "${workspaceRoot}"
+    }
+  ]
+}

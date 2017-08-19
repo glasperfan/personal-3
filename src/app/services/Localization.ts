@@ -1,3 +1,4 @@
+// tslint:disable:max-line-length
 import { ILink, IRole, ISection } from 'app/interfaces/Locals';
 
 export interface ILocals {
@@ -100,7 +101,8 @@ export const Locals: ILocals = {
       header: 'Content',
       elementId: 'content',
       content: [
-        `Coming soon!`
+        `My friend Lukas and I made a <a href="https://eurovelotour.wordpress.com/">blog</a> of stories and helpful tips from cycling the EuroVelo 9 route across Europe last summer.`,
+        `I'm currently building <a href="/whim">whim</a> to improve human connections in the digital age by tracking and providing weekly proposals on ways to reach out to close friends.`
       ],
     },
     Contact: {

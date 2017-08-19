@@ -1,0 +1,123 @@
+import { IGetUserParams, ILoginArguments, ISignupArguments, IUser, IUserWithPasscode, WhimAPI, WhimError } from './models';
+import { DatabaseManager } from './database-mgr';
+import * as MongoDB from 'mongodb';
+import { v4 } from 'uuid';
+
+export class UserManager {
+
+  private readonly dbMgr: DatabaseManager;
+  private readonly collectionToken = 'users';
+
+  constructor(dbMgr: DatabaseManager) {
+    this.dbMgr = dbMgr;
+  }
+
+  public createUser(args: ISignupArguments): Promise<IUser> {
+    const newUser: IUserWithPasscode = {
+      first: args.first,
+      last: args.last,
+      email: args.email,
+      passcode: args.passcode,
+      _id: v4()
+    };
+
+    // Validate
+    try {
+      this.validateName(args.first, args.last);
+      this.validateEmail(args.email);
+      this.validatePasscode(args.passcode);
+    } catch (e) {
+      return Promise.reject(e);
+    }
+    return this.getUserByEmail(args.email).then((user: IUserWithPasscode) => {
+      if (user) {
+        throw new WhimError(`There is already a user with the email ${args.email}`);
+      } else {
+        return this.getUsersCollection().insertOne(newUser).then(write => {
+          if (!!write.result.ok) {
+            return this.removePasscode(newUser);
+          }
+          throw new WhimError(`Unable to create user ${args.first} ${args.last}`);
+        });
+      }
+    });
+  }
+
+  public authenticateUser(args: ILoginArguments): Promise<IUser> {
+    return this.getUserWithPasscodeByEmail(args.email).then((user: IUserWithPasscode) => {
+      if (user && args.passcode === user.passcode) {
+        return this.removePasscode(user);
+      }
+      throw new WhimError('Unable to authenticate.');
+    });
+  }
+
+  public getUser(_userId: string): Promise<IUser> {
+    return this.getUserWithPasscode(_userId)
+      .then(user => Promise.resolve(this.removePasscode(user)));
+  }
+
+  public getUserWithPasscode(_userId: string): Promise<IUserWithPasscode> {
+    return this.getUsersCollection().findOne(_userId).then(user => {
+      if (!user) {
+        throw new WhimError('Unable to find user for id.');
+      }
+      return Promise.resolve(user);
+    });
+  }
+
+  public getUserByEmail(email: string): Promise<IUser> {
+    return this.getUserWithPasscodeByEmail(email)
+      .then(user => Promise.resolve(this.removePasscode(user)));
+  }
+
+  public getUserWithPasscodeByEmail(email: string): Promise<IUserWithPasscode> {
+    return this.getUsersCollection().findOne({ email: email }).then(user => {
+      if (!user) {
+        throw new WhimError('Unable to find user for id.');
+      }
+      return Promise.resolve(user);
+    });
+  }
+
+  private getCollectionToken(): string {
+    return this.collectionToken;
+  }
+
+  private getUsersCollection(): MongoDB.Collection<IUserWithPasscode> {
+    return this.dbMgr.getOrCreateCollection<IUserWithPasscode>(this.getCollectionToken());
+  }
+
+  private removePasscode(user: IUserWithPasscode): IUser {
+    delete user.passcode;
+    return user as IUser;
+  }
+
+  private validateName(firstName: string, lastName: string): void {
+    if (!firstName || !lastName) {
+      throw new WhimError('First name and last name cannot be empty.');
+    }
+    if (firstName.trim().length === 0 || lastName.trim().length === 0) {
+      throw new WhimError('First name and last name cannot be just spaces.');
+    };
+  }
+
+  private validateEmail(email: string): void {
+    const re = /\S+@\S+\.\S+/;
+    if (!re.test(email)) {
+      throw new WhimError('Email does not have a recognizable format.');
+    }
+  }
+
+  private validatePasscode(passcode: string): void {
+    if (isNaN(Number(passcode))) {
+      throw new WhimError('Passcode must be numeric.');
+    }
+    if (!passcode) {
+      throw new WhimError('Passcode cannot be empty');
+    }
+    if (passcode.length !== 4) {
+      throw new WhimError('Passcode must be 4 digits.');
+    }
+  }
+}
