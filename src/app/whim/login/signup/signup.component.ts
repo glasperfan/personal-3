@@ -1,4 +1,4 @@
-import { AuthStatus, IError, ISignupArguments, ISignupResponse } from '../../models';
+import { IError, ISignupArguments, ISignupResponse, WindowView } from '../../models';
 import { AccountService } from '../../services/account.service';
 import { Component, Output, EventEmitter } from '@angular/core';
 
@@ -11,7 +11,7 @@ export class SignupComponent {
   public userInput: ISignupArguments;
   private processMessage: string;
 
-  @Output() authStatusChange = new EventEmitter<AuthStatus>();
+  @Output() switchTo = new EventEmitter<WindowView>();
 
   constructor(private accountService: AccountService) {
     this.userInput = {
@@ -29,7 +29,7 @@ export class SignupComponent {
       .then((response: ISignupResponse) => {
         this.accountService.storeEmailCookie(inputEmail);
         this.accountService.storeAuthCookie(response._id);
-        this.authStatusChange.emit(AuthStatus.Authenticated);
+        this.switchTo.emit(WindowView.Dashboard);
         this.processMessage = undefined;
       })
       .catch((err: IError) => {
@@ -38,6 +38,6 @@ export class SignupComponent {
   }
 
   private toLogin(): void {
-    this.authStatusChange.emit(AuthStatus.LoginRequired);
+    this.switchTo.emit(WindowView.Login);
   }
 }

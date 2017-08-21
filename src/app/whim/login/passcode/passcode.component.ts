@@ -1,4 +1,4 @@
-import { AuthStatus, IError, ILoginResponse, IUser } from '../../models';
+import { IError, ILoginResponse, IUser, WindowView } from '../../models';
 import { AccountService } from '../../services/account.service';
 import { Component, Output, EventEmitter } from '@angular/core';
 
@@ -12,7 +12,7 @@ export class PasscodeComponent {
   public passcodeInput: string;
   private userData: IUser;
   private processMessage: string;
-  @Output() authStatusChange = new EventEmitter<AuthStatus>();
+  @Output() switchTo = new EventEmitter<WindowView>();
 
   constructor(private accountService: AccountService) {
     const emailCookie = this.accountService.getEmailCookie();
@@ -26,7 +26,7 @@ export class PasscodeComponent {
       .then((response: ILoginResponse) => {
         this.accountService.storeEmailCookie(this.userData.email);
         this.accountService.storeAuthCookie(response._id);
-        this.authStatusChange.emit(AuthStatus.Authenticated);
+        this.switchTo.emit(WindowView.Dashboard);
         this.processMessage = undefined;
       })
       .catch((err: IError) => this.processMessage = err.errorMessage);
@@ -35,6 +35,6 @@ export class PasscodeComponent {
   private toLogin(): void {
     this.accountService.removeEmailCookie();
     this.accountService.removeAuthCookie();
-    this.authStatusChange.emit(AuthStatus.LoginRequired);
+    this.switchTo.emit(WindowView.Login);
   }
 }

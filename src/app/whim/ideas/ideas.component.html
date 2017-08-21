@@ -1,6 +1,14 @@
-<div class="header">ideas for {{todayDate}}</div>
-<div class="ideas">
-  <div class="idea" *ngFor="let i of ideas">today you could {{i.method.name}} {{i.person.first}} {{i.person.last}}.
+<div class="header">ideas for {{todayDateFormatted}}:</div>
+<div class="display-ideas" *ngIf="(ideas | async)?.length > 0">
+  <div class="ideas" *ngFor="let s of ideas | async">
+    <div class="idea">Set up a time to hang out with Scott.</div>
+    <div class="idea">Call Megan to catch up.</div>
+    <div class="idea">{{s.message}}</div>
   </div>
 </div>
-
+<div class="no-ideas" *ngIf="(ideas | async)?.length === 0 && noFriendsAvailable">
+  You'll need to <span class="internal-link" (click)="addUsers">add</span> some friends and family to get started.
+</div>
+<div class="no-ideas" *ngIf="(ideas | async)?.length === 0 && !noFriendsAvailable">
+  Something went wrong :/ contact Hugh
+</div>

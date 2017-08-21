@@ -7,8 +7,9 @@ import { HttpService } from './services/http.service';
 import { PasscodeComponent } from './login/passcode/passcode.component';
 import { SignupComponent } from './login/signup/signup.component';
 import { LoginComponent } from './login/login/login.component';
-import { AccountService } from './services/account.service';
 import { IdeasComponent } from './ideas/ideas.component';
+import { AccountService } from './services/account.service';
+import { DashboardComponent } from './dashboard/dashboard.component';
 import { FriendService } from './services/friend.service';
 import { IdeaGeneratorService } from './services/idea-generator.service';
 import { whim_routing } from './whim.routing';
@@ -27,6 +28,7 @@ export const API_URL = new InjectionToken<string>('API_URL');
   ],
   declarations: [
     WhimComponent,
+    DashboardComponent,
     IdeasComponent,
     LoginComponent,
     SignupComponent,

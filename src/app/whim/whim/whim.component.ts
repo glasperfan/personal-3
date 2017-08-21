@@ -1,18 +1,19 @@
-import { AuthStatus } from '../models';
+import { WindowManager } from '../services/window.manager';
 import { AccountService } from '../services/account.service';
 import { Component, OnInit } from '@angular/core';
+import { WindowView } from '../models';
 
 @Component({
   selector: 'p3-whim',
   templateUrl: './whim.component.html',
-  styleUrls: ['./whim.component.less']
+  styleUrls: ['./whim.component.less'],
+  providers: [WindowManager]
 })
 export class WhimComponent implements OnInit {
-  private authStatus: AuthStatus;
-  private AuthStatus: any = AuthStatus;
+  private WindowView = WindowView;
 
-  constructor(private accountService: AccountService) {
-    this.resetLogin();
+  constructor(private accountService: AccountService, private windowManager: WindowManager) {
+    this.clearView();
   }
 
   ngOnInit() {
@@ -22,22 +23,22 @@ export class WhimComponent implements OnInit {
   private checkLoginStatus(): void {
     if (!this.accountService.userHasSession) {
       // If there's no session, prompt full sign-in/sign-up.
-      this.authStatus = AuthStatus.LoginRequired;
+      this.windowManager.switchTo(WindowView.Login);
     } else {
       // Else, ask for passcode if user hasn't authenticated recently.
-      this.authStatus = AuthStatus.Unknown;
+      this.clearView();
       const emailCookie = this.accountService.getEmailCookie();
       this.accountService.userIsAuthenticated.then((success: boolean) => {
-        this.authStatus = success ? AuthStatus.Authenticated : AuthStatus.PasscodeRequired;
+        this.windowManager.switchTo(success ? WindowView.Dashboard : WindowView.Passcode);
       });
     }
   }
 
-  private resetLogin(): void {
-    this.authStatus = AuthStatus.Unknown;
+  private clearView(): void {
+    this.switchTo(WindowView.None);
   }
 
-  private authChange(newAuthStatus: AuthStatus): void {
-    this.authStatus = newAuthStatus;
+  private switchTo(view: WindowView): void {
+    this.windowManager.switchTo(view);
   }
 }

@@ -21,7 +21,20 @@ export interface IFriend {
 }
 
 export interface IMethod {
-  name: string;
+  methodCode: MethodCode;
+  message: string;
+}
+
+export enum MethodCode {
+  Email,
+  Call,
+  Text,
+  VideoChat,
+  Hangout,
+  Meal,
+  Gift,
+  CarePackage,
+  Letter
 }
 
 export interface IUser {
@@ -35,18 +48,21 @@ export interface IUserWithPasscode extends IUser {
   passcode: string;
 }
 
-export enum AuthStatus {
-  Unknown,
-  PasscodeRequired,
-  Signup,
-  LoginRequired,
-  Authenticated
+/***** ROUTING *****/
+export enum WindowView {
+  None = 'None', // display nothing
+  Login = 'Login',
+  Signup = 'Signup',
+  Passcode = 'Passcode',
+  Dashboard = 'Dashboard',
+  AddUsers = 'AddUsers',
+  AddEvents = 'AddEvents',
+  Calendar = 'Calendar'
 }
-
 
 /***** MESSAGING INTERFACES *****/
 export enum WhimAPI {
-  GetIdeasForToday = '/',
+  GetIdeasForDate = '/ideas',
   Login = '/login',
   Logout = '/logout',
   Signup = '/signup',
@@ -63,11 +79,12 @@ export interface IResponse {
 
 export interface IError {
   errorMessage: string;
-  errorCode: number;
+  httpCode: number;
 }
 
-export interface IGetIdeasTodayArguments {
+export interface IGetIdeasForDateParams {
   userId: string;
+  timestamp: number;
 }
 
 export interface ILoginArguments extends IPasscodeArguments {
@@ -120,14 +137,19 @@ export interface IGetFriendArguments {
 
 
 /***** MESSAGING INTERFACES *****/
+export type WhimErrorMessage = string | WhimErrorCode;
 export class WhimError implements IError {
 
-  public readonly errorMessage: string;
-  public readonly errorCode: number;
+  public readonly errorMessage: WhimErrorMessage;
+  public readonly httpCode: number;
 
-  constructor(message: string, code: number = 200) {
+  constructor(message: WhimErrorMessage, code: number = 200) {
     this.errorMessage = message;
-    this.errorCode = code;
+    this.httpCode = code;
   }
+}
+
+export enum WhimErrorCode {
+  InsufficientFriends = 'Whim.InsufficientFriends'
 }
 

@@ -4,7 +4,7 @@ import {
     IGetAllFriendsArguments,
     IGetAvailableFriendsArguments,
     IGetFriendArguments,
-    IGetIdeasTodayArguments,
+    IGetIdeasForDateParams,
     IGetUserParams,
     ILoginArguments,
     IResponse,
@@ -15,6 +15,7 @@ import {
 } from './models';
 import { DatabaseManager } from './database-mgr';
 import { FriendManager } from './friend-mgr';
+import { HistoryManager } from './history-mgr';
 import { IdeaGenerator } from './idea-gen';
 import { MethodManager } from './method-mgr';
 import { UserManager } from './user-mgr';
@@ -33,12 +34,13 @@ interface IApp {
   FriendManager: FriendManager;
   MethodManager: MethodManager;
   UserManager: UserManager;
+  HistoryManager: HistoryManager;
   IdeaGenerator: IdeaGenerator;
 }
 
 function errorHandler(err: IError, res: express.Response): void {
   if (err) {
-    res.status(err.errorCode);
+    res.status(err.httpCode);
     res.send(<IResponse>{ error: err });
   }
 };
@@ -50,6 +52,7 @@ class App implements IApp {
   private friendMgr: FriendManager;
   private ideaGenerator: IdeaGenerator;
   private methodMgr: MethodManager;
+  private historyMgr: HistoryManager;
   public userMgr: UserManager;
 
   private readonly dbUrl: string;
@@ -68,6 +71,7 @@ class App implements IApp {
   public get FriendManager(): FriendManager { return this.friendMgr; }
   public get MethodManager(): MethodManager { return this.methodMgr; }
   public get UserManager(): UserManager { return this.userMgr; }
+  public get HistoryManager(): HistoryManager { return this.historyMgr; }
   public get IdeaGenerator(): IdeaGenerator { return this.ideaGenerator; }
 
   public connectToMongo(): Promise<void> {
@@ -146,9 +150,10 @@ class App implements IApp {
           .catch((error: IError) => errorHandler(error, res));
     });
 
-    router.get(WhimAPI.GetIdeasForToday, (req, res, next) => {
-      const args: IGetIdeasTodayArguments = req.body;
-      this.ideaGenerator.getIdeasForToday(args.userId)
+    router.get(WhimAPI.GetIdeasForDate, (req, res, next) => {
+      req.query.timestamp = Number(req.query.timestamp);
+      const params: IGetIdeasForDateParams = req.query;
+      this.ideaGenerator.getIdeasForDate(params.userId, new Date(Number(params.timestamp)))
         .then(ideas => res.json(ideas))
         .catch((error: IError) => errorHandler(error, res));
     });
@@ -159,9 +164,10 @@ class App implements IApp {
   private managers(): void {
     this.databaseMgr = new DatabaseManager(this.dbUrl);
     this.friendMgr = new FriendManager(this.databaseMgr);
-    this.methodMgr = new MethodManager(this.databaseMgr);
+    this.methodMgr = new MethodManager();
     this.userMgr = new UserManager(this.databaseMgr);
-    this.ideaGenerator = new IdeaGenerator(this.friendMgr, this.methodMgr);
+    this.historyMgr = new HistoryManager();
+    this.ideaGenerator = new IdeaGenerator(this.friendMgr, this.methodMgr, this.historyMgr);
   }
 }
 
@@ -177,6 +183,8 @@ expressApp.set('port', port);
 const server = http.createServer(expressApp);
 server.listen(port);
 
-whimApp.connectToMongo().then(() => console.log(`Connected to MongoDB on port ${dbPort}.`));
+whimApp.connectToMongo()
+  .then(() => console.log(`Connected to MongoDB on port ${dbPort}.`))
+  .catch(_ => 'Unable to connect to MongoDB. Is the Mongo daemon running?');
 
 
