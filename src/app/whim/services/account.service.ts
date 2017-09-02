@@ -29,10 +29,7 @@ export class AccountService {
   private readonly authCookieExpiration = 1;
   private _currentUser$: BehaviorSubject<IUser> = new BehaviorSubject<IUser>(undefined);
 
-  constructor(private http: HttpService) {
-    // this.removeEmailCookie();
-    // this.removeAuthCookie();
-  }
+  constructor(private http: HttpService) {}
 
   public get currentUser$(): Promise<IUser> {
     return this._currentUser$.take(1).toPromise();
@@ -51,13 +48,18 @@ export class AccountService {
       });
   }
 
-  public logout(): Promise<void> {
-    return this.http.postOrThrow<void>(WhimAPI.Logout, undefined);
+  public logout(): void {
+    this.removeEmailCookie();
+    this.removeAuthCookie();
   }
 
   public signup(args: ISignupArguments): Promise<IUser> {
     return this.http.post<ISignupArguments, ISignupResponse>(WhimAPI.Signup, args)
-      .then((response: ISignupResponse) => Promise.resolve(response as IUser));
+      .then((response: ISignupResponse) => {
+        const authenticatedUser: IUser = response as IUser;
+        this._currentUser$.next(authenticatedUser);
+        return Promise.resolve(response as IUser);
+      });
   }
 
   public getUser(userId: string): Promise<IUser> {

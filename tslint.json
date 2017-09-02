@@ -21,13 +21,12 @@
     "interface-over-type-literal": true,
     "label-position": true,
     "max-line-length": [
-      true,
-      140
+      false
     ],
     "member-access": false,
     "member-ordering": [
       true,
-      "static-before-instance",
+      { "order": "statics-first" },
       "variables-before-functions"
     ],
     "no-arg": true,

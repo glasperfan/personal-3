@@ -1,0 +1,17 @@
+<div class="header">upcoming events:</div>
+
+<div *ngIf="userEvents$ | async as events; else cannotLoad">
+  <div class="calendar" *ngIf="events.length > 0; else cannotLoad">
+    <div class="events" *ngFor="let e of events">
+      <div class="event">
+        <div class="top-row">
+          <div class="event-title">{{e.title}}</div>
+          <div class="event-date">{{e.date | date:'medium'}}</div>
+        </div>
+        <div class="bottom-row" *ngIf="e.description">{{e.description}}</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ng-template #cannotLoad><div class="no-events">{{errorMessage}}</div></ng-template>

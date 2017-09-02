@@ -24,12 +24,13 @@ export class IdeaGenerator {
         return Promise.resolve(archivedIdeas);
       }
       return this.friendMgr.getAvailableFriends(userId).then((friends: IFriend[]) => {
-        if (!friends.length) {
+        if (friends.length < ideaCount) {
           throw new WhimError(WhimErrorCode.InsufficientFriends);
         }
         const ideas: IIdeaSelection[] = new Array(ideaCount);
+        const methods = MethodManager.DefaultFormatGenerators;
         for (let i = 0; i < ideaCount; i++) {
-          ideas[i] = this.generateIdea(userId, friends, MethodManager.DefaultFormatGenerators);
+          ideas[i] = this.generateIdea(userId, friends, methods);
         }
         return Promise.resolve(ideas);
       });
@@ -40,8 +41,8 @@ export class IdeaGenerator {
     // For now, we assume no preference for how to communicate with a friend. Later,
     // users should be able to customize the methods of communication (i.e. avoid ideas of having
     // a meal with a friend who lives far away).
-    const randomFriend: IFriend = this.randomSelectFromArray(friends);
-    const randomMethod: IMethodGenerator = this.randomSelectFromArray(methods);
+    const randomFriend: IFriend = this.randomSelectWithoutReplacement(friends);
+    const randomMethod: IMethodGenerator = this.randomSelectWithoutReplacement(methods);
     const randomIdea: IIdea = {
       _id: v4(),
       person: randomFriend,
@@ -59,8 +60,9 @@ export class IdeaGenerator {
     };
   }
 
-  private randomSelectFromArray<T>(arr: T[]): T {
-    return arr[Math.floor(Math.random() * arr.length)];
+  private randomSelectWithoutReplacement<T>(arr: T[]): T {
+    const i = Math.floor(Math.random() * arr.length);
+    return arr.splice(i, 1)[0];
   }
 
 };

@@ -1,7 +1,7 @@
 <div id="fb-root"></div>
 <div class="frame" [ngSwitch]="windowManager.currentView$ | async">
   <div class="description">
-    <p><b>Whim</b> is about building stronger connections with the most important people in your life. In this age of technological distractions and productivity obsessions, I rarely take the time out of my day to reach out to even my closest friends. I built this as a reminder that</p>
+    <p><b>whim</b> is about building stronger connections with the most important people in your life. In this age of technological distractions and productivity obsessions, I rarely take the time out of my day to reach out to even my closest friends. I built this as a reminder that</p>
 
     <p class="indent">we can all find 5 minutes in the day to strengthen the relationships that matter to us</p>
     <p class="indent">those 5 minutes can mean a world of difference to the person you reach out to
@@ -9,9 +9,22 @@
     <p>Try it out. Choose someone once a day and take the time to reach out to them in a meaningful way.</p>
   </div>
 
-  <div *ngSwitchCase="WindowView.None"></div>
-  <p3-whim-login *ngSwitchCase="WindowView.Login"       (switchTo)="switchTo($event)"></p3-whim-login>
-  <p3-whim-passcode *ngSwitchCase="WindowView.Passcode" (switchTo)="switchTo($event)"></p3-whim-passcode>
-  <p3-whim-signup *ngSwitchCase="WindowView.Signup"     (switchTo)="switchTo($event)"></p3-whim-signup>
-  <p3-whim-dashboard *ngSwitchDefault></p3-whim-dashboard>
+  <div class="break"></div>
+
+  <div class="window-view-container">
+    <div *ngSwitchCase="WindowView.None"></div>
+    <p3-whim-login *ngSwitchCase="WindowView.Login"             (switchTo)="switchTo($event)"></p3-whim-login>
+    <p3-whim-passcode *ngSwitchCase="WindowView.Passcode"       (switchTo)="switchTo($event)"></p3-whim-passcode>
+    <p3-whim-signup *ngSwitchCase="WindowView.Signup"           (switchTo)="switchTo($event)"></p3-whim-signup>
+    <p3-whim-add-friends *ngSwitchCase="WindowView.AddFriends"  (switchTo)="switchTo($event)"></p3-whim-add-friends>
+    <p3-whim-add-events *ngSwitchCase="WindowView.AddEvents"    (switchTo)="switchTo($event)"></p3-whim-add-events>
+    <p3-whim-dashboard *ngSwitchDefault                         (switchTo)="switchTo($event)"></p3-whim-dashboard>
+  </div>
+
+  <div class="break"></div>
+
+  <div class="footer">
+    <div class="internal-link" (click)="logout()">Logout</div>
+    <div class="internal-link">Settings</div>
+  </div>
 </div>

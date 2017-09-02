@@ -9,9 +9,9 @@ import { Component, Output, EventEmitter } from '@angular/core';
 })
 export class SignupComponent {
   public userInput: ISignupArguments;
-  private processMessage: string;
-
   @Output() switchTo = new EventEmitter<WindowView>();
+
+  private processMessage: string;
 
   constructor(private accountService: AccountService) {
     this.userInput = {

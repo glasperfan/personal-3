@@ -1,16 +1,13 @@
-import { IAddFriendArguments, IAddFriendsArguments, IFriend, IUser } from './models';
+import { IAddFriendArguments, IAddFriendsArguments, IFriend, IUser, WhimError } from './models';
 import { DatabaseManager } from './database-mgr';
 import * as MongoDB from 'mongodb';
 import { v4 } from 'uuid';
 
 export class FriendManager {
 
-  private dbMgr: DatabaseManager;
   private readonly collectionTokenPrefix = 'friends';
 
-  constructor(dbMgr: DatabaseManager) {
-    this.dbMgr = dbMgr;
-  }
+  constructor(private dbMgr: DatabaseManager) { };
 
   getAllFriends(userId: string): Promise<IFriend[]> {
     return this.getUserFriendCollection(userId)
@@ -34,41 +31,8 @@ export class FriendManager {
         if (!!write.result.ok) {
           return newFriends;
         }
-        throw new Error(`FriendManager: could not create new friends.`);
+        throw new WhimError(`FriendManager: could not create new friends.`);
       });
-  }
-
-  saveInitialFriends(userId: string): Promise<MongoDB.InsertWriteOpResult> {
-    return this.getUserFriendCollection(userId).insertMany(<IFriend[]>[
-      {
-        _id: v4(),
-        first: '321',
-        last: 'Zabriskie',
-        userId: userId,
-        wasRemoved: false
-      },
-      {
-        _id: v4(),
-        first: '231',
-        last: 'Zabriskie',
-        userId: userId,
-        wasRemoved: false
-      },
-      {
-        _id: v4(),
-        first: '12',
-        last: 'Zabriskie',
-        userId: userId,
-        wasRemoved: false
-      },
-      {
-        _id: v4(),
-        first: '23',
-        last: 'Zabriskie',
-        userId: userId,
-        wasRemoved: false
-      }
-    ]);
   }
 
   private createFriend(userId: string, friendArg: IAddFriendArguments): IFriend {
@@ -76,12 +40,13 @@ export class FriendManager {
       _id: v4(),
       first: friendArg.first,
       last: friendArg.last,
+      notes: friendArg.notes,
       userId: userId,
       wasRemoved: false
     };
   }
 
-  private genUserCollectionToken(userId: string) {
+  private genUserCollectionToken(userId: string): string {
     return `${this.collectionTokenPrefix}/${userId}`;
   }
 

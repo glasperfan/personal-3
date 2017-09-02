@@ -1,0 +1,32 @@
+/* whim-specific styling */
+
+.whim-header {
+  display: block;
+  position: relative;
+  margin: 10px 0 15px;
+}
+
+.whim-title {
+  font-weight: bold;
+  margin: 10px 0;
+  text-align: center;
+}
+
+.whim-subtitle {
+  font-size: 12px;
+  text-align: center;
+  font-style: italic;
+  margin-bottom: 5px;
+}
+
+.internal-link {
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.break {
+  border-bottom: 1px dashed #ccc;
+  height: 1px;
+  width: 100%;
+  margin: 15px 0;
+}

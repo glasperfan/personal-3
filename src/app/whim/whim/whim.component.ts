@@ -41,4 +41,9 @@ export class WhimComponent implements OnInit {
   private switchTo(view: WindowView): void {
     this.windowManager.switchTo(view);
   }
+
+  private logout(): void {
+    this.accountService.logout();
+    this.windowManager.switchTo(WindowView.Login);
+  }
 }

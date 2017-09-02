@@ -29,8 +29,8 @@ export class UserManager {
     } catch (e) {
       return Promise.reject(e);
     }
-    return this.getUserByEmail(args.email).then((user: IUserWithPasscode) => {
-      if (user) {
+    return this.hasUserForEmail(args.email).then(userExists => {
+      if (userExists) {
         throw new WhimError(`There is already a user with the email ${args.email}`);
       } else {
         return this.getUsersCollection().insertOne(newUser).then(write => {
@@ -45,7 +45,7 @@ export class UserManager {
 
   public authenticateUser(args: ILoginArguments): Promise<IUser> {
     return this.getUserWithPasscodeByEmail(args.email).then((user: IUserWithPasscode) => {
-      if (user && args.passcode === user.passcode) {
+      if (user && args.passcode === String(user.passcode)) {
         return this.removePasscode(user);
       }
       throw new WhimError('Unable to authenticate.');
@@ -60,7 +60,7 @@ export class UserManager {
   public getUserWithPasscode(_userId: string): Promise<IUserWithPasscode> {
     return this.getUsersCollection().findOne(_userId).then(user => {
       if (!user) {
-        throw new WhimError('Unable to find user for id.');
+        throw new WhimError('Unable to find user by id.');
       }
       return Promise.resolve(user);
     });
@@ -71,10 +71,14 @@ export class UserManager {
       .then(user => Promise.resolve(this.removePasscode(user)));
   }
 
+  public hasUserForEmail(email: string): Promise<boolean> {
+    return this.getUsersCollection().findOne({ email: email }).then(user => Promise.resolve(!!user));
+  }
+
   public getUserWithPasscodeByEmail(email: string): Promise<IUserWithPasscode> {
     return this.getUsersCollection().findOne({ email: email }).then(user => {
       if (!user) {
-        throw new WhimError('Unable to find user for id.');
+        throw new WhimError(`Unable to find a user with the email ${email}.`);
       }
       return Promise.resolve(user);
     });

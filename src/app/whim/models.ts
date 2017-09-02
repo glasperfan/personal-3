@@ -12,12 +12,23 @@ export interface IIdea {
   userId: string;
 }
 
-export interface IFriend {
+export interface IEvent {
   _id: string;
+  userId: string;
+  title: string;
+  date: number;
+  description: string;
+}
+
+export interface IName {
   first: string;
   last: string;
+}
+
+export interface IFriend extends IName {
+  _id: string;
   userId: string;
-  wasRemoved: boolean;
+  notes: string;
 }
 
 export interface IMethod {
@@ -55,7 +66,7 @@ export enum WindowView {
   Signup = 'Signup',
   Passcode = 'Passcode',
   Dashboard = 'Dashboard',
-  AddUsers = 'AddUsers',
+  AddFriends = 'AddFriends',
   AddEvents = 'AddEvents',
   Calendar = 'Calendar'
 }
@@ -64,13 +75,14 @@ export enum WindowView {
 export enum WhimAPI {
   GetIdeasForDate = '/ideas',
   Login = '/login',
-  Logout = '/logout',
   Signup = '/signup',
   GetUser = '/user',
-  AddFriends = '/user/friend/add',
-  GetAllFriends = '/user/friend/all',
-  GetAvailableFriends = '/user/friend/available',
-  GetFriend = '/user/friend'
+  AddFriends = '/friends',
+  GetAllFriends = '/friends',
+  GetAvailableFriends = '/friends/available',
+  GetFriend = '/user/friend',
+  GetEvents = '/events',
+  AddEvents = '/events'
 }
 
 export interface IResponse {
@@ -115,6 +127,7 @@ export interface IGetUserResponse extends IUser { }
 export interface IAddFriendArguments {
   first: string;
   last: string;
+  notes: string;
 }
 
 export interface IAddFriendsArguments {
@@ -135,6 +148,22 @@ export interface IGetFriendArguments {
   friendId: string;
 }
 
+export interface IGetEventsParams {
+  userId: string;
+  includeArchived: boolean;
+}
+
+export interface IAddEventArguments {
+  title: string;
+  description: string;
+  date: number;
+}
+
+export interface IAddEventsArguments {
+  userId: string;
+  events: IAddEventArguments[];
+}
+
 
 /***** MESSAGING INTERFACES *****/
 export type WhimErrorMessage = string | WhimErrorCode;
@@ -150,6 +179,8 @@ export class WhimError implements IError {
 }
 
 export enum WhimErrorCode {
-  InsufficientFriends = 'Whim.InsufficientFriends'
+  InsufficientFriends = 'Whim.InsufficientFriends',
+  NoEvents = 'Whim.NoEventsForUser',
+  UnableToParseDate = 'Whim.UnableToParseDate'
 }
 

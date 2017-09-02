@@ -1,8 +1,10 @@
 import {
+    IAddEventsArguments,
     IAddFriendsArguments,
     IError,
     IGetAllFriendsArguments,
     IGetAvailableFriendsArguments,
+    IGetEventsParams,
     IGetFriendArguments,
     IGetIdeasForDateParams,
     IGetUserParams,
@@ -17,6 +19,7 @@ import { DatabaseManager } from './database-mgr';
 import { FriendManager } from './friend-mgr';
 import { HistoryManager } from './history-mgr';
 import { IdeaGenerator } from './idea-gen';
+import { CalendarManager } from './calendar-mgr';
 import { MethodManager } from './method-mgr';
 import { UserManager } from './user-mgr';
 import * as bodyParser from 'body-parser';
@@ -34,6 +37,7 @@ interface IApp {
   FriendManager: FriendManager;
   MethodManager: MethodManager;
   UserManager: UserManager;
+  CalendarManager: CalendarManager;
   HistoryManager: HistoryManager;
   IdeaGenerator: IdeaGenerator;
 }
@@ -47,13 +51,14 @@ function errorHandler(err: IError, res: express.Response): void {
 
 class App implements IApp {
 
+  public userMgr: UserManager;
   private express: express.Application;
   private databaseMgr: DatabaseManager;
   private friendMgr: FriendManager;
   private ideaGenerator: IdeaGenerator;
+  private calendarMgr: CalendarManager;
   private methodMgr: MethodManager;
   private historyMgr: HistoryManager;
-  public userMgr: UserManager;
 
   private readonly dbUrl: string;
 
@@ -71,6 +76,7 @@ class App implements IApp {
   public get FriendManager(): FriendManager { return this.friendMgr; }
   public get MethodManager(): MethodManager { return this.methodMgr; }
   public get UserManager(): UserManager { return this.userMgr; }
+  public get CalendarManager(): CalendarManager { return this.calendarMgr; }
   public get HistoryManager(): HistoryManager { return this.historyMgr; }
   public get IdeaGenerator(): IdeaGenerator { return this.ideaGenerator; }
 
@@ -130,6 +136,7 @@ class App implements IApp {
     });
 
     router.get(WhimAPI.GetAllFriends, (req, res, next) => {
+      // TODO: unimplemented, rename GetFriends
       const args: IGetAllFriendsArguments = req.body;
       this.friendMgr.getAllFriends(args.userId)
         .then(friends => res.json(friends))
@@ -137,6 +144,7 @@ class App implements IApp {
     });
 
     router.get(WhimAPI.GetAvailableFriends, (req, res, next) => {
+      // TODO: merge with GetFriends
       const args: IGetAvailableFriendsArguments = req.body;
       this.friendMgr.getAvailableFriends(args.userId)
         .then(friends => res.json(friends))
@@ -158,15 +166,31 @@ class App implements IApp {
         .catch((error: IError) => errorHandler(error, res));
     });
 
+    router.get(WhimAPI.GetEvents, (req, res, next) => {
+      req.query.includeArchived = !!req.query.includeArchived;
+      const params: IGetEventsParams = req.query;
+      this.calendarMgr.getEvents(params.userId, params.includeArchived)
+        .then(events => res.json(events))
+        .catch((error: IError) => errorHandler(error, res));
+    });
+
+    router.post(WhimAPI.AddEvents, (req, res, next) => {
+      const args: IAddEventsArguments = req.body;
+      this.calendarMgr.createEvents(args)
+        .then(events => res.json(events))
+        .catch((error: IError) => errorHandler(error, res));
+    });
+
     this.express.use('/', router);
   }
 
   private managers(): void {
     this.databaseMgr = new DatabaseManager(this.dbUrl);
-    this.friendMgr = new FriendManager(this.databaseMgr);
     this.methodMgr = new MethodManager();
-    this.userMgr = new UserManager(this.databaseMgr);
     this.historyMgr = new HistoryManager();
+    this.userMgr = new UserManager(this.databaseMgr);
+    this.friendMgr = new FriendManager(this.databaseMgr);
+    this.calendarMgr = new CalendarManager(this.databaseMgr);
     this.ideaGenerator = new IdeaGenerator(this.friendMgr, this.methodMgr, this.historyMgr);
   }
 }
