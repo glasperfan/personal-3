@@ -1,5 +1,3 @@
-import { AddCalendarEventsComponent } from './add/events/add-events.component';
-import { AddFriendsComponent } from './add/friends/add-friends.component';
 import { NgModule, ModuleWithProviders, InjectionToken } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -9,9 +7,9 @@ import { HttpService } from './services/http.service';
 import { PasscodeComponent } from './login/passcode/passcode.component';
 import { SignupComponent } from './login/signup/signup.component';
 import { LoginComponent } from './login/login/login.component';
-import { AddButtonComponent } from './dashboard/add-btn/add-btn.component';
-import { IdeasComponent } from './ideas/ideas.component';
+import { CommandLineComponent } from './cmd-line/cmd-line.component';
 import { CalendarComponent } from './calendar/calendar.component';
+import { IdeasComponent } from './ideas/ideas.component';
 import { AccountService } from './services/account.service';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { FriendService } from './services/friend.service';
@@ -33,11 +31,9 @@ export const API_URL = new InjectionToken<string>('API_URL');
   declarations: [
     WhimComponent,
     DashboardComponent,
-    AddButtonComponent,
-    AddFriendsComponent,
-    AddCalendarEventsComponent,
     IdeasComponent,
     CalendarComponent,
+    CommandLineComponent,
     LoginComponent,
     SignupComponent,
     PasscodeComponent

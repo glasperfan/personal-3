@@ -9,6 +9,7 @@ import {
     IGetIdeasForDateParams,
     IGetUserParams,
     ILoginArguments,
+    IParseSearchArguments,
     IResponse,
     ISignupArguments,
     IUser,
@@ -18,6 +19,7 @@ import {
 import { DatabaseManager } from './database-mgr';
 import { FriendManager } from './friend-mgr';
 import { HistoryManager } from './history-mgr';
+import { CommandParser } from './command-parser';
 import { IdeaGenerator } from './idea-gen';
 import { CalendarManager } from './calendar-mgr';
 import { MethodManager } from './method-mgr';
@@ -40,6 +42,7 @@ interface IApp {
   CalendarManager: CalendarManager;
   HistoryManager: HistoryManager;
   IdeaGenerator: IdeaGenerator;
+  CommandParser: CommandParser;
 }
 
 function errorHandler(err: IError, res: express.Response): void {
@@ -59,6 +62,7 @@ class App implements IApp {
   private calendarMgr: CalendarManager;
   private methodMgr: MethodManager;
   private historyMgr: HistoryManager;
+  private commandParser: CommandParser;
 
   private readonly dbUrl: string;
 
@@ -68,7 +72,6 @@ class App implements IApp {
     this.middleware();
     this.routes();
     this.managers();
-    this.connectToMongo();
   }
 
   public get Express(): express.Application { return this.express; }
@@ -79,6 +82,7 @@ class App implements IApp {
   public get CalendarManager(): CalendarManager { return this.calendarMgr; }
   public get HistoryManager(): HistoryManager { return this.historyMgr; }
   public get IdeaGenerator(): IdeaGenerator { return this.ideaGenerator; }
+  public get CommandParser(): CommandParser { return this.commandParser; }
 
   public connectToMongo(): Promise<void> {
     return this.databaseMgr.connectToDb();
@@ -181,6 +185,13 @@ class App implements IApp {
         .catch((error: IError) => errorHandler(error, res));
     });
 
+    router.get(WhimAPI.ParseSearch, (req, res, next) => {
+      const params: IParseSearchArguments = req.query;
+      this.commandParser.parseForSearchResults(params.searchTerm, params.userId)
+        .then(results => res.json(results))
+        .catch((error: IError) => errorHandler(error, res));
+    });
+
     this.express.use('/', router);
   }
 
@@ -192,6 +203,7 @@ class App implements IApp {
     this.friendMgr = new FriendManager(this.databaseMgr);
     this.calendarMgr = new CalendarManager(this.databaseMgr);
     this.ideaGenerator = new IdeaGenerator(this.friendMgr, this.methodMgr, this.historyMgr);
+    this.commandParser = new CommandParser(this.databaseMgr, this.friendMgr, this.calendarMgr);
   }
 }
 
@@ -209,6 +221,9 @@ server.listen(port);
 
 whimApp.connectToMongo()
   .then(() => console.log(`Connected to MongoDB on port ${dbPort}.`))
-  .catch(_ => 'Unable to connect to MongoDB. Is the Mongo daemon running?');
+  .catch((err: IError) => {
+    console.log(err.errorMessage);
+    process.exit(1);
+  });
 
 

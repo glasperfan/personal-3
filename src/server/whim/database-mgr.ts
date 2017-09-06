@@ -1,3 +1,4 @@
+import { WhimError } from './models';
 import * as MongoDB from 'mongodb';
 const MongoClient = MongoDB.MongoClient;
 
@@ -22,13 +23,20 @@ export class DatabaseManager {
   }
 
   public connectToDb(): Promise<void> {
-    return MongoClient.connect(this.dbUrl).then((db: MongoDB.Db) => {
-      if (db) {
-        this.dbObject = db;
-        return Promise.resolve();
-      }
-      throw new Error(`Unable to connect to the database at url ${this.dbUrl}`);
-    });
+    return MongoClient.connect(this.dbUrl)
+      .then((db: MongoDB.Db) => {
+        if (db) {
+          this.dbObject = db;
+          return Promise.resolve();
+        }
+        throw new WhimError(`Empty database object returned for url ${this.dbUrl}`);
+      })
+      .catch(_ => {
+        throw new WhimError(`
+          Unable to connect to the database at url ${this.dbUrl}.
+          Are you sure the mongo daemon (mongod) is running?
+        `);
+      });
   }
 
   public getOrCreateCollection<T>(collectionName: string): MongoDB.Collection<T> {

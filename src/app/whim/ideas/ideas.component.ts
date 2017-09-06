@@ -9,10 +9,9 @@ import { IError, IIdeaSelection, WhimErrorCode, WindowView } from '../models';
   styleUrls: ['./ideas.component.less']
 })
 export class IdeasComponent implements OnInit {
-  private readonly requiredFriendCount = 4;
-
   @Input() date: Date;
   @Output() switchTo = new EventEmitter<WindowView>();
+  private readonly requiredFriendCount = 4;
   private readonly todayDateFormatted: string;
   private ideas: Promise<IIdeaSelection[]>;
   private insufficientFriendsReason: boolean;

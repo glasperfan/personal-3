@@ -11,8 +11,13 @@ import { v4 } from 'uuid';
 export class DashboardComponent {
 
   @Output() switchTo = new EventEmitter<WindowView>();
+  private isActiveSearch = false;
 
   private switchToView(view: WindowView): void {
     this.switchTo.emit(view);
+  }
+
+  private toggleActiveSearch(isActive: boolean) {
+    this.isActiveSearch = isActive;
   }
 }

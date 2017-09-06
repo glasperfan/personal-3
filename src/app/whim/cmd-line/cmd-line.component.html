@@ -1,0 +1,17 @@
+<div class="input-container">
+  <input #cmdInput class="cmd-input"
+  placeholder="Type here..."
+  [ngModel]="searchInput"
+  (ngModelChange)="onInput($event)"/>
+</div>
+<div class="results-container" *ngIf="(cmdInput.value || '').length">
+  <ul class="results" *ngIf="results.length">
+    <li class="result" *ngFor="let result of results">
+      <div class="result-header" [innerHTML]="result.header"></div>
+      <div class="result-description" [innerHTML]="result.description"></div>
+    </li>
+  </ul>
+  <ul class="results" *ngIf="!results.length">
+    <li class="message">No results</li>
+  </ul>
+</div>

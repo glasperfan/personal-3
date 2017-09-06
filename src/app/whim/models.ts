@@ -1,24 +1,37 @@
 // tslint:disable:no-empty-interface
+export type Guid = string;
+
 export interface IIdeaSelection {
-  _id: string;
+  _id: Guid;
   date: Date;
   idea: IIdea;
 }
 
 export interface IIdea {
-  _id: string;
+  _id: Guid;
   person: IFriend;
   method: IMethod;
   userId: string;
 }
 
 export interface IEvent {
-  _id: string;
+  _id: Guid;
   userId: string;
   title: string;
-  date: number;
-  description: string;
+  nextDate: IEventDate;
+  description?: string;
+  relatedFriends: string[];
+  tags: string[];
+  whenAdded: Date;
+  whenLastModified: Date;
 }
+
+export interface IEventDate {
+  recurrent: boolean;
+  baseDate: number;
+  recurrenceOffset?: 'day' | 'week' | 'month';
+}
+
 
 export interface IName {
   first: string;
@@ -26,9 +39,25 @@ export interface IName {
 }
 
 export interface IFriend extends IName {
-  _id: string;
+  _id: Guid;
   userId: string;
-  notes: string;
+  birthday?: Date;
+  email?: string;
+  phone?: string;
+  location: ICity;
+  tags: string[];
+  methods: IMethod[];
+  organization?: string;
+  skills?: string[];
+  notes?: string;
+  whenAdded: Date;
+  whenLastModified: Date;
+}
+
+export interface ICity {
+  city: string;
+  state?: string;
+  country?: string;
 }
 
 export interface IMethod {
@@ -48,11 +77,10 @@ export enum MethodCode {
   Letter
 }
 
-export interface IUser {
-  _id: string;
-  first: string;
-  last: string;
+export interface IUser extends IName {
+  _id: Guid;
   email: string;
+  location: ICity;
 }
 
 export interface IUserWithPasscode extends IUser {
@@ -68,6 +96,8 @@ export enum WindowView {
   Dashboard = 'Dashboard',
   AddFriends = 'AddFriends',
   AddEvents = 'AddEvents',
+  ShowFriend = 'ShowFriend',
+  ShowEvent = 'ShowEvent',
   Calendar = 'Calendar'
 }
 
@@ -82,7 +112,8 @@ export enum WhimAPI {
   GetAvailableFriends = '/friends/available',
   GetFriend = '/user/friend',
   GetEvents = '/events',
-  AddEvents = '/events'
+  AddEvents = '/events',
+  ParseSearch = '/parse'
 }
 
 export interface IResponse {
@@ -99,23 +130,20 @@ export interface IGetIdeasForDateParams {
   timestamp: number;
 }
 
-export interface ILoginArguments extends IPasscodeArguments {
+export interface ILoginArguments {
   email: string;
+  passcode: string;
 }
 
 export interface ILoginResponse extends IUser { }
 
-export interface ISignupArguments extends IPasscodeArguments {
+export interface ISignupArguments extends ILoginArguments {
   first: string;
   last: string;
-  email: string;
+  location: ICity;
 }
 
 export interface ISignupResponse extends IUser { }
-
-export interface IPasscodeArguments {
-  passcode: string;
-}
 
 export interface IGetUserParams {
   _id?: string;
@@ -127,7 +155,15 @@ export interface IGetUserResponse extends IUser { }
 export interface IAddFriendArguments {
   first: string;
   last: string;
-  notes: string;
+  birthday?: Date;
+  email?: string;
+  phone?: string;
+  location: ICity;
+  tags: string[];
+  methods: IMethod[];
+  organization?: string;
+  skills?: string[];
+  notes?: string;
 }
 
 export interface IAddFriendsArguments {
@@ -162,6 +198,22 @@ export interface IAddEventArguments {
 export interface IAddEventsArguments {
   userId: string;
   events: IAddEventArguments[];
+}
+
+export interface IParseSearchArguments {
+  userId: string;
+  searchTerm: string;
+}
+
+export interface IParseResult {
+  header: string;
+  description: string;
+  leadsTo: WindowView;
+  arguments: any;
+}
+
+export interface IParseSearchResults {
+  results: IParseResult[];
 }
 
 

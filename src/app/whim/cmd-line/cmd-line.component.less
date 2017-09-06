@@ -1,0 +1,45 @@
+:host {
+  position: relative;
+  display: block;
+  z-index: 1;
+
+  .input-container {
+    height: 60px;
+    display: flex;
+    align-items: center;
+
+    .cmd-input {
+      width: 100%;
+      outline: none;
+      border-bottom: 1px solid #666;
+      font: 1em 'Open Sans', 'sans-serif';
+      font-weight: 300;
+    }
+  }
+
+  .results-container {
+    position: absolute;
+    width: 100%;
+
+    .results {
+      list-style: none;
+      border: 1px solid #ccc;
+      box-shadow: 3px 4px 3px 0px #ddd;
+
+      li {
+        border-bottom: 1px solid #ddd;
+        padding: 6px;
+        background-color: white;
+        cursor: pointer;
+
+        &:hover {
+          background-color: #f7f7f7;
+        }
+        .result-description {
+          font-size: 0.75em;
+          font-style: italic;
+        }
+      }
+    }
+  }
+}

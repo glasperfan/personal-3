@@ -32,13 +32,19 @@ export class CalendarManager {
     });
   }
 
+  getUserEventCollection(userId: string): MongoDB.Collection<IEvent> {
+    return this.getEventCollection<IEvent>(userId);
+  }
+
   private createEvent(args: IAddEventArguments, userId: string): IEvent {
     return <IEvent>{
       _id: v4(),
       userId: userId,
       title: args.title,
-      date: args.date,
-      description: args.description
+      nextDate: { recurrent: false, baseDate: args.date },
+      description: args.description,
+      whenAdded: new Date(),
+      whenLastModified: new Date()
     };
   }
 
@@ -49,9 +55,5 @@ export class CalendarManager {
   private getEventCollection<T>(userId: string): MongoDB.Collection<T> {
     const token = this.genEventCollectionToken(userId);
     return this.dbMgr.getOrCreateCollection(token) as MongoDB.Collection<T>;
-  }
-
-  private getUserEventCollection(userId: string): MongoDB.Collection<IEvent> {
-    return this.getEventCollection<IEvent>(userId);
   }
 }

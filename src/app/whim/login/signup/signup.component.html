@@ -17,8 +17,18 @@
     </div>
 
     <div class="form-group">
+      <label for="city">City</label>
+      <input type="text" name="city" class="form-control" [(ngModel)]="userInput.location.city" required>
+    </div>
+
+    <div class="form-group">
       <label for="passcode">Passcode</label>
       <input type="password" name="passcode" class="form-control" [(ngModel)]="userInput.passcode" required maxlength="4" size="4">
+    </div>
+
+    <div class="form-group">
+      <label for="confirm">Retype passcode</label>
+      <input type="password" name="confirm" class="form-control" [(ngModel)]="confirmationPasscode" required maxlength="4" size="4">
     </div>
 
     <div class="form-control-desc">Choose a 4-digit passcode as your password.</div>

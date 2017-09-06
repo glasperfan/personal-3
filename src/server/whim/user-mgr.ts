@@ -17,6 +17,7 @@ export class UserManager {
       first: args.first,
       last: args.last,
       email: args.email,
+      location: args.location,
       passcode: args.passcode,
       _id: v4()
     };

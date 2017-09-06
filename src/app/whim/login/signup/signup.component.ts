@@ -14,12 +14,7 @@ export class SignupComponent {
   private processMessage: string;
 
   constructor(private accountService: AccountService) {
-    this.userInput = {
-      first: undefined,
-      last: undefined,
-      email: undefined,
-      passcode: undefined
-    };
+    this.resetInput();
   }
 
   private signup(): void {
@@ -39,5 +34,9 @@ export class SignupComponent {
 
   private toLogin(): void {
     this.switchTo.emit(WindowView.Login);
+  }
+
+  private resetInput(): void {
+    this.userInput = <any>{ location: {} };
   }
 }

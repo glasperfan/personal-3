@@ -10,13 +10,18 @@
 
 .form-group {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin: 25px 100px;
+  align-items: baseline;
+  justify-content: flex-start;
+  margin: 25px 0;
 
   &.multi-line {
     flex-direction: column;
     align-items: left;
+  }
+
+  label {
+    width: 220px;
+    text-align: right;
   }
 
   input {
@@ -24,6 +29,7 @@
     outline: none;
     border-bottom: 1px solid #666;
     font: 1em 'Open Sans', 'sans-serif';
+    margin-left: 16px;
   }
 
   textarea {
