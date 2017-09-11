@@ -7,11 +7,14 @@ import { HttpService } from './services/http.service';
 import { PasscodeComponent } from './login/passcode/passcode.component';
 import { SignupComponent } from './login/signup/signup.component';
 import { LoginComponent } from './login/login/login.component';
+import { AddTagsComponent } from './add/tags/tags.component';
 import { CommandLineComponent } from './cmd-line/cmd-line.component';
 import { CalendarComponent } from './calendar/calendar.component';
 import { IdeasComponent } from './ideas/ideas.component';
 import { AccountService } from './services/account.service';
 import { DashboardComponent } from './dashboard/dashboard.component';
+import { AddCalendarEventsComponent } from './add/events/add-events.component';
+import { AddFriendsComponent } from './add/friends/add-friends.component';
 import { FriendService } from './services/friend.service';
 import { IdeaGeneratorService } from './services/idea-generator.service';
 import { whim_routing } from './whim.routing';
@@ -36,7 +39,10 @@ export const API_URL = new InjectionToken<string>('API_URL');
     CommandLineComponent,
     LoginComponent,
     SignupComponent,
-    PasscodeComponent
+    PasscodeComponent,
+    AddFriendsComponent,
+    AddCalendarEventsComponent,
+    AddTagsComponent
   ],
   exports: [ ] /* components referenced in RootModule */
 })

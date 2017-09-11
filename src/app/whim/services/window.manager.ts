@@ -1,23 +1,27 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs/Rx';
 import { AccountService } from './account.service';
-import { WindowView } from '../models';
+import { WindowView, WindowViewWithArgs } from '../models';
 
 @Injectable()
 export class WindowManager {
-  private _currentView$: BehaviorSubject<WindowView>;
+  private _currentView$: BehaviorSubject<WindowViewWithArgs>;
 
   constructor(private accountService: AccountService) {
-    this._currentView$ = new BehaviorSubject<WindowView>(WindowView.None);
+    this._currentView$ = new BehaviorSubject<WindowViewWithArgs>(new WindowViewWithArgs(WindowView.None));
   }
 
-  public get currentView$(): Observable<WindowView> {
+  public get currentView$(): Observable<WindowViewWithArgs> {
     return this._currentView$.asObservable();
   }
 
-  public switchTo(view: WindowView): void {
+  public get currentWindow$(): Observable<WindowView> {
+    return this._currentView$.asObservable().map(v => v.window);
+  }
+
+  public switchTo(view: WindowViewWithArgs): void {
     let requiresAuthentication: boolean;
-    switch (view) {
+    switch (view.window) {
       case WindowView.Login:
       case WindowView.Signup:
       case WindowView.Passcode:
@@ -31,11 +35,12 @@ export class WindowManager {
     this.accountService.currentUserIsAuthenticated$.then(isAuthenticated => {
       if (requiresAuthentication && !isAuthenticated) {
         // redirect to login
-        return Promise.resolve(WindowView.Login);
+        // TODO pass through user email if available
+        return Promise.resolve(new WindowViewWithArgs(WindowView.Login));
       }
       return Promise.resolve(view);
-    }).then((viewToDisplay: WindowView) => {
-      console.log(`WindowManager: switching to ${viewToDisplay}`);
+    }).then((viewToDisplay: WindowViewWithArgs) => {
+      console.log(`WindowManager: switching to ${viewToDisplay.window} with arguments ${JSON.stringify(viewToDisplay.args)}`);
       this._currentView$.next(viewToDisplay);
     });
   }

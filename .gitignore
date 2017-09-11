@@ -15,6 +15,7 @@
 # misc
 **/settings.js
 **/*.pem
+friends.txt
 
 # IDEs and editors
 /.idea

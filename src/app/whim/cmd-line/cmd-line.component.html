@@ -6,9 +6,11 @@
 </div>
 <div class="results-container" *ngIf="(cmdInput.value || '').length">
   <ul class="results" *ngIf="results.length">
-    <li class="result" *ngFor="let result of results">
+    <li class="result" *ngFor="let result of results" (click)="onSelect(result)">
       <div class="result-header" [innerHTML]="result.header"></div>
-      <div class="result-description" [innerHTML]="result.description"></div>
+      <div class="result-description">
+        <p *ngFor="let d of (result.description.split('%%'))" [innerHTML]="d"></p>
+      </div>
     </li>
   </ul>
   <ul class="results" *ngIf="!results.length">

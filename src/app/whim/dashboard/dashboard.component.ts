@@ -1,6 +1,6 @@
-import { IIdea, IUser, WindowView } from '../models';
+import { IIdea, IUser, IWindowViewWithArgs, WindowViewWithArgs } from '../models';
 import { IdeaGeneratorService } from '../services/idea-generator.service';
-import { Component, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { v4 } from 'uuid';
 
 @Component({
@@ -9,11 +9,11 @@ import { v4 } from 'uuid';
   styleUrls: ['./dashboard.component.less']
 })
 export class DashboardComponent {
-
-  @Output() switchTo = new EventEmitter<WindowView>();
+  @Input() public args;
+  @Output() switchTo = new EventEmitter<WindowViewWithArgs>();
   private isActiveSearch = false;
 
-  private switchToView(view: WindowView): void {
+  private switchToView(view: WindowViewWithArgs): void {
     this.switchTo.emit(view);
   }
 

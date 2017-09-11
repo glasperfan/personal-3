@@ -1,5 +1,5 @@
 import { Component, OnInit, Output, EventEmitter } from '@angular/core';
-import { IParseResult } from '../models';
+import { IParseResult, IWindowViewWithArgs, WindowViewWithArgs } from '../models';
 import { CommandService } from 'app/whim/services/command.service';
 
 @Component({
@@ -9,7 +9,8 @@ import { CommandService } from 'app/whim/services/command.service';
   providers: [CommandService]
 })
 export class CommandLineComponent implements OnInit {
-  @Output() public isActiveSearch: EventEmitter<boolean> = new EventEmitter();
+  @Output() public switchTo = new EventEmitter<WindowViewWithArgs>();
+  @Output() public isActiveSearch = new EventEmitter<boolean>();
   private results: IParseResult[] = [];
 
   constructor(private commandService: CommandService) { }
@@ -23,5 +24,9 @@ export class CommandLineComponent implements OnInit {
   onInput(searchTerm: string): void {
     this.isActiveSearch.emit(!!searchTerm && !!searchTerm.length);
     this.commandService.requests$.next(searchTerm);
+  }
+
+  onSelect(choice: IParseResult): void {
+    this.switchTo.emit(new WindowViewWithArgs(choice.leadsTo, choice.arguments));
   }
 }

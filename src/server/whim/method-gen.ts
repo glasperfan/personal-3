@@ -60,7 +60,7 @@ export class LetterMethodGenerator extends BaseMethodGenerator {
 }
 
 export class CarePackageMethodGenerator extends BaseMethodGenerator {
-  constructor() { super(MethodCode.CarePackage, 1, 'Assemble a care package for {} - without Amazon`s help.'); }
+  constructor() { super(MethodCode.CarePackage, 1, `Assemble a care package for {} - without Amazon's help.`); }
 }
 
 export class MealMethodGenerator extends BaseMethodGenerator {

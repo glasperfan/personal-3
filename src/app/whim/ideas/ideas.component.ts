@@ -1,7 +1,7 @@
 import { AccountService } from '../services/account.service';
 import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
 import { IdeaGeneratorService } from '../services/idea-generator.service';
-import { IError, IIdeaSelection, WhimErrorCode, WindowView } from '../models';
+import { IError, IIdeaSelection, WhimErrorCode, WindowView, WindowViewWithArgs } from '../models';
 
 @Component({
   selector: 'p3-whim-ideas',
@@ -10,7 +10,7 @@ import { IError, IIdeaSelection, WhimErrorCode, WindowView } from '../models';
 })
 export class IdeasComponent implements OnInit {
   @Input() date: Date;
-  @Output() switchTo = new EventEmitter<WindowView>();
+  @Output() switchTo = new EventEmitter<WindowViewWithArgs>();
   private readonly requiredFriendCount = 4;
   private readonly todayDateFormatted: string;
   private ideas: Promise<IIdeaSelection[]>;
@@ -36,7 +36,7 @@ export class IdeasComponent implements OnInit {
   }
 
   private addFriends(): void {
-    this.switchTo.emit(WindowView.AddFriends);
+    this.switchTo.emit(new WindowViewWithArgs(WindowView.AddFriends));
   }
 
   private formatTodayDate(): string {

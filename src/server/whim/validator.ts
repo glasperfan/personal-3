@@ -4,7 +4,7 @@ export class Validator {
   public static TagStartIdentifier = '#';
   public static NextWeekKeyword = 'next';
   public static EmailRegex = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-  public static PhoneRegex = /^[0-9]+$/;
+  public static PhoneRegex = /^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/;
   public static AcceptedDatetimeKeywords: any[] = [
     ['today', moment(new Date())],
     ['tomorrow', moment(new Date()).add(1, 'days')],
@@ -13,21 +13,25 @@ export class Validator {
   ];
 
   public static AcceptedDatetimeFormats: string[] = [
-    'ddd',              // Sat, Sun
-    'dddd',             // Saturday, Sunday
-    'MMM D',            // Sep 9, Sept 9
-    'MMM Do',           // Sep 9th, Sept 9th
-    'MMMM D',           // September 9
-    'MMMM Do',          // September 9th
-    'M/D/YY',           // 09/8/17
-    'M/D/YYYY',         // 09/8/2017,
-    'M/D/YY h:mm a',    // 09/8/17 5:04 AM
-    'M/D/YYYY h:mm a',  // 09/8/2017 5:04 PM
-    'M-D-YY',           // 09-8-17
-    'M-D-YYYY',         // 09-8-2017,
-    'M-D-YY h:mm a',    // 09-8-17 5:04 AM
     'M-D-YYYY h:mm a',  // 09-8-2017 5:04 PM
-    'h:m a'             // 3:30 am
+    'M-D-YY h:mm a',    // 09-8-17 5:04 AM
+    'M/D/YYYY h:mm a',  // 09/8/2017 5:04 PM
+    'M/D/YY h:mm a',    // 09/8/17 5:04 AM
+    'MMMM Do, YYYY',    // September 7th, 1994
+    'MMMM D YYYY',      // September 7 1994
+    'MMMM D, YYYY',     // September 7, 1994
+    'M/D/YYYY',         // 09/8/2017,
+    'M-D-YYYY',         // 09-8-2017,
+    'M/D/YY',           // 09/8/17
+    'M-D-YY',           // 09-8-17
+    'MMMM Do',          // September 9th
+    'MMMM D',           // September 9
+    'MMM Do',           // Sep 9th, Sept 9th
+    'MMM D',            // Sep 9, Sept 9
+    'dddd',             // Saturday, Sunday
+    'ddd',              // Sat, Sun
+    'h:m a',            // 3:30 am
+    'x'                 // Unix timestamp
   ];
 
   public static Today = moment(new Date());
@@ -46,7 +50,6 @@ export class Validator {
   }
 
   public static isPhoneNumber(s: string): boolean {
-    s = s.replace(/[-+()\s]/g, '');
     return this.PhoneRegex.test(s);
   }
 
@@ -55,12 +58,21 @@ export class Validator {
     return componentCount >= 2 && componentCount <= 3;
   }
 
+  public static isDate(s: string): boolean {
+    const result = this.parseDate(s);
+    return result && result.isValid();
+  }
+
   public static capitalize(s: string) {
     return s.charAt(0).toUpperCase() + s.slice(1);
   }
 
   public static parseDate(s: string, ensureAfterNow: boolean = false): moment.Moment {
     let result: moment.Moment;
+
+    if (!s || !s.length) {
+      return result;
+    }
 
     // First try keywords
     for (const format of this.AcceptedDatetimeKeywords) {

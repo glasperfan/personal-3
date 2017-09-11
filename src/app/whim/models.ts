@@ -18,7 +18,7 @@ export interface IEvent {
   _id: Guid;
   userId: string;
   title: string;
-  nextDate: IEventDate;
+  date: IEventDate;
   description?: string;
   relatedFriends: string[];
   tags: string[];
@@ -41,7 +41,7 @@ export interface IName {
 export interface IFriend extends IName {
   _id: Guid;
   userId: string;
-  birthday?: Date;
+  birthday?: number;
   email?: string;
   phone?: string;
   location: ICity;
@@ -101,6 +101,15 @@ export enum WindowView {
   Calendar = 'Calendar'
 }
 
+export interface IWindowViewWithArgs {
+  window: WindowView;
+  args: any;
+}
+
+export class WindowViewWithArgs implements IWindowViewWithArgs {
+  constructor(public window: WindowView, public args: any = undefined) { }
+}
+
 /***** MESSAGING INTERFACES *****/
 export enum WhimAPI {
   GetIdeasForDate = '/ideas',
@@ -155,7 +164,7 @@ export interface IGetUserResponse extends IUser { }
 export interface IAddFriendArguments {
   first: string;
   last: string;
-  birthday?: Date;
+  birthday?: number; // timestamp
   email?: string;
   phone?: string;
   location: ICity;

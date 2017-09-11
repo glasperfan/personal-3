@@ -3,27 +3,27 @@
   <form (ngSubmit)="signup()">
     <div class="form-group">
       <label for="first">First name</label>
-      <input type="text" name="first" class="form-control" [(ngModel)]="userInput.first" required>
+      <input type="text" name="first" class="form-control" [(ngModel)]="args.first" required>
     </div>
 
     <div class="form-group">
       <label for="last">Last name</label>
-      <input type="text" name="last" class="form-control" [(ngModel)]="userInput.last" required>
+      <input type="text" name="last" class="form-control" [(ngModel)]="args.last" required>
     </div>
 
     <div class="form-group">
       <label for="email">Email</label>
-      <input type="text" name="email" class="form-control" [(ngModel)]="userInput.email" required>
+      <input type="text" name="email" class="form-control" [(ngModel)]="args.email" required>
     </div>
 
     <div class="form-group">
       <label for="city">City</label>
-      <input type="text" name="city" class="form-control" [(ngModel)]="userInput.location.city" required>
+      <input type="text" name="city" class="form-control" [(ngModel)]="args.location.city" required>
     </div>
 
     <div class="form-group">
       <label for="passcode">Passcode</label>
-      <input type="password" name="passcode" class="form-control" [(ngModel)]="userInput.passcode" required maxlength="4" size="4">
+      <input type="password" name="passcode" class="form-control" [(ngModel)]="args.passcode" required maxlength="4" size="4">
     </div>
 
     <div class="form-group">

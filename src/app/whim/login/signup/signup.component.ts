@@ -1,6 +1,6 @@
-import { IError, ISignupArguments, ISignupResponse, WindowView } from '../../models';
+import { IError, ISignupArguments, ISignupResponse, WindowView, WindowViewWithArgs } from '../../models';
 import { AccountService } from '../../services/account.service';
-import { Component, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 
 @Component({
   selector: 'p3-whim-signup',
@@ -8,23 +8,31 @@ import { Component, Output, EventEmitter } from '@angular/core';
   styleUrls: ['./../login.less']
 })
 export class SignupComponent {
-  public userInput: ISignupArguments;
-  @Output() switchTo = new EventEmitter<WindowView>();
+  @Output() public switchTo = new EventEmitter<WindowViewWithArgs>();
+  private _args: ISignupArguments;
 
   private processMessage: string;
 
   constructor(private accountService: AccountService) {
-    this.resetInput();
+    this.args = undefined;
+  }
+
+  @Input() public set args(args: ISignupArguments) {
+    this._args = args || <any>{ location: {} };
+  }
+
+  public get args(): ISignupArguments {
+    return this._args;
   }
 
   private signup(): void {
     this.processMessage = 'getting set up...';
-    const inputEmail = this.userInput.email;
-    this.accountService.signup(this.userInput)
+    const inputEmail = this.args.email;
+    this.accountService.signup(this.args)
       .then((response: ISignupResponse) => {
         this.accountService.storeEmailCookie(inputEmail);
         this.accountService.storeAuthCookie(response._id);
-        this.switchTo.emit(WindowView.Dashboard);
+        this.switchTo.emit(new WindowViewWithArgs(WindowView.Dashboard));
         this.processMessage = undefined;
       })
       .catch((err: IError) => {
@@ -33,10 +41,6 @@ export class SignupComponent {
   }
 
   private toLogin(): void {
-    this.switchTo.emit(WindowView.Login);
-  }
-
-  private resetInput(): void {
-    this.userInput = <any>{ location: {} };
+    this.switchTo.emit(new WindowViewWithArgs(WindowView.Login));
   }
 }

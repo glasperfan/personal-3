@@ -8,7 +8,11 @@
           "type": "node",
           "request": "launch",
           "name": "node app.js",
-          "program": "${workspaceRoot}/js/app.js"
+          "program": "${workspaceRoot}/js/app.js",
+          "outFiles": [
+            "${workspaceRoot}/js/**/*.js"
+          ],
+          "sourceMaps": true
         }
     ]
 }

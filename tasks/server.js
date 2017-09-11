@@ -1,5 +1,6 @@
 var gulp = require('gulp');
 var ts = require('gulp-typescript');
+var sourcemaps = require('gulp-sourcemaps');
 const path = require('path');
 
 const rootDir = path.join(__filename, '..', '..');
@@ -15,6 +16,8 @@ var tsProject = ts.createProject(tsConfig);
 gulp.task('build-whim-server', function () {
   var tsFiles = path.join(whimServerDir, '*.ts');
   return gulp.src(path.join(tsFiles))
+    .pipe(sourcemaps.init())
     .pipe(tsProject())
+    .pipe(sourcemaps.write())
     .pipe(gulp.dest(whimServerJSDir));
 });

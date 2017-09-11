@@ -1,5 +1,13 @@
-<p3-whim-cmd-line (isActiveSearch)="toggleActiveSearch($event)"></p3-whim-cmd-line>
-<p3-whim-ideas [ngClass]="{'active-search': isActiveSearch}" (switchTo)="switchToView($event)"></p3-whim-ideas>
+<p3-whim-cmd-line
+(switchTo)="switchToView($event)"
+(isActiveSearch)="toggleActiveSearch($event)"></p3-whim-cmd-line>
+
+<p3-whim-ideas
+(switchTo)="switchToView($event)"
+[ngClass]="{'active-search': isActiveSearch}"></p3-whim-ideas>
+
+
 <p3-whim-calendar [ngClass]="{'active-search': isActiveSearch}"></p3-whim-calendar>
+
 <!-- <p3-whim-settings></p3-whim-settings> -->
 

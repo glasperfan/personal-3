@@ -10,10 +10,11 @@ export class CalendarManager {
   constructor(private dbMgr: DatabaseManager) { };
 
   getEvents(userId: string, includeArchived: boolean): Promise<IEvent[]> {
-    return this.getUserEventCollection(userId).find({
+    const operation = this.getUserEventCollection(userId).find({
       userId: userId,
       date: { $gte: Date.now() }
-    }).toArray().then(events => {
+    }).toArray();
+    return operation.then(events => {
       if (!events || !events.length) {
         throw new WhimError(WhimErrorCode.NoEvents);
       }
@@ -23,8 +24,7 @@ export class CalendarManager {
 
   createEvents(args: IAddEventsArguments) {
     const newEvents: IEvent[] = args.events.map(e => this.createEvent(e, args.userId));
-    return this.getUserEventCollection(args.userId)
-    .insertMany(newEvents).then(write => {
+    return this.getUserEventCollection(args.userId).insertMany(newEvents).then(write => {
       if (!!write.result.ok) {
         return newEvents;
       }
@@ -41,7 +41,7 @@ export class CalendarManager {
       _id: v4(),
       userId: userId,
       title: args.title,
-      nextDate: { recurrent: false, baseDate: args.date },
+      date: { recurrent: false, baseDate: args.date },
       description: args.description,
       whenAdded: new Date(),
       whenLastModified: new Date()

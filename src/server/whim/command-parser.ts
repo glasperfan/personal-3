@@ -2,14 +2,15 @@ import { CalendarManager } from './calendar-mgr';
 import { FriendManager } from './friend-mgr';
 import { Validator } from './validator';
 import {
-  IEventDate,
-  IName,
-  IParseResult,
-  IParseSearchArguments,
-  WhimError,
-  WindowView,
-  IFriend,
-  IEvent
+    IAddFriendArguments,
+    IEvent,
+    IEventDate,
+    IFriend,
+    IName,
+    IParseResult,
+    IParseSearchArguments,
+    WhimError,
+    WindowView,
 } from './models';
 import { DatabaseManager } from './database-mgr';
 import * as moment from 'moment-timezone';
@@ -31,12 +32,6 @@ export class CommandParser {
     private friendMgr: FriendManager,
     private calendarMgr: CalendarManager) { }
 
-  // "-----" => we want to check against all queryable text from each friend
-  // A few special commands:
-  // Add [first] [last] [phone number?] [email?] [tags]
-  //
-  // Types of search results
-  // Limit to 10 results
   public parseForSearchResults(searchTerm: string, userId: string): Promise<IParseResult[]> {
     if (!searchTerm || !searchTerm.length || !userId) {
       throw new WhimError('A search term and userId is required');
@@ -54,26 +49,30 @@ export class CommandParser {
     }
 
     return Promise.all([
-      this.friendMgr.getUserFriendCollection(userId),
-      this.calendarMgr.getUserEventCollection(userId)
-    ]).then(collections => Promise.all([
-      this.searchByText<IFriend>(collections[0], searchComponents),
-      this.searchByText<IEvent>(collections[1], searchComponents)
-    ])).then(aggregateResults => {
+      this.searchByText<IFriend>(this.friendMgr.getUserFriendCollection(userId), searchComponents),
+      this.searchByText<IEvent>(this.calendarMgr.getUserEventCollection(userId), searchComponents)
+    ]).then(aggregateResults => {
       results = results.concat(aggregateResults[0].map(f =>
         new QueryFriendParseResult(f, searchComponents).AsResult()));
       results = results.concat(aggregateResults[1].map(e =>
         new QueryEventParseResult(e, searchComponents).AsResult()));
       return Promise.resolve(results);
-    });
-  }
-
-  private searchByTag<T>(collection: MongoDB.Collection<T>, tags: string[]): Promise<T[]> {
-    return Promise.resolve([]); /* TODO */
+      }).catch(err => {
+        return Promise.reject(err);
+      });
   }
 
   private searchByText<T>(collection: MongoDB.Collection<T>, components: string[]): Promise<T[]> {
-    return Promise.resolve([]); /* TODO */
+    const addIndex = collection.createIndex({ '$**': 'text' });
+    const viewAll = addIndex.then(_ => collection.find().toArray());
+    return viewAll.then(allResults => {
+      console.log(allResults);
+      return collection.find({
+        '$text': {
+          '$search': components.join(' ')
+        }
+      }).toArray();
+    });
   }
 }
 
@@ -84,8 +83,8 @@ enum QueryIntent {
 }
 
 interface ISnippet {
-  snippet: string;
   field: string;
+  text: string;
 }
 
 /*
@@ -161,14 +160,19 @@ abstract class ParseResultWithValidator implements IParseResult {
 
   protected abstract extractData(): void;
 
-  protected formatSnippet(snippet: ISnippet, match: string): string {
-    const bolded = snippet.snippet.replace(match, `<b>${match}</b>`);
+  protected formatSnippet(snippet: ISnippet, snippetRegex: RegExp): string {
+    const match = snippetRegex.exec(snippet.text);
+    const bolded = snippet.text.replace(match[0], `<b>${match[0]}</b>`);
     return `${bolded} <i>(${snippet.field})</i>`;
   }
 
   protected formatTags(tags: string[]) {
     return (!!tags && !!tags.length) ? ' ' + tags.map(t => `<b>${t}</b>`).join(' ') : '';
   }
+
+  private splice(str: string, start: number, delCount: number, newSubStr: string): string {
+      return str.slice(0, start) + newSubStr + str.slice(start + Math.abs(delCount));
+  };
 }
 
 export class AddFriendParseResult extends ParseResultWithValidator {
@@ -176,7 +180,7 @@ export class AddFriendParseResult extends ParseResultWithValidator {
   public static AddKeyword = 'add';
 
   public static validate(inputComponents: string[]): boolean {
-    return inputComponents[0] === this.AddKeyword;
+    return inputComponents[0].trim().toLocaleLowerCase() === this.AddKeyword;
   }
 
   public leadsTo: WindowView = WindowView.AddFriends;
@@ -184,6 +188,7 @@ export class AddFriendParseResult extends ParseResultWithValidator {
   private _lastName: string;
   private _email: string;
   private _phone: string;
+  private _birthday: moment.Moment;
   private _notes: string;
   private _tags: string[];
 
@@ -205,32 +210,43 @@ export class AddFriendParseResult extends ParseResultWithValidator {
     }
     let desc = `${this._firstName}${this._lastName ? (' ' + this._lastName) : ''} (name)`;
     if (this._email) {
-      desc += ` ${this._email} (email)`;
+      desc += `%%${this._email} (email)`;
     }
     if (this._phone) {
-      desc += ` ${this._phone} (phone)`;
+      desc += `%%${this._phone} (phone)`;
+    }
+    if (this._birthday) {
+      desc += `%%${this._birthday.format('MMMM Do')} (birthday)`;
     }
     if (this._tags) {
-      desc += ` ${this._tags.join(', ')} (tags)`;
+      desc += `%%${this._tags.join(', ')} (tags)`;
     }
     return desc;
   }
 
-  public get arguments(): any {
-    return {
-      name: {
-        first: this._firstName,
-        last: this._lastName
-      },
+  public get arguments(): IAddFriendArguments {
+    return <IAddFriendArguments>{
+      first: this._firstName,
+      last: this._lastName,
       email: this._email,
       phone: this._phone,
+      birthday: this._birthday && this._birthday.toDate().getTime(),
       notes: this._notes,
       tags: this._tags
     };
   }
 
   protected extractData(): void {
-    for (const component of this._components.slice(1)) {
+    let toSkip = 0;
+    this._components.slice(1).forEach((component, idx) => {
+      if (toSkip > 0) {
+        --toSkip;
+        return;
+      }
+      // Parsing in reverse order of length since May 22 will match before May 22 1990
+      const asDate = Validator.parseDate(this._components.slice(idx + 1, idx + 4).join(' '))
+        || Validator.parseDate(this._components.slice(idx + 1, idx + 3).join(' '))
+        || Validator.parseDate(component);
       if (Validator.isTag(component)) {
         if (!this._tags) {
           this._tags = [];
@@ -240,6 +256,9 @@ export class AddFriendParseResult extends ParseResultWithValidator {
         this._email = component;
       } else if (Validator.isPhoneNumber(component) && !this._phone) {
         this._phone = component;
+      } else if (asDate && asDate.isValid()) {
+        this._birthday = asDate;
+        toSkip = (<any>asDate)._i.split(' ').length - 1;
       } else if (!this._firstName && !Validator.isTagStart(component)) {
         this._firstName = Validator.capitalize(component);
       } else if (!this._lastName && !Validator.isTagStart(component)) {
@@ -251,7 +270,7 @@ export class AddFriendParseResult extends ParseResultWithValidator {
           this._notes += ` ${component}`;
         }
       }
-    }
+    });
   }
 }
 
@@ -300,7 +319,7 @@ export class AddEventParseResult extends ParseResultWithValidator {
   public get arguments(): any {
     return {
       title: this._title,
-      nextDate: this._date,
+      date: this._date,
       tags: this._tags
     };
   };
@@ -353,8 +372,8 @@ export class AddEventParseResult extends ParseResultWithValidator {
 
 export class QueryFriendParseResult extends ParseResultWithValidator {
   public leadsTo: WindowView;
-  private _snippet: string;
-  private _tags: string[];
+  private _snippet = '';
+  private _tags: string[] = [];
 
   constructor(private _friend: IFriend, private _searchComponents: string[]) {
     super();
@@ -366,7 +385,14 @@ export class QueryFriendParseResult extends ParseResultWithValidator {
   }
 
   public get description(): string {
-    return `${this._snippet}...${this.formatTags(this._tags)}`;
+    let desc = this._snippet || '';
+    if (this._tags && this._snippet) {
+      desc += '...';
+    }
+    if (this._tags && this._tags.length) {
+      desc += this.formatTags(this._tags);
+    }
+    return desc;
   }
 
   public get arguments(): any {
@@ -376,17 +402,16 @@ export class QueryFriendParseResult extends ParseResultWithValidator {
   protected extractData(): void {
     const snippets = QueryText.ParseFriend(this._friend);
     for (const component of this._searchComponents) {
-      if (Validator.isTag(component)) {
-        if (!this._tags) {
-          this._tags = [];
-        }
+      const regexComponent = new RegExp(component, 'i');
+      if (Validator.isTag(component) && this._friend.tags.includes(component)) {
         this._tags.push(component);
       }
       // For now support the first matching snippet
-      if (!this._snippet) {
-        for (const snippet of snippets) {
-          if (snippet.snippet.includes(component)) {
-            this._snippet = this.formatSnippet(snippet, component);
+      if (!this._snippet || !this._snippet.length) {
+        for (const s of snippets) {
+          if (s.text && regexComponent.test(s.text)) {
+            this._snippet = this.formatSnippet(s, regexComponent);
+            break;
           }
         }
       }
@@ -420,6 +445,7 @@ export class QueryEventParseResult extends ParseResultWithValidator {
   protected extractData(): void {
     const snippets = QueryText.ParseEvent(this._event);
     for (const component of this._searchComponents) {
+      const regexComponent = new RegExp(component, 'i');
       if (Validator.isTag(component)) {
         if (!this._tags) {
           this._tags = [];
@@ -428,9 +454,9 @@ export class QueryEventParseResult extends ParseResultWithValidator {
       }
       // For now support the first matching snippet
       if (!this._snippet) {
-        for (const snippet of snippets) {
-          if (snippet.snippet.includes(component)) {
-            this._snippet = this.formatSnippet(snippet, component);
+        for (const s of snippets) {
+          if (s.text && regexComponent.test(s.text)) {
+            this._snippet = this.formatSnippet(s, regexComponent);
           }
         }
       }
@@ -442,29 +468,31 @@ class QueryText {
   /* TODO: implement caching system */
 
   public static ParseFriend(f: IFriend): ISnippet[] {
+    const birthdayMoment = Validator.parseDate(f.birthday && f.birthday.toString());
     return [
-      { snippet: `${f.first} ${f.last}`, field: 'name' },
-      { snippet: moment(f.birthday).format('MMMM D, YYYY'), field: 'birthday' },
-      { snippet: f.email, field: 'email' },
-      { snippet: f.phone, field: 'phone' },
-      { snippet: `${f.location.city}`, field: 'location' },
-      { snippet: f.organization, field: 'organization' },
-      { snippet: f.skills.join(', '), field: 'skills' },
-      { snippet: f.notes, field: 'notes' }
+      { text: `${f.first} ${f.last}`, field: 'name' },
+      { text: birthdayMoment && birthdayMoment.format('MMMM D, YYYY'), field: 'birthday' },
+      { text: f.email, field: 'email' },
+      { text: f.phone, field: 'phone' },
+      { text: f.location && f.location.city, field: 'location' },
+      { text: f.organization, field: 'organization' },
+      { text: f.skills && f.skills.join(', '), field: 'skills' },
+      { text: f.notes, field: 'notes' }
     ].map(s => this.Normalize(s));
   }
 
   public static ParseEvent(e: IEvent): ISnippet[] {
+    const baseDateMoment = Validator.parseDate(e.date && e.date.baseDate && e.date.baseDate.toString());
     return [
-      { snippet: e.title, field: 'title' },
-      { snippet: moment(e.nextDate.baseDate).format('MMMM D, YYYY'), field: 'date' },
-      { snippet: e.description, field: 'description' },
-      { snippet: e.relatedFriends.join(', '), field: 'tagged friends' },
+      { text: e.title, field: 'title' },
+      { text: baseDateMoment && baseDateMoment.format('MMMM D, YYYY'), field: 'date' },
+      { text: e.description, field: 'description' },
+      { text: e.relatedFriends && e.relatedFriends.join(', '), field: 'tagged friends' },
     ].map(s => this.Normalize(s));
   }
 
   private static Normalize(s: ISnippet): ISnippet {
-    s.snippet = s.snippet.trim().toLocaleLowerCase();
+    s.text = s.text && s.text.trim();
     return s;
   }
 }
