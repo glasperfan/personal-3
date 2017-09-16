@@ -21,18 +21,18 @@ abstract class BaseMethodGenerator implements IMethodGenerator {
     if (this.friendArgCount === 0) {
       return this.formatString;
     } else if (this.friendArgCount === 1) {
-      return this.formatString.replace('{}',  this.displayName(friends[0]));
+      return this.formatString.replace('{}', friends[0].name.displayName);
     } else {
       let formattedMsg = this.formatString;
       for (let i = 0; i < this.friendArgCount; i++) {
-        formattedMsg = formattedMsg.replace(`{${i}}`, this.displayName(friends[i]));
+        formattedMsg = formattedMsg.replace(`{${i}}`, friends[i].name.displayName);
       }
       return formattedMsg;
     }
   }
 
   displayName(friend: IFriend): string {
-    return `${friend.first} ${friend.last}`;
+    return friend.name.displayName;
   }
 }
 

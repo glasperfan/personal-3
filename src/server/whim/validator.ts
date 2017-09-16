@@ -17,6 +17,7 @@ export class Validator {
     'M-D-YY h:mm a',    // 09-8-17 5:04 AM
     'M/D/YYYY h:mm a',  // 09/8/2017 5:04 PM
     'M/D/YY h:mm a',    // 09/8/17 5:04 AM
+    'MMMM Do YYYY',     // September 7th 1994
     'MMMM Do, YYYY',    // September 7th, 1994
     'MMMM D YYYY',      // September 7 1994
     'MMMM D, YYYY',     // September 7, 1994

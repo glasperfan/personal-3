@@ -1,5 +1,5 @@
 import { Validator } from './validator';
-import { IAddFriendArguments, IAddFriendsArguments, IFriend, IUser, WhimError } from './models';
+import { IAddFriendArguments, IAddFriendsArguments, IFriend, IUser, Note, WhimError, Birthday } from './models';
 import { DatabaseManager } from './database-mgr';
 import * as MongoDB from 'mongodb';
 import { v4 } from 'uuid';
@@ -7,21 +7,52 @@ import * as moment from 'moment';
 
 export class FriendManager {
 
+  // Note: 'text' fields must all be adjacent
+  public static readonly QueryIndexes: { [field: string]: string | number } = {
+    'name.displayName': 'text',
+    email: 'text',
+    phone: 'text',
+    'birthday.birthdate': 'text',
+    'address.address1': 'text',
+    'address.address2': 'text',
+    'address.city': 'text',
+    'address.state': 'text',
+    'address.country': 'text',
+    organization: 'text',
+    'notes.text': 'text'
+  };
+
+  public static readonly TagIndex = 'tags';
+
   private readonly collectionTokenPrefix = 'friends';
   constructor(private dbMgr: DatabaseManager) { };
 
+
   getAllFriends(userId: string): Promise<IFriend[]> {
-    return this.getUserFriendCollection(userId).find({ userId: userId }).toArray();
+    return this.getUserFriendCollection(userId).then(collection =>
+      collection.find({ userId: userId }).toArray());
   }
 
   getAvailableFriends(userId: string): Promise<IFriend[]> {
     return this.getUserFriendCollection(userId)
-      .find({ userId: userId, wasRemoved: false }).toArray();
+      .then(collection => {
+        console.log(collection);
+        return collection.find().toArray();
+      })
+      .catch(e => {
+        console.log(e);
+        throw e;
+      });
   }
 
   getRemovedFriends(userId: string): Promise<IFriend[]> {
-    return this.getUserFriendCollection(userId)
-      .find({ userId: userId, wasRemoved: true }).toArray();
+    try {
+      return this.getUserFriendCollection(userId).then(collection =>
+        collection.find({ userId: userId, wasRemoved: true }).toArray());
+    } catch (e) {
+      console.log(e);
+      throw e;
+    }
   }
 
   createFriends(args: IAddFriendsArguments): Promise<IFriend[]> {
@@ -31,7 +62,11 @@ export class FriendManager {
     } catch (err) {
       return Promise.reject(err);
     }
-    return this.getUserFriendCollection(args.userId).insertMany(newFriends).then(write => {
+
+    const operation = this.getUserFriendCollection(args.userId).then(collection =>
+      collection.insertMany(newFriends));
+
+    return operation.then(write => {
       if (!!write.result.ok) {
         return newFriends;
       }
@@ -39,29 +74,39 @@ export class FriendManager {
     });
   }
 
-  getUserFriendCollection(userId: string): MongoDB.Collection<IFriend> {
+  getUserFriendCollection(userId: string): Promise<MongoDB.Collection<IFriend>> {
     return this.getUserCollection<IFriend>(userId);
   }
 
   private createFriend(userId: string, friendArg: IAddFriendArguments): IFriend {
-    this.validateArguments(friendArg);
+    this.validateArguments(friendArg); // TODO: validate birthday
+    const bday: moment.Moment = friendArg.birthday ? Validator.parseDate(friendArg.birthday) : undefined;
     return <IFriend>{
       _id: v4(),
-      first: friendArg.first,
-      last: friendArg.last,
-      birthday: friendArg.birthday,
+      name: {
+        first: friendArg.first,
+        last: friendArg.last,
+        displayName: `${friendArg.first} ${friendArg.last}`,
+      },
+      birthday: friendArg ? new Birthday(bday) : undefined,
       email: friendArg.email,
       phone: friendArg.phone,
-      location: friendArg.location,
+      address: {
+        address1: friendArg.address1,
+        address2: friendArg.address2,
+        city: friendArg.city,
+        state: friendArg.state,
+        country: friendArg.country
+      },
       tags: friendArg.tags || [],
-      methods: friendArg.methods || [],
+      methods: [],
       organization: friendArg.organization,
-      skills: friendArg.skills || [],
-      notes: friendArg.notes,
+      skills: [],
+      notes: friendArg.firstNote ? [new Note(friendArg.firstNote)] : [],
       userId: userId,
       wasRemoved: false,
-      whenAdded: new Date(),
-      whenLastModified: new Date()
+      whenAdded: Date.now(),
+      whenLastModified: Date.now()
     };
   }
 
@@ -87,8 +132,12 @@ export class FriendManager {
     return `${this.collectionTokenPrefix}/${userId}`;
   }
 
-  private getUserCollection<T>(userId: string): MongoDB.Collection<T> {
+  private getUserCollection<T>(userId: string): Promise<MongoDB.Collection<T>> {
     const token = this.genUserCollectionToken(userId);
-    return this.dbMgr.getOrCreateCollection(token) as MongoDB.Collection<T>;
+    const collection = this.dbMgr.getOrCreateCollection(token) as MongoDB.Collection<T>;
+    return collection.createIndex(
+      FriendManager.QueryIndexes,
+      { name: 'textQuery' }
+    ).then(_ => collection);
   }
 }

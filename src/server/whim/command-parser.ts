@@ -11,6 +11,8 @@ import {
     IParseSearchArguments,
     WhimError,
     WindowView,
+    INote,
+    Birthday,
 } from './models';
 import { DatabaseManager } from './database-mgr';
 import * as moment from 'moment-timezone';
@@ -21,9 +23,13 @@ export class CommandParser {
   private static FriendQueryIndexes: string[] = [
     'email',
     'phone',
-    'location',
+    'address.address1',
+    'address.city',
+    'address.state',
+    'address.country',
     'tags',
-    'methods'
+    'methods',
+    'notes.text'
   ];
   private resultsCache: { [userId: string]: IParseResult[] };
 
@@ -49,9 +55,12 @@ export class CommandParser {
     }
 
     return Promise.all([
-      this.searchByText<IFriend>(this.friendMgr.getUserFriendCollection(userId), searchComponents),
-      this.searchByText<IEvent>(this.calendarMgr.getUserEventCollection(userId), searchComponents)
-    ]).then(aggregateResults => {
+      this.friendMgr.getUserFriendCollection(userId),
+      this.calendarMgr.getUserEventCollection(userId)
+    ]).then((collections: MongoDB.Collection[]) => Promise.all([
+      this.searchByText<IFriend>(collections[0], searchComponents),
+      this.searchByText<IEvent>(collections[1], searchComponents)
+    ])).then(aggregateResults => {
       results = results.concat(aggregateResults[0].map(f =>
         new QueryFriendParseResult(f, searchComponents).AsResult()));
       results = results.concat(aggregateResults[1].map(e =>
@@ -63,23 +72,13 @@ export class CommandParser {
   }
 
   private searchByText<T>(collection: MongoDB.Collection<T>, components: string[]): Promise<T[]> {
-    const addIndex = collection.createIndex({ '$**': 'text' });
-    const viewAll = addIndex.then(_ => collection.find().toArray());
-    return viewAll.then(allResults => {
-      console.log(allResults);
-      return collection.find({
-        '$text': {
-          '$search': components.join(' ')
-        }
-      }).toArray();
-    });
+    return collection.find({ '$text': { '$search': components.join(' ') } })
+      .toArray()
+      .catch(e => {
+        console.log(e);
+        return [];
+      });
   }
-}
-
-enum QueryIntent {
-  Skill = 'skill',
-  Location = 'location',
-  Tag = 'tag'
 }
 
 interface ISnippet {
@@ -160,10 +159,19 @@ abstract class ParseResultWithValidator implements IParseResult {
 
   protected abstract extractData(): void;
 
-  protected formatSnippet(snippet: ISnippet, snippetRegex: RegExp): string {
+  protected addToSnippet(currentSnippet: ISnippet, snippet: ISnippet, snippetRegex: RegExp): ISnippet {
+    if (!currentSnippet || !currentSnippet) {
+      return this.formatSnippet(snippet, snippetRegex);
+    }
+    const match = snippetRegex.exec(currentSnippet.text);
+    currentSnippet.text = currentSnippet.text.replace(match[0], `<b>${match[0]}</b>`);
+    return currentSnippet;
+  }
+
+  protected formatSnippet(snippet: ISnippet, snippetRegex: RegExp): ISnippet {
     const match = snippetRegex.exec(snippet.text);
     const bolded = snippet.text.replace(match[0], `<b>${match[0]}</b>`);
-    return `${bolded} <i>(${snippet.field})</i>`;
+    return { text: `${bolded} <i>(${snippet.field})</i>`, field: snippet.field };
   }
 
   protected formatTags(tags: string[]) {
@@ -178,9 +186,11 @@ abstract class ParseResultWithValidator implements IParseResult {
 export class AddFriendParseResult extends ParseResultWithValidator {
 
   public static AddKeyword = 'add';
+  public static MetKeyword = 'met';
 
   public static validate(inputComponents: string[]): boolean {
-    return inputComponents[0].trim().toLocaleLowerCase() === this.AddKeyword;
+    const keyword = inputComponents[0].trim().toLocaleLowerCase();
+    return [this.AddKeyword, this.MetKeyword].some(k => k === keyword);
   }
 
   public leadsTo: WindowView = WindowView.AddFriends;
@@ -188,9 +198,9 @@ export class AddFriendParseResult extends ParseResultWithValidator {
   private _lastName: string;
   private _email: string;
   private _phone: string;
-  private _birthday: moment.Moment;
-  private _notes: string;
-  private _tags: string[];
+  private _birthday: Birthday;
+  private _firstNote: string;
+  private _tags: string[] = [];
 
   constructor(private _components: string[]) {
     super();
@@ -216,9 +226,9 @@ export class AddFriendParseResult extends ParseResultWithValidator {
       desc += `%%${this._phone} (phone)`;
     }
     if (this._birthday) {
-      desc += `%%${this._birthday.format('MMMM Do')} (birthday)`;
+      desc += `%%${this._birthday.birthdate} (birthday)`;
     }
-    if (this._tags) {
+    if (this._tags.length) {
       desc += `%%${this._tags.join(', ')} (tags)`;
     }
     return desc;
@@ -230,8 +240,8 @@ export class AddFriendParseResult extends ParseResultWithValidator {
       last: this._lastName,
       email: this._email,
       phone: this._phone,
-      birthday: this._birthday && this._birthday.toDate().getTime(),
-      notes: this._notes,
+      birthday: this._birthday && this._birthday.birthdate,
+      firstNote: this._firstNote,
       tags: this._tags
     };
   }
@@ -248,26 +258,23 @@ export class AddFriendParseResult extends ParseResultWithValidator {
         || Validator.parseDate(this._components.slice(idx + 1, idx + 3).join(' '))
         || Validator.parseDate(component);
       if (Validator.isTag(component)) {
-        if (!this._tags) {
-          this._tags = [];
-        }
         this._tags.push(component);
       } else if (Validator.isEmail(component) && !this._email) {
         this._email = component;
       } else if (Validator.isPhoneNumber(component) && !this._phone) {
         this._phone = component;
       } else if (asDate && asDate.isValid()) {
-        this._birthday = asDate;
+        this._birthday = new Birthday(asDate);
         toSkip = (<any>asDate)._i.split(' ').length - 1;
       } else if (!this._firstName && !Validator.isTagStart(component)) {
         this._firstName = Validator.capitalize(component);
       } else if (!this._lastName && !Validator.isTagStart(component)) {
         this._lastName = Validator.capitalize(component);
       } else {
-        if (!this._notes) {
-          this._notes = component;
+        if (!this._firstNote) {
+          this._firstNote = component;
         } else {
-          this._notes += ` ${component}`;
+          this._firstNote += ` ${component}`;
         }
       }
     });
@@ -342,7 +349,7 @@ export class AddEventParseResult extends ParseResultWithValidator {
         if (parsedDate) {
           this._date = {
             recurrent: false,
-            baseDate: parsedDate.toDate().getTime()
+            baseDate: parsedDate.valueOf()
           };
           toSkip = idx;
           return;
@@ -352,7 +359,7 @@ export class AddEventParseResult extends ParseResultWithValidator {
         if (parsedDate) {
           this._date = {
             recurrent: true,
-            baseDate: parsedDate.toDate().getTime(),
+            baseDate: parsedDate.valueOf(),
             recurrenceOffset: 'week'
           };
           toSkip = idx;
@@ -372,7 +379,7 @@ export class AddEventParseResult extends ParseResultWithValidator {
 
 export class QueryFriendParseResult extends ParseResultWithValidator {
   public leadsTo: WindowView;
-  private _snippet = '';
+  private _snippet: ISnippet;
   private _tags: string[] = [];
 
   constructor(private _friend: IFriend, private _searchComponents: string[]) {
@@ -381,12 +388,12 @@ export class QueryFriendParseResult extends ParseResultWithValidator {
   }
 
   public get header(): string {
-    return `${this._friend.first} ${this._friend.last}`;
+    return this._friend.name.displayName;
   }
 
   public get description(): string {
-    let desc = this._snippet || '';
-    if (this._tags && this._snippet) {
+    let desc = (this._snippet && this._snippet.text) || '';
+    if (this._tags && this._tags.length && this._snippet) {
       desc += '...';
     }
     if (this._tags && this._tags.length) {
@@ -407,11 +414,12 @@ export class QueryFriendParseResult extends ParseResultWithValidator {
         this._tags.push(component);
       }
       // For now support the first matching snippet
-      if (!this._snippet || !this._snippet.length) {
-        for (const s of snippets) {
-          if (s.text && regexComponent.test(s.text)) {
+      for (const s of snippets) {
+        if (s.text && regexComponent.test(s.text)) {
+          if (!this._snippet) {
             this._snippet = this.formatSnippet(s, regexComponent);
-            break;
+          } else if (this._snippet && this._snippet.field === s.field) {
+            this.addToSnippet(this._snippet, s, regexComponent);
           }
         }
       }
@@ -468,16 +476,15 @@ class QueryText {
   /* TODO: implement caching system */
 
   public static ParseFriend(f: IFriend): ISnippet[] {
-    const birthdayMoment = Validator.parseDate(f.birthday && f.birthday.toString());
     return [
-      { text: `${f.first} ${f.last}`, field: 'name' },
-      { text: birthdayMoment && birthdayMoment.format('MMMM D, YYYY'), field: 'birthday' },
+      { text: f.name.displayName, field: 'name' },
+      { text: f.birthday && f.birthday.birthdate, field: 'birthday' },
       { text: f.email, field: 'email' },
       { text: f.phone, field: 'phone' },
-      { text: f.location && f.location.city, field: 'location' },
+      { text: f.address && f.address.city, field: 'location' },
       { text: f.organization, field: 'organization' },
       { text: f.skills && f.skills.join(', '), field: 'skills' },
-      { text: f.notes, field: 'notes' }
+      { text: (f.notes || []).map(note => note.text).join(' '), field: 'notes' }
     ].map(s => this.Normalize(s));
   }
 
@@ -496,4 +503,3 @@ class QueryText {
     return s;
   }
 }
-

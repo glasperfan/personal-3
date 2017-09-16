@@ -5,15 +5,21 @@ import { v4 } from 'uuid';
 
 export class CalendarManager {
 
+  public static readonly QueryIndexes: { [field: string]: string | number } = {
+    title: 'text',
+    description: 'text'
+  };
+
   private readonly collectionTokenPrefix = 'events';
 
   constructor(private dbMgr: DatabaseManager) { };
 
   getEvents(userId: string, includeArchived: boolean): Promise<IEvent[]> {
-    const operation = this.getUserEventCollection(userId).find({
-      userId: userId,
-      date: { $gte: Date.now() }
-    }).toArray();
+    const operation = this.getUserEventCollection(userId)
+      .then(collection => collection.find({
+        userId: userId,
+        date: { $gte: Date.now() }
+      }).toArray());
     return operation.then(events => {
       if (!events || !events.length) {
         throw new WhimError(WhimErrorCode.NoEvents);
@@ -24,7 +30,9 @@ export class CalendarManager {
 
   createEvents(args: IAddEventsArguments) {
     const newEvents: IEvent[] = args.events.map(e => this.createEvent(e, args.userId));
-    return this.getUserEventCollection(args.userId).insertMany(newEvents).then(write => {
+    const operation = this.getUserEventCollection(args.userId)
+      .then(collection => collection.insertMany(newEvents));
+    return operation.then(write => {
       if (!!write.result.ok) {
         return newEvents;
       }
@@ -32,7 +40,7 @@ export class CalendarManager {
     });
   }
 
-  getUserEventCollection(userId: string): MongoDB.Collection<IEvent> {
+  getUserEventCollection(userId: string): Promise<MongoDB.Collection<IEvent>> {
     return this.getEventCollection<IEvent>(userId);
   }
 
@@ -52,8 +60,12 @@ export class CalendarManager {
     return `${this.collectionTokenPrefix}/${userId}`;
   }
 
-  private getEventCollection<T>(userId: string): MongoDB.Collection<T> {
+  private getEventCollection<T>(userId: string): Promise<MongoDB.Collection<T>> {
     const token = this.genEventCollectionToken(userId);
-    return this.dbMgr.getOrCreateCollection(token) as MongoDB.Collection<T>;
+    const collection = this.dbMgr.getOrCreateCollection(token) as MongoDB.Collection<T>;
+    return collection.createIndex(
+      CalendarManager.QueryIndexes,
+      { name: 'textQuery' }
+    ).then(_ => collection);
   }
 }

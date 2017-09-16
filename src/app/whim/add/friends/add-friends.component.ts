@@ -1,5 +1,5 @@
 import { FriendService } from '../../services/friend.service';
-import { IAddFriendArguments, IError, IFriend, WindowView, WindowViewWithArgs } from '../../models';
+import { IAddFriendArguments, IError, IFriend, IName, WindowView, WindowViewWithArgs } from '../../models';
 import { Component, OnInit, Input, EventEmitter, Output } from '@angular/core';
 import * as moment from 'moment';
 
@@ -9,7 +9,7 @@ import * as moment from 'moment';
   styleUrls: ['./add-friends.component.less']
 })
 export class AddFriendsComponent implements OnInit {
-  @Input() args: any;
+  @Input() args: IAddFriendArguments;
   @Output() switchTo = new EventEmitter<WindowViewWithArgs>();
 
   private readonly title = 'Add Friends';
@@ -19,10 +19,6 @@ export class AddFriendsComponent implements OnInit {
   constructor(private friendService: FriendService) { }
 
   ngOnInit() {
-    this.args = this.args || {};
-    if (this.args.birthday) {
-      this.args.birthday = moment(new Date(this.args.birthday)).format('MMMM Do');
-    }
   }
 
   private toDashboard(): void {
@@ -41,8 +37,8 @@ export class AddFriendsComponent implements OnInit {
     } else {
       this.friendService.addFriends([this.args])
         .then((addedFriends: IFriend[]) => {
-          this.processMessage = `${addedFriends[0].first} ${addedFriends[0].last}, got it!`;
-          this.args = {};
+          this.processMessage = `${addedFriends[0].name.displayName}, got it!`;
+          this.args = <any>{ tags: [] };
           // TODO: smoother transition here
           // this.toDashboard();
         })

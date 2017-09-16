@@ -68,7 +68,8 @@ export class AccountService {
   }
 
   public getUserByEmail(email: string): Promise<IUser> {
-    return this.http.get<IUser>(WhimAPI.GetUser, { email: email });
+    return this.http.get<IUser>(WhimAPI.GetUser, { email: email })
+    .catch(_ => Promise.resolve(undefined));
   }
 
   public get userHasSession(): boolean {

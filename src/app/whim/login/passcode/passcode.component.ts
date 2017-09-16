@@ -18,10 +18,19 @@ export class PasscodeComponent {
   constructor(private accountService: AccountService) {
     const emailCookie = this.accountService.getEmailCookie();
     this.accountService.getUserByEmail(emailCookie.email)
-      .then((userData: IUser) => this.userData = userData);
+      .then((userData: IUser) => {
+        if (!userData) {
+          // this.toLogin();
+        } else {
+          this.userData = userData;
+        }
+      });
   }
 
   private login(): void {
+    if (!this.userData) {
+      return;
+    }
     this.processMessage = 'logging in...';
     this.accountService.login(this.userData.email, this.passcodeInput)
       .then((response: ILoginResponse) => {

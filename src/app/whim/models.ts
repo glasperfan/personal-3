@@ -1,4 +1,6 @@
 // tslint:disable:no-empty-interface
+import * as moment from 'moment';
+
 export type Guid = string;
 
 export interface IIdeaSelection {
@@ -33,29 +35,61 @@ export interface IEventDate {
 }
 
 
+export interface IBirthday {
+  timestamp: number;
+  birthdate: string;
+}
+
+export class Birthday {
+  public timestamp: number;
+  public birthdate: string;
+  constructor(moment: moment.Moment) {
+    this.timestamp = moment.valueOf();
+    this.birthdate = moment.format('MMMM D, YYYY');
+  }
+}
+
 export interface IName {
   first: string;
   last: string;
+  displayName: string;
 }
 
-export interface IFriend extends IName {
+export interface INote {
+  text: string;
+  dateCreated: number;
+  dateModified: number;
+}
+
+export class Note implements INote {
+  constructor(
+    public text: string = '',
+    public dateCreated: number = Date.now(),
+    public dateModified: number = Date.now()
+  ) { }
+}
+
+export interface IFriend {
   _id: Guid;
   userId: string;
-  birthday?: number;
+  name: IName;
+  birthday?: IBirthday;
   email?: string;
   phone?: string;
-  location: ICity;
+  address: IAddress;
   tags: string[];
   methods: IMethod[];
   organization?: string;
   skills?: string[];
-  notes?: string;
-  whenAdded: Date;
-  whenLastModified: Date;
+  notes?: INote[];
+  whenAdded: number;
+  whenLastModified: number;
 }
 
-export interface ICity {
-  city: string;
+export interface IAddress {
+  address1?: string;
+  address2?: string;
+  city?: string;
   state?: string;
   country?: string;
 }
@@ -77,10 +111,11 @@ export enum MethodCode {
   Letter
 }
 
-export interface IUser extends IName {
+export interface IUser {
   _id: Guid;
+  name: IName;
   email: string;
-  location: ICity;
+  location: IAddress;
 }
 
 export interface IUserWithPasscode extends IUser {
@@ -149,7 +184,7 @@ export interface ILoginResponse extends IUser { }
 export interface ISignupArguments extends ILoginArguments {
   first: string;
   last: string;
-  location: ICity;
+  city?: string;
 }
 
 export interface ISignupResponse extends IUser { }
@@ -164,15 +199,17 @@ export interface IGetUserResponse extends IUser { }
 export interface IAddFriendArguments {
   first: string;
   last: string;
-  birthday?: number; // timestamp
   email?: string;
   phone?: string;
-  location: ICity;
-  tags: string[];
-  methods: IMethod[];
+  birthday?: string;
+  address1?: string;
+  address2?: string;
+  city?: string;
+  state?: string;
+  country?: string;
   organization?: string;
-  skills?: string[];
-  notes?: string;
+  tags?: string[];
+  firstNote?: string;
 }
 
 export interface IAddFriendsArguments {

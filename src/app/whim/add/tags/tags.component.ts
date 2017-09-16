@@ -19,7 +19,7 @@ export class AddTagsComponent {
   }
 
   private set values(newTags: string) {
-    const tagArr = newTags.split(' ');
+    const tagArr = newTags && newTags.trim().length ? newTags.split(' ') : [];
     for (let i = tagArr.length - 1; i >= 0; i--) {
       if (!tagArr[i].startsWith('#')) {
         tagArr[i] = '#' + tagArr[i];

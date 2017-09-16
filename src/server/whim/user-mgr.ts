@@ -14,10 +14,13 @@ export class UserManager {
 
   public createUser(args: ISignupArguments): Promise<IUser> {
     const newUser: IUserWithPasscode = {
-      first: args.first,
-      last: args.last,
+      name: {
+        first: args.first,
+        last: args.last,
+        displayName: `${args.first} ${args.last}`,
+      },
       email: args.email,
-      location: args.location,
+      location: { city: args.city },
       passcode: args.passcode,
       _id: v4()
     };

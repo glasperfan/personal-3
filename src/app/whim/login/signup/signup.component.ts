@@ -10,7 +10,7 @@ import { Component, Input, Output, EventEmitter } from '@angular/core';
 export class SignupComponent {
   @Output() public switchTo = new EventEmitter<WindowViewWithArgs>();
   private _args: ISignupArguments;
-
+  private confirmationPasscode: string;
   private processMessage: string;
 
   constructor(private accountService: AccountService) {
@@ -18,7 +18,7 @@ export class SignupComponent {
   }
 
   @Input() public set args(args: ISignupArguments) {
-    this._args = args || <any>{ location: {} };
+    this._args = args || <any>{};
   }
 
   public get args(): ISignupArguments {
@@ -26,6 +26,11 @@ export class SignupComponent {
   }
 
   private signup(): void {
+    // Basic validation
+    if (this.args.passcode !== this.confirmationPasscode) {
+        this.processMessage = `The passcodes don't match.`;
+        return;
+    }
     this.processMessage = 'getting set up...';
     const inputEmail = this.args.email;
     this.accountService.signup(this.args)
