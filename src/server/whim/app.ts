@@ -15,6 +15,7 @@ import {
     IUser,
     WhimAPI,
     WhimError,
+    IFriend,
 } from './models';
 import { DatabaseManager } from './database-mgr';
 import { FriendManager } from './friend-mgr';
@@ -156,10 +157,17 @@ class App implements IApp {
     });
 
     router.get(WhimAPI.GetFriend, (req, res, next) => {
-        const args: IGetFriendArguments = req.body;
-        this.friendMgr.getRemovedFriends(args.userId)
-          .then(friends => res.json(friends))
-          .catch((error: IError) => errorHandler(error, res));
+      const args: IGetFriendArguments = req.body;
+      this.friendMgr.getRemovedFriends(args.userId)
+        .then(friends => res.json(friends))
+        .catch((error: IError) => errorHandler(error, res));
+    });
+
+    router.put(WhimAPI.UpdateFriends, (req, res, next) => {
+      const args: IFriend[] = req.body;
+      this.friendMgr.updateFriends(args)
+        .then(_ => res.json({ successful: args.length, failed: 0 }))
+        .catch((error: IError) => errorHandler(error, res));
     });
 
     router.get(WhimAPI.GetIdeasForDate, (req, res, next) => {

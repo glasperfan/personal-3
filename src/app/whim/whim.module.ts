@@ -15,8 +15,13 @@ import { AccountService } from './services/account.service';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { AddCalendarEventsComponent } from './add/events/add-events.component';
 import { AddFriendsComponent } from './add/friends/add-friends.component';
+import { ShowFriendsComponent } from './show/friends/show-friends.component';
 import { FriendService } from './services/friend.service';
 import { IdeaGeneratorService } from './services/idea-generator.service';
+import { StringFieldComponent } from './controls/string-field.component';
+import { NotesFieldComponent } from './controls/notes-field.component';
+import { DateFormatPipe } from './controls/date.pipe';
+import { MarkdownPipe } from './controls/markdown.pipe';
 import { whim_routing } from './whim.routing';
 import { WhimComponent } from './whim/whim.component';
 import { ServerEndpoint } from '../../server/whim/settings';
@@ -42,7 +47,13 @@ export const API_URL = new InjectionToken<string>('API_URL');
     PasscodeComponent,
     AddFriendsComponent,
     AddCalendarEventsComponent,
-    AddTagsComponent
+    ShowFriendsComponent,
+    AddTagsComponent,
+    /* Controls */
+    StringFieldComponent,
+    NotesFieldComponent,
+    DateFormatPipe,
+    MarkdownPipe
   ],
   exports: [ ] /* components referenced in RootModule */
 })

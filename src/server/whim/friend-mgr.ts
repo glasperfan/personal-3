@@ -74,15 +74,40 @@ export class FriendManager {
     });
   }
 
+  updateFriends(args: IFriend[]): Promise<void> {
+    const ops: Promise<void>[] = [];
+    for (const el of args) {
+      let friend = Object.assign({}, el) as IFriend;
+      friend = this.updateFriend(friend);
+      ops.push(this.getUserFriendCollection(friend.userId).then(collection => {
+        return collection.replaceOne({ _id: friend._id }, friend)
+          .then(result => {
+            if (!!result.result.ok) {
+              return Promise.resolve();
+            }
+            return Promise.reject(`Failed to update friend document (id: ${friend._id}).`);
+          })
+          .catch(err => Promise.reject(err));
+      }));
+    }
+    return Promise.all(ops).then(_ => _[0]);
+  }
+
   getUserFriendCollection(userId: string): Promise<MongoDB.Collection<IFriend>> {
     return this.getUserCollection<IFriend>(userId);
   }
 
-  private createFriend(userId: string, friendArg: IAddFriendArguments): IFriend {
+  private updateFriend(friend: IFriend): IFriend {
+    friend.name.displayName = `${friend.name.first} ${friend.name.last}`;
+    friend.whenLastModified = Date.now();
+    return friend;
+  }
+
+  private createFriend(userId: string, friendArg: IAddFriendArguments, id?: string): IFriend {
     this.validateArguments(friendArg); // TODO: validate birthday
     const bday: moment.Moment = friendArg.birthday ? Validator.parseDate(friendArg.birthday) : undefined;
     return <IFriend>{
-      _id: v4(),
+      _id: id || v4(),
       name: {
         first: friendArg.first,
         last: friendArg.last,

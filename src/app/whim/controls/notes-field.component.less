@@ -1,0 +1,73 @@
+@import 'field';
+
+.field.notes-field {
+  display: block;
+  margin: 6px 0;
+
+  .notes {
+    flex: 1;
+
+    .new-note {
+      margin-bottom: 25px;
+    }
+  }
+
+  .border {
+    border: 1px solid #ccc;
+    padding: 2px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  textarea {
+    border: none;
+    padding: 2px 5px;
+    outline: none;
+    cursor: text;
+    min-height: 80px;
+    margin-top: 2px;
+    box-sizing: border-box;
+  }
+
+  .description {
+    font-size: 12px;
+    color: #aaa;
+  }
+
+  .note {
+    margin-bottom: 20px;
+    padding: 1px 0 7px 0;
+    width: 100%;
+
+    .border {
+      border: none;
+    }
+
+    .note-content {
+      .header {
+        margin-bottom: 3px;
+        padding: 0 3px;
+        font-size: 12px;
+        color: #aaa;
+        display: flex;
+        border-bottom: 1px solid #ccc;
+      }
+
+      .wrapper {
+        position: relative;
+        overflow: hidden;
+
+        .text {
+          word-break: break-word;
+        }
+      }
+
+      .actions {
+        font-size: 12px;
+        color: #aaa;
+        display: flex;
+        justify-content: flex-end;
+      }
+    }
+  }
+}

@@ -1,0 +1,101 @@
+<div class="whim-header">
+  <div class="whim-title">{{title}}</div>
+  <div class="whim-subtitle" (click)="toEditMode()" *ngIf="!editMode">{{description}}</div>
+</div>
+
+<p3-whim-string-field
+[label]="'first'"
+[field]="'name.first'"
+[initialValue]="args.name.first"
+[editMode]="editMode"
+(onChange)="updateField($event)">
+</p3-whim-string-field>
+
+<p3-whim-string-field
+[label]="'last'"
+[field]="'name.last'"
+[initialValue]="args.name.last"
+[editMode]="editMode"
+(onChange)="updateField($event)">
+</p3-whim-string-field>
+
+<p3-whim-string-field
+[label]="'email'"
+[field]="'email'"
+[initialValue]="args.email"
+[editMode]="editMode"
+(onChange)="updateField($event)">
+</p3-whim-string-field>
+<p3-whim-string-field
+[label]="'phone'"
+[field]="'phone'"
+[initialValue]="args.phone"
+[editMode]="editMode"
+(onChange)="updateField($event)">
+</p3-whim-string-field>
+
+<p3-whim-string-field
+[label]="'address'"
+[field]="'address.address1'"
+[initialValue]="args.address.address1"
+[editMode]="editMode"
+(onChange)="updateField($event)">
+</p3-whim-string-field>
+
+<p3-whim-string-field
+[label]="'address (line 2)'"
+[field]="'address.address2'"
+[initialValue]="args.address.address2"
+[editMode]="editMode"
+(onChange)="updateField($event)">
+</p3-whim-string-field>
+
+<p3-whim-string-field
+[label]="'city'"
+[field]="'address.city'"
+[initialValue]="args.address.city"
+[editMode]="editMode"
+(onChange)="updateField($event)">
+</p3-whim-string-field>
+
+<p3-whim-string-field
+[label]="'state'"
+[field]="'address.state'"
+[initialValue]="args.address.state"
+[editMode]="editMode"
+(onChange)="updateField($event)">
+</p3-whim-string-field>
+
+<p3-whim-string-field
+[label]="'country'"
+[field]="'address.country'"
+[initialValue]="args.address.country"
+[editMode]="editMode"
+(onChange)="updateField($event)">
+</p3-whim-string-field>
+
+<p3-whim-string-field
+[label]="'organization'"
+[field]="'organization'"
+[initialValue]="args.organization"
+[editMode]="editMode"
+(onChange)="updateField($event)">
+</p3-whim-string-field>
+
+<p3-whim-notes-field
+[label]="'notes'"
+[field]="'notes'"
+[initialValue]="args.notes"
+[editMode]="editMode"
+(onChange)="updateField($event)">
+</p3-whim-notes-field>
+
+<div class="button-group">
+  <button
+  type="submit"
+  *ngIf="editMode"
+  (click)="submitChanges()">Update {{args.name.first}}</button>
+  <div class="nav-away-button" (click)="toDashboard()">Back to dashboard</div>
+</div>
+
+<div class="process-message">{{processMessage}}</div>

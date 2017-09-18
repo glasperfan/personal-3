@@ -19,4 +19,10 @@ export class FriendService {
     });
   }
 
+  updateFriends(friends: IFriend[]): Promise<void> {
+    return this.accountService.currentUser$.then(currentUser => {
+      return this.http.putOrThrow<IFriend[]>(WhimAPI.UpdateFriends, friends);
+    });
+  }
+
 }

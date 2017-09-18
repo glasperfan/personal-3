@@ -1,0 +1,40 @@
+<div class="field notes-field">
+  <div class="data">
+    <label class ="label" [attr.for]="label">{{label}}</label>
+    <div class="notes">
+
+      <div class="new-note" *ngIf="editMode">
+        <div class="border">
+          <textarea class="form-control"
+          [placeholder]="placeholderText"
+          (keydown)="listenForSubmit($event)"
+          [(ngModel)]="newNoteText">
+          </textarea>
+        </div>
+        <div class="description">Type Shift + Enter to submit.</div>
+      </div>
+
+      <div class="note" *ngFor="let note of value; let i = index">
+        <div class="border">
+          <div class="note-content">
+            <div class="header">
+              <div class="header-prop" *ngIf="note.dateCreated === note.dateModified">
+                {{note.dateCreated | dateFormat}}
+              </div>
+              <div class="header-prop" *ngIf="note.dateCreated !== note.dateModified">
+                edited {{note.dateModified | dateFormat}}
+              </div>
+            </div>
+            <div class="wrapper">
+              <div class="text" [innerHTML]="note.text | markdown"></div>
+            </div>
+            <div class="actions">
+              <div class="action" *ngIf="!editMode">{{note.text.length}} characters</div>
+              <div class="action" (click)="deleteNote(i)" *ngIf="editMode">delete</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

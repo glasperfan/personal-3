@@ -131,8 +131,8 @@ export enum WindowView {
   Dashboard = 'Dashboard',
   AddFriends = 'AddFriends',
   AddEvents = 'AddEvents',
-  ShowFriend = 'ShowFriend',
-  ShowEvent = 'ShowEvent',
+  ShowFriends = 'ShowFriends',
+  ShowEvents = 'ShowEvents',
   Calendar = 'Calendar'
 }
 
@@ -153,8 +153,9 @@ export enum WhimAPI {
   GetUser = '/user',
   AddFriends = '/friends',
   GetAllFriends = '/friends',
+  UpdateFriends = '/friends',
   GetAvailableFriends = '/friends/available',
-  GetFriend = '/user/friend',
+  GetFriend = '/friend',
   GetEvents = '/events',
   AddEvents = '/events',
   ParseSearch = '/parse'
@@ -167,6 +168,11 @@ export interface IResponse {
 export interface IError {
   errorMessage: string;
   httpCode: number;
+}
+
+export interface IField {
+  field: string;
+  value: any;
 }
 
 export interface IGetIdeasForDateParams {

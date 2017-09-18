@@ -13,12 +13,13 @@
 
   <div class="window-view-container">
     <div *ngSwitchCase="WindowView.None"></div>
-    <p3-whim-login *ngSwitchCase="WindowView.Login"             [args]="viewArgs" (switchTo)="switchTo($event)"></p3-whim-login>
-    <p3-whim-passcode *ngSwitchCase="WindowView.Passcode"       [args]="viewArgs" (switchTo)="switchTo($event)"></p3-whim-passcode>
-    <p3-whim-signup *ngSwitchCase="WindowView.Signup"           [args]="viewArgs" (switchTo)="switchTo($event)"></p3-whim-signup>
-    <p3-whim-add-friends *ngSwitchCase="WindowView.AddFriends"  [args]="viewArgs" (switchTo)="switchTo($event)"></p3-whim-add-friends>
-    <p3-whim-add-events *ngSwitchCase="WindowView.AddEvents"    [args]="viewArgs" (switchTo)="switchTo($event)"></p3-whim-add-events>
-    <p3-whim-dashboard *ngSwitchDefault                         [args]="viewArgs" (switchTo)="switchTo($event)"></p3-whim-dashboard>
+    <p3-whim-login *ngSwitchCase="WindowView.Login"               [args]="viewArgs" (switchTo)="switchTo($event)"></p3-whim-login>
+    <p3-whim-passcode *ngSwitchCase="WindowView.Passcode"         [args]="viewArgs" (switchTo)="switchTo($event)"></p3-whim-passcode>
+    <p3-whim-signup *ngSwitchCase="WindowView.Signup"             [args]="viewArgs" (switchTo)="switchTo($event)"></p3-whim-signup>
+    <p3-whim-add-friends *ngSwitchCase="WindowView.AddFriends"    [args]="viewArgs" (switchTo)="switchTo($event)"></p3-whim-add-friends>
+    <p3-whim-add-events *ngSwitchCase="WindowView.AddEvents"      [args]="viewArgs" (switchTo)="switchTo($event)"></p3-whim-add-events>
+    <p3-whim-show-friends *ngSwitchCase="WindowView.ShowFriends"  [args]="viewArgs" (switchTo)="switchTo($event)"></p3-whim-show-friends>
+    <p3-whim-dashboard *ngSwitchDefault                           [args]="viewArgs" (switchTo)="switchTo($event)"></p3-whim-dashboard>
   </div>
 
   <div class="break"></div>

@@ -48,6 +48,28 @@ export class HttpService {
     }).toPromise<void>();
   }
 
+  put<T, U>(url: string, payload: T): Promise<U> {
+    return this.http.put<U>(
+      Url.resolve(this.serverEndpoint, url),
+      payload
+    ).do((response: any) => {
+      if (response.error) {
+        throw response.error as IError;
+      }
+    }).toPromise<U>();
+  }
+
+  putOrThrow<T>(url: string, payload: T): Promise<void> {
+    return this.http.put<void>(
+      Url.resolve(this.serverEndpoint, url),
+      payload
+    ).do((response: any) => {
+      if (response.error) {
+        throw response.error as IError;
+      }
+    }).toPromise<void>();
+  }
+
   delete(url: string, queryParams?: QueryParams): Promise<void> {
     return this.http.delete<void>(
       Url.resolve(this.serverEndpoint, url),

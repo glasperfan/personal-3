@@ -378,7 +378,7 @@ export class AddEventParseResult extends ParseResultWithValidator {
 }
 
 export class QueryFriendParseResult extends ParseResultWithValidator {
-  public leadsTo: WindowView;
+  public leadsTo = WindowView.ShowFriends;
   private _snippet: ISnippet;
   private _tags: string[] = [];
 
@@ -402,8 +402,8 @@ export class QueryFriendParseResult extends ParseResultWithValidator {
     return desc;
   }
 
-  public get arguments(): any {
-    return { friend: this._friend };
+  public get arguments(): IFriend {
+    return this._friend;
   }
 
   protected extractData(): void {
@@ -429,9 +429,9 @@ export class QueryFriendParseResult extends ParseResultWithValidator {
 
 export class QueryEventParseResult extends ParseResultWithValidator {
 
-  public leadsTo: WindowView;
+  public leadsTo = WindowView.ShowEvents;
   private _tags: string[];
-  private _snippet: string;
+  private _snippet: ISnippet;
 
   constructor(private _event: IEvent, private _searchComponents: string[]) {
     super();
@@ -443,11 +443,11 @@ export class QueryEventParseResult extends ParseResultWithValidator {
   }
 
   public get description(): string {
-    return `${this._snippet}...${this.formatTags(this._tags)}`;
+    return `${this._snippet && this._snippet.text}...${this.formatTags(this._tags)}`;
   }
 
-  public get arguments(): any {
-    return { event: this._event };
+  public get arguments(): IEvent {
+    return this._event;
   }
 
   protected extractData(): void {
@@ -484,7 +484,7 @@ class QueryText {
       { text: f.address && f.address.city, field: 'location' },
       { text: f.organization, field: 'organization' },
       { text: f.skills && f.skills.join(', '), field: 'skills' },
-      { text: (f.notes || []).map(note => note.text).join(' '), field: 'notes' }
+      { text: f.notes.map(note => note.text).join(' '), field: 'notes' }
     ].map(s => this.Normalize(s));
   }
 
