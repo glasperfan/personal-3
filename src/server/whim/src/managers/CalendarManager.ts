@@ -1,5 +1,5 @@
-import { IAddEventArguments, IAddEventsArguments, IEvent, WhimError, WhimErrorCode } from './models';
-import { DatabaseManager } from './database-mgr';
+import { IAddEventArguments, IAddEventsArguments, IEvent, WhimError, WhimErrorCode } from '../models';
+import { DatabaseManager } from '../managers';
 import * as MongoDB from 'mongodb';
 import { v4 } from 'uuid';
 

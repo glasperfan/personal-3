@@ -1,4 +1,4 @@
-<div class="field string-field">
+<div class="field string-field" *ngIf="shouldShow">
   <div class="data">
     <label class ="label"[attr.for]="label">{{label}}</label>
     <div *ngIf="!editMode">

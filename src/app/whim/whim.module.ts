@@ -22,6 +22,7 @@ import { StringFieldComponent } from './controls/string-field.component';
 import { NotesFieldComponent } from './controls/notes-field.component';
 import { DateFormatPipe } from './controls/date.pipe';
 import { MarkdownPipe } from './controls/markdown.pipe';
+import { Autosize } from 'angular2-autosize/src/autosize.directive';
 import { whim_routing } from './whim.routing';
 import { WhimComponent } from './whim/whim.component';
 import { ServerEndpoint } from '../../server/whim/settings';
@@ -53,7 +54,8 @@ export const API_URL = new InjectionToken<string>('API_URL');
     StringFieldComponent,
     NotesFieldComponent,
     DateFormatPipe,
-    MarkdownPipe
+    MarkdownPipe,
+    Autosize
   ],
   exports: [ ] /* components referenced in RootModule */
 })

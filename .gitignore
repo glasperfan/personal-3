@@ -3,6 +3,7 @@
 # specific
 /src/server/whim/**/*.js
 /src/server/whim/**/*.d.ts
+/src/server/whim/**/*.js.map
 
 # compiled output
 /dist

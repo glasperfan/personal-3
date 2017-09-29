@@ -1,3 +1,4 @@
+import { FieldComponent } from './field.component';
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { IField, INote, Note } from 'app/whim/models';
 
@@ -6,20 +7,10 @@ import { IField, INote, Note } from 'app/whim/models';
   templateUrl: './notes-field.component.html',
   styleUrls: ['./notes-field.component.less']
 })
-export class NotesFieldComponent {
+export class NotesFieldComponent extends FieldComponent<INote[]> {
 
-  @Input() label: string;
-  @Input() field: string;
-  @Input() editMode: boolean;
-  @Input() showControls = false;
-  @Output() onChange = new EventEmitter<IField>();
-  private value: INote[];
   private newNoteText: string;
   private readonly placeholderText = 'Add a note...';
-
-  @Input() set initialValue(initialValue: INote[]) {
-    this.value = initialValue;
-  }
 
   listenForSubmit(event: KeyboardEvent) {
     // Shift + Enter

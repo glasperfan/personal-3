@@ -1,4 +1,4 @@
-import { IFriend, MethodCode } from './models';
+import { MethodCode, IFriend } from '../models';
 
 export interface IMethodGenerator {
   code: MethodCode;

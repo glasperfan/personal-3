@@ -1,4 +1,4 @@
-import { WhimError } from './models';
+import { WhimError } from '../models';
 import * as MongoDB from 'mongodb';
 const MongoClient = MongoDB.MongoClient;
 
@@ -42,9 +42,9 @@ export class DatabaseManager {
   public getOrCreateCollection<T>(collectionName: string): MongoDB.Collection<T> {
     return this.dbObject.collection(collectionName, (err, col) => {
       if (!err) {
-        console.log(err);
         return col;
       }
+      console.log(`Creating collection ${collectionName}`);
       return this.dbObject.createCollection<T>(collectionName);
     });
   }

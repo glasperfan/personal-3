@@ -1,4 +1,4 @@
-import { IIdeaSelection } from './models';
+import { IIdeaSelection } from '../models';
 export class HistoryManager {
 
   public getHistoryForDate(date: Date): Promise<IIdeaSelection[]> {

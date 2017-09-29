@@ -17,14 +17,17 @@ import {
     WhimError,
     IFriend,
 } from './models';
-import { DatabaseManager } from './database-mgr';
-import { FriendManager } from './friend-mgr';
-import { HistoryManager } from './history-mgr';
-import { CommandParser } from './command-parser';
-import { IdeaGenerator } from './idea-gen';
-import { CalendarManager } from './calendar-mgr';
-import { MethodManager } from './method-mgr';
-import { UserManager } from './user-mgr';
+import {
+  CalendarManager,
+  DatabaseManager,
+  FriendManager,
+  HistoryManager,
+  MethodManager,
+  UserManager
+} from './managers';
+import { IdeaGenerator } from './generators';
+import { CommandParser } from './parsers';
+
 import * as bodyParser from 'body-parser';
 import * as express from 'express';
 import * as http from 'http';
@@ -36,12 +39,12 @@ import { Settings } from './settings';
 
 interface IApp {
   Express: express.Application;
+  CalendarManager: CalendarManager;
   DatabaseManager: DatabaseManager;
   FriendManager: FriendManager;
+  HistoryManager: HistoryManager;
   MethodManager: MethodManager;
   UserManager: UserManager;
-  CalendarManager: CalendarManager;
-  HistoryManager: HistoryManager;
   IdeaGenerator: IdeaGenerator;
   CommandParser: CommandParser;
 }

@@ -8,9 +8,9 @@
           "type": "node",
           "request": "launch",
           "name": "node app.js",
-          "program": "${workspaceRoot}/js/app.js",
+          "program": "${workspaceRoot}/dist/app.js",
           "outFiles": [
-            "${workspaceRoot}/js/**/*.js"
+            "${workspaceRoot}/dist/**/*.js"
           ],
           "sourceMaps": true
         }

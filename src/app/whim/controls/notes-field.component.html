@@ -1,11 +1,12 @@
-<div class="field notes-field">
+<div class="field notes-field" *ngIf="shouldShow">
   <div class="data">
     <label class ="label" [attr.for]="label">{{label}}</label>
     <div class="notes">
 
       <div class="new-note" *ngIf="editMode">
         <div class="border">
-          <textarea class="form-control"
+          <textarea autosize
+          class="form-control"
           [placeholder]="placeholderText"
           (keydown)="listenForSubmit($event)"
           [(ngModel)]="newNoteText">

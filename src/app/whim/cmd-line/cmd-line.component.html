@@ -9,7 +9,7 @@
     <li class="result" *ngFor="let result of results" (click)="onSelect(result)">
       <div class="result-header" [innerHTML]="result.header"></div>
       <div class="result-description">
-        <p *ngFor="let d of (result.description.split('%%'))" [innerHTML]="d"></p>
+        <p *ngFor="let d of (result.description.split('%%'))" [innerHTML]="d | markdown"></p>
       </div>
     </li>
   </ul>

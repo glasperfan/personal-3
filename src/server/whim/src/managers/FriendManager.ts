@@ -1,6 +1,6 @@
-import { Validator } from './validator';
-import { IAddFriendArguments, IAddFriendsArguments, IFriend, IUser, Note, WhimError, Birthday } from './models';
-import { DatabaseManager } from './database-mgr';
+import { parseString, Validator } from '../parsers';
+import { IAddFriendArguments, IAddFriendsArguments, IFriend, IUser, Note, WhimError, Birthday } from '../models';
+import { DatabaseManager } from '../managers';
 import * as MongoDB from 'mongodb';
 import { v4 } from 'uuid';
 import * as moment from 'moment';
@@ -36,11 +36,9 @@ export class FriendManager {
   getAvailableFriends(userId: string): Promise<IFriend[]> {
     return this.getUserFriendCollection(userId)
       .then(collection => {
-        console.log(collection);
         return collection.find().toArray();
       })
       .catch(e => {
-        console.log(e);
         throw e;
       });
   }
@@ -105,7 +103,7 @@ export class FriendManager {
 
   private createFriend(userId: string, friendArg: IAddFriendArguments, id?: string): IFriend {
     this.validateArguments(friendArg); // TODO: validate birthday
-    const bday: moment.Moment = friendArg.birthday ? Validator.parseDate(friendArg.birthday) : undefined;
+    const bday: moment.Moment = friendArg.birthday ? parseString(friendArg.birthday) : undefined;
     return <IFriend>{
       _id: id || v4(),
       name: {

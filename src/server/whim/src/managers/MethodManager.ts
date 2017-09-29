@@ -7,9 +7,9 @@ import {
     MealMethodGenerator,
     TextMethodGenerator,
     VideoChatMethodGenerator,
-} from './method-gen';
-import { IFriend, IMethod, IUser, MethodCode } from './models';
-import { DatabaseManager } from './database-mgr';
+} from '../generators';
+import { IFriend, IMethod, IUser, MethodCode } from '../models';
+import { DatabaseManager } from '../managers';
 
 export class MethodManager {
   public static get DefaultFormatGenerators(): IMethodGenerator[] {

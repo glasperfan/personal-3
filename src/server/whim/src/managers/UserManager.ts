@@ -1,5 +1,5 @@
-import { IGetUserParams, ILoginArguments, ISignupArguments, IUser, IUserWithPasscode, WhimAPI, WhimError } from './models';
-import { DatabaseManager } from './database-mgr';
+import { IGetUserParams, ILoginArguments, ISignupArguments, IUser, IUserWithPasscode, WhimAPI, WhimError } from '../models';
+import { DatabaseManager } from '../managers';
 import * as MongoDB from 'mongodb';
 import { v4 } from 'uuid';
 

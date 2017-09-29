@@ -1,7 +1,9 @@
+import { HttpService } from '../services/http.service';
 import { WindowManager } from '../services/window.manager';
 import { AccountService } from '../services/account.service';
 import { Component, OnInit } from '@angular/core';
 import { WindowView, WindowViewWithArgs } from '../models';
+import { Subscription } from 'rxjs/Rx';
 
 @Component({
   selector: 'p3-whim',
@@ -12,8 +14,9 @@ import { WindowView, WindowViewWithArgs } from '../models';
 export class WhimComponent implements OnInit {
   private WindowView = WindowView;
   private viewArgs: any;
+  private connRefusedSubscription: Subscription;
 
-  constructor(private accountService: AccountService, private windowManager: WindowManager) {
+  constructor(private httpService: HttpService, private accountService: AccountService, private windowManager: WindowManager) {
     this.clearView();
   }
 

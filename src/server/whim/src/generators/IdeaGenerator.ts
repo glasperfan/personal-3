@@ -1,9 +1,11 @@
-import { HistoryManager } from './history-mgr';
-import { IMethodGenerator } from './method-gen';
-import { IFriend, IIdea, IIdeaSelection, IMethod, IUser, MethodCode, WhimError, WhimErrorCode } from './models';
-import { DatabaseManager } from './database-mgr';
-import { FriendManager } from './friend-mgr';
-import { MethodManager } from './method-mgr';
+import { WhimError, WhimErrorCode, IIdea, IIdeaSelection, IFriend } from '../models';
+import {
+  DatabaseManager,
+  HistoryManager,
+  FriendManager,
+  MethodManager
+} from '../managers';
+import { IMethodGenerator } from './MethodGenerator';
 import { v4 } from 'uuid';
 
 // Takes a user, their methods, their history, and their friend list, and spits out ideas.

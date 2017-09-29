@@ -1,3 +1,4 @@
+import { FieldComponent } from './field.component';
 import { IField } from '../models';
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 
@@ -6,20 +7,10 @@ import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
   templateUrl: './string-field.component.html',
   styleUrls: ['./string-field.component.less']
 })
-export class StringFieldComponent implements OnInit {
-  @Input() label: string;
-  @Input() field: string;
-  @Input() editMode: boolean;
-  @Input() showControls = false;
-  @Output() onChange = new EventEmitter<IField>();
-  private value: string;
+export class StringFieldComponent extends FieldComponent<string> implements OnInit {
   private readonly emptyProperty = 'undefined';
 
   ngOnInit() {
-  }
-
-  @Input() set initialValue(initialValue: string) {
-    this.value = initialValue;
   }
 
   update(newValue: string): void {

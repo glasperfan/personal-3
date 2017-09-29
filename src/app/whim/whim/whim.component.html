@@ -1,4 +1,7 @@
-<div id="fb-root"></div>
+<div id="dialog" *ngIf="httpService.connRefused$ | async">
+  <div class="header">Uh oh...</div>
+  <div class="subtitle">We can't seem to connect to the server.</div>
+</div>
 <div class="frame" [ngSwitch]="windowManager.currentWindow$ | async">
   <div class="description">
     <p><b>whim</b> is about building stronger connections with the most important people in your life. In this age of technological distractions and productivity obsessions, I rarely take the time out of my day to reach out to even my closest friends. I built this as a reminder that</p>

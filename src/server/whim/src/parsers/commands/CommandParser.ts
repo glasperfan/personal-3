@@ -1,6 +1,5 @@
-import { CalendarManager } from './calendar-mgr';
-import { FriendManager } from './friend-mgr';
-import { Validator } from './validator';
+import { parseArray, parseString, Validator } from '../../parsers';
+import { CalendarManager, FriendManager, DatabaseManager } from '../../managers';
 import {
     IAddFriendArguments,
     IEvent,
@@ -13,13 +12,11 @@ import {
     WindowView,
     INote,
     Birthday,
-} from './models';
-import { DatabaseManager } from './database-mgr';
+} from '../../models';
 import * as moment from 'moment-timezone';
 import * as MongoDB from 'mongodb';
 
 export class CommandParser {
-
   private static FriendQueryIndexes: string[] = [
     'email',
     'phone',
@@ -75,6 +72,7 @@ export class CommandParser {
     return collection.find({ '$text': { '$search': components.join(' ') } })
       .toArray()
       .catch(e => {
+        console.log('SEARCH BY TEXT ERROR');
         console.log(e);
         return [];
       });
@@ -254,9 +252,7 @@ export class AddFriendParseResult extends ParseResultWithValidator {
         return;
       }
       // Parsing in reverse order of length since May 22 will match before May 22 1990
-      const asDate = Validator.parseDate(this._components.slice(idx + 1, idx + 4).join(' '))
-        || Validator.parseDate(this._components.slice(idx + 1, idx + 3).join(' '))
-        || Validator.parseDate(component);
+      const asDate = this.extractDateComponents(idx);
       if (Validator.isTag(component)) {
         this._tags.push(component);
       } else if (Validator.isEmail(component) && !this._email) {
@@ -279,26 +275,42 @@ export class AddFriendParseResult extends ParseResultWithValidator {
       }
     });
   }
+
+  private extractDateComponents(idx: number): moment.Moment {
+    if (this._birthday) {
+      return undefined;
+    }
+    return parseArray(this._components.slice(idx + 1, idx + 4))
+    || parseArray(this._components.slice(idx + 1, idx + 3))
+    || parseString(this._components[idx]);
+  }
 }
 
 export class AddEventParseResult extends ParseResultWithValidator {
 
   public static OnceDateKeyword = 'on';
-  public static OnceTimeKeyword = 'at';
   public static RecurrentKeyword = 'every';
+  public static Keywords = [
+    AddEventParseResult.OnceDateKeyword,
+    AddEventParseResult.RecurrentKeyword,
+    'today',
+    'tomorrow',
+    'next week'
+  ];
 
   public static validate(inputComponents: string[]): boolean {
-    const onMatch = inputComponents.lastIndexOf(this.OnceDateKeyword);
-    const atMatch = inputComponents.lastIndexOf(this.OnceTimeKeyword);
-    const everyMatch = inputComponents.lastIndexOf(this.RecurrentKeyword);
-    return [onMatch, atMatch, everyMatch]
-      .some(keywordIdx => keywordIdx > 0 && keywordIdx < inputComponents.length - 1);
+    for (const keyword in this.Keywords) {
+      if (keyword in inputComponents) {
+        return true;
+      }
+    }
+    return false;
   }
 
   public leadsTo: WindowView = WindowView.AddEvents;
   private _date: IEventDate;
-  private _title: string;
-  private _tags: string[];
+  private _title = '';
+  private _tags: string[] = [];
 
   constructor(private _components: string[]) {
     super();
@@ -310,15 +322,16 @@ export class AddEventParseResult extends ParseResultWithValidator {
   }
 
   public get description(): string {
-    let desc = 'Use the keywords "at" or "on" for one-time events, and "every" for recurring events.';
+    let desc: string;
     if (this._date) {
-      const formattedDate = moment(this._date.baseDate)
-        .tz(moment.tz.guess())
-        .format('MMMM D, YYYY hh:mm a z');
+      const formattedDate = moment(this._date.baseDate).format('MMMM D, YYYY');
       desc = `${formattedDate} (date)`;
     }
-    if (this._tags) {
+    if (this._tags && this._tags.length) {
       desc += ` ${this._tags.join(', ')} (tags)`;
+    }
+    if (!desc) {
+      desc = 'Use the keywords "at" or "on" for one-time events, and "every" for recurring events.';
     }
     return desc;
   }
@@ -332,48 +345,52 @@ export class AddEventParseResult extends ParseResultWithValidator {
   };
 
   protected extractData(): void {
-    let toSkip = 0;
-    this._components.forEach((component, idx) => {
-      if (toSkip > 0) {
-        --toSkip;
-        return;
+    for (let idx = 0; idx < this._components.length; idx++) {
+      const component = this._components[idx];
+      if (this.extractTag(component)) {
+        continue;
       }
-      if (Validator.isTag(component)) {
-        if (!this._tags) {
-          this._tags = [];
-        }
-        this._tags.push(component);
-      } else if (component === AddEventParseResult.OnceTimeKeyword ||
-        component === AddEventParseResult.OnceDateKeyword) {
-        const parsedDate = Validator.parseDate(this._components.slice(idx + 1).join(' '));
-        if (parsedDate) {
-          this._date = {
-            recurrent: false,
-            baseDate: parsedDate.valueOf()
-          };
-          toSkip = idx;
-          return;
-        }
-      } else if (component === AddEventParseResult.RecurrentKeyword) {
-        const parsedDate = Validator.parseDate(this._components.slice(idx + 1).join(' '));
-        if (parsedDate) {
-          this._date = {
-            recurrent: true,
-            baseDate: parsedDate.valueOf(),
-            recurrenceOffset: 'week'
-          };
-          toSkip = idx;
-          return;
+      const numDateComponents: number = this.extractDateComponents(idx);
+      if (numDateComponents > 0) {
+        idx += numDateComponents;
+        continue;
+      }
+      if (this.extractDescription(component)) {
+        continue;
+      }
+    }
+  }
+
+  private extractTag(term: string): boolean {
+    const match: boolean = Validator.isTag(term);
+    if (match) {
+      this._tags.push(term);
+    }
+    return match;
+  }
+
+  private extractDescription(term: string): boolean {
+    const match: boolean = !Validator.isTagStart(term);
+    if (match) {
+        this._title += ` ${term}`;
+    }
+    return match;
+  }
+
+  /**
+   * Returns end index of valid date string, found starting from idx.
+   * -1 if none found.
+   */
+  private extractDateComponents(idx: number): number {
+    if (!this._date) {
+      for (let i = idx + 1; i <= this._components.length; i++) {
+        const parsed = parseArray(this._components.slice(idx, i));
+        if (parsed !== undefined) {
+          return i;
         }
       }
-      if (!Validator.isTagStart(component)) {
-        if (!this._title) {
-          this._title = component;
-        } else {
-          this._title += ` ${component}`;
-        }
-      }
-    });
+    }
+    return -1;
   }
 }
 
@@ -489,7 +506,7 @@ class QueryText {
   }
 
   public static ParseEvent(e: IEvent): ISnippet[] {
-    const baseDateMoment = Validator.parseDate(e.date && e.date.baseDate && e.date.baseDate.toString());
+    const baseDateMoment = parseString(e.date && e.date.baseDate && e.date.baseDate.toString());
     return [
       { text: e.title, field: 'title' },
       { text: baseDateMoment && baseDateMoment.format('MMMM D, YYYY'), field: 'date' },
