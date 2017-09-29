@@ -25,7 +25,7 @@ gulp.task('build-whim-server', function () {
   return gulp.src(tsFiles)
     .pipe(sourcemaps.init())
     .pipe(tsProject())
-    .pipe(sourcemaps.write('../src'))
+    .pipe(sourcemaps.write('.', { includeContent: false, sourceRoot: '..\src' }))
     .pipe(gulp.dest(whimServerDistDir));
 });
 

@@ -16,7 +16,7 @@ import {
     WhimAPI,
     WhimError,
     IFriend,
-} from './models';
+} from '../models';
 import {
   CalendarManager,
   DatabaseManager,
@@ -24,9 +24,9 @@ import {
   HistoryManager,
   MethodManager,
   UserManager
-} from './managers';
-import { IdeaGenerator } from './generators';
-import { CommandParser } from './parsers';
+} from '../managers';
+import { IdeaGenerator } from '../generators';
+import { CommandParser } from '../parsers';
 
 import * as bodyParser from 'body-parser';
 import * as express from 'express';
