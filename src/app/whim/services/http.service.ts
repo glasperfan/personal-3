@@ -25,11 +25,8 @@ export class HttpService {
     return this.http.get<T>(
       Url.resolve(this.serverEndpoint, url),
       { params: this.genParams(queryParams) }
-    ).do((response: any) => {
-      if (response.error) {
-        throw response.error as IError;
-      }
-      }).toPromise<T>()
+    ).do((response: any) => this.checkForServerError(response))
+      .toPromise<T>()
       .catch(err => this.proccessHttpError(err));
   }
 
@@ -94,16 +91,21 @@ export class HttpService {
 
   private checkForServerError(response: any): void {
     if (response.error) {
-      throw response.error as IError;
+      throw new WhimError(response.error.errorMessage, response.error.httpCode);
     }
   }
 
-  private proccessHttpError(err: HttpErrorResponse): any {
+  private proccessHttpError(err: HttpErrorResponse | WhimError): any {
     // Connection refused
-    if (err.status === 0) {
+    if (err instanceof HttpErrorResponse && err.status === 0) {
       this._connRefused$.next(true);
+      throw new WhimError(err.message, err.status);
+    } else if (err instanceof WhimError) {
+      // Propagate any other errors
+      throw err;
+    } else {
+      throw new WhimError('Unhandled exception in http.service.');
     }
-    throw new WhimError(err.message, err.status);
   }
 
 }

@@ -25,7 +25,7 @@ import { MarkdownPipe } from './controls/markdown.pipe';
 import { Autosize } from 'angular2-autosize/src/autosize.directive';
 import { whim_routing } from './whim.routing';
 import { WhimComponent } from './whim/whim.component';
-import { ServerEndpoint } from '../../server/whim/settings';
+import { ServerEndpoint } from '../../server/whim/src/app/settings';
 
 // TODO: update for local and prod endpoints
 export const API_URL = new InjectionToken<string>('API_URL');
