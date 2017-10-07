@@ -4,6 +4,27 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
+      {
+        "type": "node",
+        "request": "launch",
+        "name": "Mocha Tests",
+        "program": "/usr/local/bin/mocha",
+        "args": [
+          "-u",
+          "tdd",
+          "--timeout",
+          "999999",
+          "--colors",
+          "${workspaceRoot}/test/**/*.js"
+        ],
+        "runtimeArgs": [ "--nolazy" ],
+        "outFiles": [
+          "${workspaceRoot}/test/**/*.js"
+        ],
+        "sourceMaps": false,
+        "internalConsoleOptions": "openOnSessionStart",
+        "preLaunchTask": "build-whim-tests"
+      },
         {
           "type": "node",
           "request": "launch",
@@ -12,7 +33,8 @@
           "outFiles": [
             "${workspaceRoot}/dist/**/*.js"
           ],
-          "sourceMaps": true
+          "sourceMaps": true,
+          "preLaunchTask": "build-whim-server"
         }
     ]
 }

@@ -1,5 +1,14 @@
 import { parseString, Validator } from '../parsers';
-import { IAddFriendArguments, IAddFriendsArguments, IFriend, IUser, Note, WhimError, Birthday } from '../models';
+import {
+    Birthday,
+    IAddFriendArguments,
+    IAddFriendsArguments,
+    IFriend,
+    IParsedDate,
+    IUser,
+    Note,
+    WhimError,
+} from '../models';
 import { DatabaseManager } from '../managers';
 import * as MongoDB from 'mongodb';
 import { v4 } from 'uuid';
@@ -103,7 +112,7 @@ export class FriendManager {
 
   private createFriend(userId: string, friendArg: IAddFriendArguments, id?: string): IFriend {
     this.validateArguments(friendArg); // TODO: validate birthday
-    const bday: moment.Moment = friendArg.birthday ? parseString(friendArg.birthday) : undefined;
+    const bday: IParsedDate = friendArg.birthday ? parseString(friendArg.birthday) : undefined;
     return <IFriend>{
       _id: id || v4(),
       name: {
@@ -111,7 +120,7 @@ export class FriendManager {
         last: friendArg.last,
         displayName: `${friendArg.first} ${friendArg.last}`,
       },
-      birthday: friendArg ? new Birthday(bday) : undefined,
+      birthday: friendArg ? new Birthday(moment(bday.startDate, 'x')) : undefined,
       email: friendArg.email,
       phone: friendArg.phone,
       address: {

@@ -4,3 +4,4 @@ const path = require('path');
 require('require-dir')('./tasks');
 
 gulp.task('default', ['build-whim-server']);
+gulp.task('test', ['build-whim-tests', 'run-unit-tests']);

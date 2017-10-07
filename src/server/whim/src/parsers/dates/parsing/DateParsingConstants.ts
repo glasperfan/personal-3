@@ -1,14 +1,11 @@
+import { RecurrenceInterval } from '../../../models';
 import * as moment from 'moment';
 
 export class DateParsingConstants {
   public static readonly SkipOneKeyword = 'next';
   public static readonly AlternatingKeyword = 'other';
 
-  public static readonly AcceptedDatetimeFormats: string[] = [
-    'M-D-YYYY h:mm a',  // 09-8-2017 5:04 PM
-    'M-D-YY h:mm a',    // 09-8-17 5:04 AM
-    'M/D/YYYY h:mm a',  // 09/8/2017 5:04 PM
-    'M/D/YY h:mm a',    // 09/8/17 5:04 AM
+  public static readonly AcceptedDateFormats: string[] = [
     'MMMM Do YYYY',     // September 7th 1994
     'MMMM Do, YYYY',    // September 7th, 1994
     'MMMM D YYYY',      // September 7 1994
@@ -20,34 +17,84 @@ export class DateParsingConstants {
     'MMMM Do',          // September 9th
     'MMMM D',           // September 9
     'MMM Do',           // Sep 9th, Sept 9th
-    'MMM D',            // Sep 9, Sept 9
+    'MMM D'            // Sep 9, Sept 9
+  ];
+
+  public static readonly AcceptedWeekDateFormats: string[] = [
     'dddd',             // Saturday, Sunday
-    'ddd',              // Sat, Sun
-    'h:m a',            // 3:30 am
+    'ddd'              // Sat, Sun
+  ];
+
+  public static readonly AcceptedTimeFormats: string[] = [
+    'h:m a'            // 3:30 am
+  ];
+
+  public static readonly AcceptedDatetimeFormats: string[] = [
+    'M-D-YYYY h:mm a',  // 09-8-2017 5:04 PM
+    'M-D-YY h:mm a',    // 09-8-17 5:04 AM
+    'M/D/YYYY h:mm a',  // 09/8/2017 5:04 PM
+    'M/D/YY h:mm a',    // 09/8/17 5:04 AM
     'x'                 // Unix timestamp
   ];
 
-  public static Now() {
+  public static readonly DateUnits: string[] = [
+    'day', 'week', 'month', 'year',
+    'days', 'weeks', 'months', 'years'
+  ];
+
+  public static readonly DateUnitToRecurrenceInterval: { [unit: string]: RecurrenceInterval } = {
+    'day': 'day',
+    'days': 'day',
+    'week': 'week',
+    'weeks': 'week',
+    'month': 'month',
+    'months': 'month',
+    'year': 'year',
+    'years': 'year'
+  };
+
+  public static AsDayOfWeek(s: string): moment.Moment {
+    const m = moment(s, 'dddd');
+    return m.isValid() ? m : undefined;
+  }
+
+  public static Now(): moment.Moment {
     return moment(Date.now());
   };
 
-  public static StartOfDay(d: moment.Moment): moment.Moment {
-    return d.clone().startOf('day');
+  public static StartOfDay(d?: moment.Moment): moment.Moment {
+    return (d || this.Now()).clone().startOf('day');
   }
 
-  public static StartOfToday() {
+  public static StartOfToday(): moment.Moment {
     return this.StartOfDay(this.Now());
   }
 
-  public static StartOfYesterday(d: moment.Moment): moment.Moment {
-    return d.clone().startOf('day').subtract(1, 'day');
+  public static StartOfTomorrow(d?: moment.Moment): moment.Moment {
+    return (d || this.Now()).clone().startOf('day').add(1, 'day');
   }
 
-  public static StartOfOneWeekBefore(d: moment.Moment): moment.Moment {
-    return d.clone().startOf('day').subtract(1, 'week');
+  public static StartOfYesterday(d?: moment.Moment): moment.Moment {
+    return (d || this.Now()).clone().startOf('day').subtract(1, 'day');
   }
 
-  public static IsValidTimestamp(timestamp: number) {
+  public static StartOfWeek(d?: moment.Moment): moment.Moment {
+    return (d || this.Now()).clone().startOf('week');
+  }
+
+  public static StartOfMonth(d?: moment.Moment): moment.Moment {
+    return (d || this.Now()).clone().startOf('month');
+  }
+
+  public static StartOfYear(d?: moment.Moment): moment.Moment {
+    return (d || this.Now()).clone().startOf('year');
+  }
+
+  public static StartOfOneWeekBefore(d?: moment.Moment): moment.Moment {
+    return (d || this.Now()).clone().startOf('day').subtract(1, 'week');
+  }
+
+  public static IsValidTimestamp(timestamp: number): boolean {
     return !isNaN(new Date(timestamp).getTime());
   }
 }

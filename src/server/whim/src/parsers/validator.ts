@@ -33,7 +33,7 @@ export class Validator {
 
   public static isDate(s: string): boolean {
     const result = parseString(s);
-    return result && result.isValid();
+    return !!result;
   }
 
   public static capitalize(s: string) {

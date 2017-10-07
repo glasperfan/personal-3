@@ -1,3 +1,4 @@
+import { OneTimeDate } from '../parsers/dates/OneTimeDate';
 import { IAddEventArguments, IAddEventsArguments, IEvent, WhimError, WhimErrorCode } from '../models';
 import { DatabaseManager } from '../managers';
 import * as MongoDB from 'mongodb';
@@ -49,7 +50,7 @@ export class CalendarManager {
       _id: v4(),
       userId: userId,
       title: args.title,
-      date: { recurrent: false, baseDate: args.date },
+      date: new OneTimeDate(args.date),
       description: args.description,
       whenAdded: new Date(),
       whenLastModified: new Date()

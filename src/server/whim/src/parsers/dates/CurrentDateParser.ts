@@ -1,4 +1,4 @@
-import { WhimError } from '../../models';
+import { WhimError, IParsedDate } from '../../models';
 import { DateParser as V1Parser} from './parsing/v1/parser';
 import { IDateParser } from './contracts/IDateParser';
 
@@ -11,12 +11,10 @@ export function getCurrentParser(): IDateParser {
   }
 }
 
-const parser = getCurrentParser();
-
-export function parseString(s: string) {
-  return parser.parseString(s);
+export function parseString(s: string): IParsedDate {
+  return getCurrentParser().parseString(s);
 }
 
-export function parseArray(s: string[]) {
-  return parser.parseArray(s);
+export function parseArray(s: string[]): IParsedDate {
+  return getCurrentParser().parseArray(s);
 }
