@@ -21,13 +21,14 @@ const whimServerDistDir = path.join(whimServerDir, 'dist');
 const whimServerModelsDir = path.join(whimServerSrcDir, 'models');
 
 const tsConfig = path.join(whimServerDir, 'tsconfig.json');
-var tsProject = ts.createProject(tsConfig);
+var tsProjectServer = ts.createProject(tsConfig);
+var tsProjectTest = ts.createProject(tsConfig);
 
 gulp.task('build-whim-server', function () {
   var tsFiles = path.join(whimServerSrcDir, '**/*.ts');
   return gulp.src(tsFiles)
     .pipe(sourcemaps.init())
-    .pipe(tsProject())
+    .pipe(tsProjectServer())
     .pipe(sourcemaps.write('.', { includeContent: false, sourceRoot: '..\src' }))
     .pipe(gulp.dest(whimServerDistDir));
 });
@@ -41,8 +42,8 @@ gulp.task('build-whim-server-for-tests', function () {
   var tsFiles = path.join(whimServerSrcDir, '**/*.ts');
   return gulp.src(tsFiles)
     .pipe(sourcemaps.init())
-    .pipe(tsProject())
-    .pipe(sourcemaps.write())
+    .pipe(tsProjectServer())
+    .pipe(sourcemaps.write('.'))
     .pipe(gulp.dest(whimServerSrcDir));
 });
 
@@ -50,7 +51,7 @@ gulp.task('build-whim-tests', function () {
   var tsFiles = path.join(whimServerTestDir, '**/*.ts');
   return gulp.src(tsFiles)
     .pipe(sourcemaps.init())
-    .pipe(tsProject())
+    .pipe(tsProjectTest())
     .pipe(sourcemaps.write('.'))
     .pipe(gulp.dest(whimServerTestDir))
 });

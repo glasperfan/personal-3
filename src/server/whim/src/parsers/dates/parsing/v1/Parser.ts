@@ -8,6 +8,7 @@ import { DateParsingConstants as Constants } from '../DateParsingConstants';
  * V1 does not support:
  *  1. multiple dates in a single input
  *  2. inner words not related to the date (i.e. 'remind me' in the middle of the string)
+ *  3. Assumes all dates are described in a single sentence.
  *
  * Approach is to split each string into 3 components.
  *  1. Start date (SD)
@@ -22,16 +23,17 @@ import { DateParsingConstants as Constants } from '../DateParsingConstants';
  * If recurrence is implied but not specified, the default recurrence will be:
  *  RP: 'every day'
  *  RD: 'forever'
+ *
+ * For the 3rd assumption, consider the sentence: "Jeff goes to the store on
+ * Monday. He will go every week." We assume that each sentence describes up to
+ * 1 date. So "on Monday" is one day and "every week".
+ * Potentially in a later version, we are able to associate the 2 date information
+ * fragments, since they form a composite date together.
  * */
 export class DateParser implements IDateParser {
-  private static Formats = Constants.AcceptedDateFormats.concat(Constants.AcceptedDatetimeFormats);
-  private _isRecurrent = false;
-  private _isAlternating = false;
-  private _recurEvery: IRecurEvery;
-  private _recurFor: IRecurFor;
-  private _startDate: moment.Moment;
+  private static keywords = ['for', 'every', 'starting', 'on', 'is'];
+  private static minorKeywords = ['next', 'this'];
   private _s: string;
-  private _startInputText: string;
 
   public parseArray(sArr: string[]): IParsedDate {
     return this.parseString(sArr.join(' '));
@@ -39,11 +41,144 @@ export class DateParser implements IDateParser {
 
   public parseString(s: string): IParsedDate {
     this._s = s = s && s.trim();
-    this.extractStartDateComponents(s);
-    this.extractRecurEveryComponents(s);
-    this.extractRecurForComponents(s);
+    // Split by sentence
+    const sentences = s.split('. ');
+
+    // For each sentence, find potential date information fragments.
+    for (const sentence of sentences) {
+      const fragments = this.extractFragments(sentence);
+      const fragParser = new FragmentParser(fragments);
+      const extractedDate = fragParser.extract();
+      if (extractedDate) {
+        return extractedDate;
+      }
+    }
+    return undefined;
+  }
+
+  private extractFragments(sentence: string): string[] {
+    let fragments: string[] = [];
+    let currentFragment: string[] = [];
+    const words = sentence.replace(',', '').split(' ');
+    for (const word of words) {
+      const lc = word.toLowerCase();
+      if (DateParser.keywords.includes(lc)) { // start of fragment
+        if (currentFragment.length) {
+          fragments = fragments.concat(this.explode(currentFragment));
+        }
+        currentFragment = [word];
+      } else if (currentFragment.length) { // continuation of fragment
+        currentFragment.push(word);
+      } else if (DateParser.minorKeywords.includes(lc)) {
+        if (currentFragment.length) {
+          fragments = fragments.concat(this.explode(currentFragment));
+        }
+        currentFragment = [word];
+      }
+    }
+
+    // Flush last fragment
+    if (currentFragment.length) {
+      fragments = fragments.concat(this.explode(currentFragment));
+    }
+
+    // Normalize
+    fragments = fragments.map(f => {
+      f = f.replace(/\.+$/, ''); // no trailing periods
+      return f.replace(',', ''); // no commas
+    });
+
+    // Although slow, if we don't find any fragments, try every word.
+    return fragments.length ? fragments : words;
+  }
+
+  /** 'Starting Monday I will go. => [
+   *    'Starting Monday',
+   *    'Starting Monday I',
+   *    'Starting Monday I will']
+   *  We assume the longest date in word length is 4. (i.e. On September 18th 2017)
+   * */
+  private explode(words: string[]): string[] {
+    const options = [];
+    for (let i = 2; i <= 4; i++) {
+      if (words.length >= i) {
+        options.push(words.slice(0, i).join(' '));
+      }
+    }
+    return options;
+  }
+}
+
+/**
+ * We break each sentence into fragments, and then test for a valid date within it.
+ * If no fragment provides date information, return undefined.
+ * Use FragmentParser properties to access any extract information from an input sentence.
+ *
+ */
+class FragmentParser {
+  private static Formats = Constants.AcceptedDateFormats.concat(Constants.AcceptedDatetimeFormats);
+  public fragments: string[];
+  private _isRecurrent = false;
+  private _isAlternating = false;
+  private _recurEvery: IRecurEvery;
+  private _recurFor: IRecurFor;
+  private _startDate: moment.Moment;
+  private _startInputText: string;
+  private _result: IParsedDate;
+  constructor(fragments: string[]) {
+    // We sort by greatest length so that fragments with
+    // the most information are tried first.
+    this.fragments = fragments.sort((a, b) => b.length - a.length);
+  }
+
+  public extract(): IParsedDate {
+    if (!this.fragments.length) {
+      return undefined;
+    }
+
+    if (this._result) {
+      return this._result;
+    }
+
+    for (const fragment of this.fragments) {
+      const keyword = fragment.split(' ')[0];
+      switch (keyword) {
+        case 'every':
+          if (!this._recurEvery) {
+            this._recurEvery = this.extractRecurEveryComponents(fragment);
+          }
+          break;
+        case 'for':
+          if (!this._recurFor) {
+            this._recurFor = this.extractRecurForComponents(fragment);
+          }
+          break;
+        case 'starting':
+        case 'on':
+        case 'is':
+        default:
+          if (!this._startDate) {
+            this._startDate = this.extractStartDateComponents(fragment);
+          }
+      }
+    }
+
+    if (this.noDateDetected) {
+      return undefined;
+    }
+
+    // Fill in defaults
+    if (!this._startDate && (this._recurEvery || this._recurFor)) {
+      this._startDate = Constants.StartOfToday();
+    }
+
+    if (this._isRecurrent && (!this._recurEvery || !this._recurFor)) {
+      this._recurEvery = this._recurEvery || this.DefaultRecurrence;
+      this._recurFor = this._recurFor || this.DefaultDuration;
+    }
+
     const endDate = this.calculateEndDate();
-    return {
+    this._result = {
       startDate: this._startDate.valueOf(),
       endDate: endDate,
       startInputText: this._startInputText,
@@ -54,9 +189,71 @@ export class DateParser implements IDateParser {
       },
       reminder: undefined
     };
+    return this._result;
   }
 
-  // Parses everything from 'today' to 'Monday' to 'next week' to 'September 18th, 2018'
+  /** 'starting [date]', 'on [date]', 'is [date]', '[date]' */
+  private extractStartDateComponents(text: string): moment.Moment {
+    const s = text.toLowerCase();
+    this._isRecurrent = s.startsWith('starting ');
+    const withoutPrefix = s.replace(/\bstarting \b|\bon \b|\bis \b/, '');
+    const startDate = this.parseDate(withoutPrefix);
+    this._startInputText = startDate ? text : undefined;
+    return startDate;
+  }
+
+  /** 'every [interval]', 'every other [interval]' */
+  private extractRecurEveryComponents(text: string): IRecurEvery {
+    const s = text.toLowerCase();
+    const everySomething = s.startsWith('every ');
+    this._isRecurrent = this._isRecurrent || everySomething;
+
+    // default recurrence: 'every day'
+    if (!everySomething && this._isRecurrent) {
+      return this.DefaultRecurrence;
+    } else if (!everySomething) {
+      return this.NoRecurrence;
+    } else {
+      let withoutPrefix = s.replace('every ', '');
+      this._isAlternating = s.includes('other ');
+      if (this._isAlternating) {
+        withoutPrefix = withoutPrefix.replace('other ', '');
+      }
+      const pattern = this.extractRecurrenceUnit(withoutPrefix);
+      return pattern ? {
+        pattern: pattern,
+        isAlternating: this._isAlternating,
+        inputText: text
+      } : this.NoRecurrence;
+    }
+  }
+
+  /** 'forever', 'for [duration]' */
+  private extractRecurForComponents(text: string): IRecurFor {
+    const s = text.toLowerCase();
+    if (s === 'forever') {
+      const duration = this.DefaultDuration; // forever
+      duration.inputText = s;
+      return duration;
+    }
+
+    const forSomething = s.startsWith('for ');
+
+    if (!forSomething && this._isRecurrent) {
+      return this.DefaultDuration;
+    } else if (!forSomething) {
+      return this.NoDuration;
+    } else {
+      const withoutPrefix = s.replace('for ', '');
+      const pattern = this.extractRecurrenceUnit(withoutPrefix);
+      return pattern ? {
+        pattern: pattern,
+        isForever: false,
+        inputText: text
+      } : this.NoDuration;
+    }
+  }
+
   private parseDate(s: string): moment.Moment {
 
     if (!s || !s.trim().length) {
@@ -94,9 +291,8 @@ export class DateParser implements IDateParser {
 
     // Monday through Sunday
     if (!result) {
-      const dayOfWeek = Constants.AsDayOfWeek(s);
-      if (dayOfWeek) {
-        result = dayOfWeek;
+      if (Constants.Weekday.includes(s)) {
+        result = Constants.NearestWeekday(s);
       }
     }
 
@@ -110,7 +306,7 @@ export class DateParser implements IDateParser {
       s = s.slice('next'.length + 1);
     }
 
-    for (const format of DateParser.Formats) {
+    for (const format of FragmentParser.Formats) {
       const parsed = moment(s, format, true);
       if (parsed.isValid()) {
         return startsNext ? parsed.add(startsNext ? 1 : 0, 'year') : parsed;
@@ -146,122 +342,6 @@ export class DateParser implements IDateParser {
     };
   }
 
-  // If 'on' and 'starting' both appear, attempt to parse both.
-  // If both parse to dates, choose the 'starting' date.
-  private extractStartDateComponents(s: string): void {
-    const onTokenIdx = s.indexOf('on ');
-    const startingTokenIdx = s.indexOf('starting ');
-    const potentialendIdx = [
-      s.indexOf('for '),
-      s.indexOf('every '),
-      s.length
-    ];
-
-    let startingStartDate: moment.Moment, onStartDate: moment.Moment;
-
-    let startingTextComponent: string, onTextComponent: string;
-    if (startingTokenIdx > -1) {
-      this._isRecurrent = true;
-      const endIdx = Math.min(...potentialendIdx.filter(idx => idx > startingTokenIdx));
-      startingTextComponent = s.slice(startingTokenIdx + 'starting'.length + 1, endIdx);
-      startingStartDate = this.parseDate(startingTextComponent);
-    }
-
-    if (onTokenIdx > -1) {
-      const endIdx = Math.min(...potentialendIdx.filter(idx => idx > onTokenIdx));
-      onTextComponent = s.slice(onTokenIdx + 'on'.length + 1, endIdx).trim();
-      onStartDate = this.parseDate(onTextComponent);
-    }
-
-    if (startingStartDate) {
-      this._startInputText = `starting ${startingTextComponent}`;
-    } else if (onStartDate) {
-      this._startInputText = `on ${onTextComponent}`;
-    }
-
-    this._startDate = startingStartDate || onStartDate || Constants.StartOfToday();
-  }
-
-  private extractRecurEveryComponents(s: string): void {
-    const everyTokenIdx = s.indexOf('every ');
-    this._isRecurrent = this._isRecurrent || everyTokenIdx > - 1;
-    const defaultRecurrence: IRecurEvery = {
-      pattern: {
-        amount: 1,
-        interval: 'day'
-      },
-      inputText: undefined,
-      isAlternating: false
-    };
-    // default recurrence: 'every day'
-    if (everyTokenIdx < 0 && this._isRecurrent) {
-      this._recurEvery = defaultRecurrence;
-    } else if (everyTokenIdx < 0) {
-      this._recurEvery = {
-        pattern: undefined,
-        isAlternating: false,
-        inputText: undefined
-      };
-    } else {
-      const endIdx = Math.min(...[
-        s.indexOf('on '),
-        s.indexOf('starting '),
-        s.indexOf('for '),
-        s.length
-      ].filter(idx => idx > everyTokenIdx));
-      let everyComponent = s.slice(everyTokenIdx + 'every'.length + 1, endIdx);
-      this._isAlternating = everyComponent.includes('other');
-      if (this._isAlternating) {
-        everyComponent = splice(everyComponent, everyComponent.indexOf('other '), 'other'.length, '');
-      }
-      const pattern = this.extractRecurrenceUnit(everyComponent);
-      this._recurEvery = {
-        pattern: pattern,
-        isAlternating: this._isAlternating,
-        inputText: pattern ? `every ${everyComponent}` : undefined
-      };
-    }
-  }
-
-  private extractRecurForComponents(s: string): void {
-    // default: forever
-    const defaultDuration: IRecurFor = {
-      pattern: undefined,
-      isForever: true,
-      inputText: undefined
-    };
-    const forTokenIdx = s.indexOf('for ');
-    if (forTokenIdx < 0 && this._isRecurrent) {
-      this._recurFor = defaultDuration;
-    } else if (forTokenIdx < 0) {
-      this._recurFor = {
-        pattern: undefined,
-        isForever: false,
-        inputText: undefined
-      };
-    } else {
-      const endIdx = Math.min(...[
-        s.indexOf('on '),
-        s.indexOf('starting '),
-        s.indexOf('every '),
-        s.length
-      ].filter(idx => idx > forTokenIdx));
-      // 'forever ', 'for 2 weeks '
-      let forComponent = s.slice(forTokenIdx, endIdx);
-      if (forComponent.startsWith('forever')) {
-        this._recurFor = defaultDuration;
-      } else {
-        forComponent = forComponent.slice('for'.length + 1);
-        const pattern = this.extractRecurrenceUnit(forComponent);
-        this._recurFor = {
-          pattern: pattern,
-          isForever: false,
-          inputText: pattern ? `for ${forComponent}` : undefined
-        };
-      }
-    }
-  }
-
   private calculateEndDate(): number {
     if (!this._isRecurrent) {
       return this._startDate.valueOf();
@@ -274,5 +354,44 @@ export class DateParser implements IDateParser {
       .clone()
       .add(this._recurFor.pattern.amount, this._recurFor.pattern.interval)
       .valueOf();
+  }
+
+  private get noDateDetected(): boolean {
+    return !(this._startDate || this._recurEvery || this._recurFor);
+  }
+
+  private get DefaultRecurrence(): IRecurEvery {
+    return {
+      pattern: {
+        amount: 1,
+        interval: 'day'
+      },
+      inputText: undefined,
+      isAlternating: false
+    };
+  }
+
+  private get NoRecurrence(): IRecurEvery {
+    return {
+      pattern: undefined,
+      isAlternating: false,
+      inputText: undefined
+    };
+  }
+
+  private get DefaultDuration(): IRecurFor {
+    return {
+      pattern: undefined,
+      isForever: true,
+      inputText: undefined
+    };
+  }
+
+  private get NoDuration(): IRecurFor {
+    return {
+      pattern: undefined,
+      isForever: false,
+      inputText: undefined
+    };
   }
 }

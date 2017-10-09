@@ -42,6 +42,16 @@ export class DateParsingConstants {
     'days', 'weeks', 'months', 'years'
   ];
 
+  public static readonly Weekday: string[] = [
+    'Monday', 'monday',
+    'Tuesday', 'tuesday',
+    'Wednesday', 'wednesday',
+    'Thursday', 'thursday',
+    'Friday', 'friday',
+    'Saturday', 'saturday',
+    'Sunday', 'sunday'
+  ];
+
   public static readonly DateUnitToRecurrenceInterval: { [unit: string]: RecurrenceInterval } = {
     'day': 'day',
     'days': 'day',
@@ -82,6 +92,10 @@ export class DateParsingConstants {
     return (d || this.Now()).clone().startOf('week');
   }
 
+  public static StartOfNextWeek(d?: moment.Moment): moment.Moment {
+    return (d || this.Now()).clone().startOf('week').add(1, 'week');
+  }
+
   public static StartOfMonth(d?: moment.Moment): moment.Moment {
     return (d || this.Now()).clone().startOf('month');
   }
@@ -92,6 +106,17 @@ export class DateParsingConstants {
 
   public static StartOfOneWeekBefore(d?: moment.Moment): moment.Moment {
     return (d || this.Now()).clone().startOf('day').subtract(1, 'week');
+  }
+
+  public static NearestWeekday(weekday: string, d?: moment.Moment) {
+    if (!this.Weekday.includes(weekday)) {
+      throw TypeError('Not a valid weekday');
+    }
+    const m = (d || moment()).day(weekday);
+    while (m < this.Now()) {
+      m.add(1, 'week');
+    }
+    return m;
   }
 
   public static IsValidTimestamp(timestamp: number): boolean {

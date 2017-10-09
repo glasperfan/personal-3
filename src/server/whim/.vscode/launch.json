@@ -4,11 +4,13 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
+
+      // TEST
       {
         "type": "node",
         "request": "launch",
         "name": "Mocha Tests",
-        "program": "/usr/local/bin/mocha",
+        "program": "${workspaceRoot}/../../../node_modules/mocha/bin/_mocha",
         "args": [
           "-u",
           "tdd",
@@ -17,24 +19,29 @@
           "--colors",
           "${workspaceRoot}/test/**/*.js"
         ],
+        "cwd": "${workspaceRoot}",
         "runtimeArgs": [ "--nolazy" ],
-        "outFiles": [
-          "${workspaceRoot}/test/**/*.js"
-        ],
         "sourceMaps": false,
         "internalConsoleOptions": "openOnSessionStart",
-        "preLaunchTask": "build-whim-tests"
+        "preLaunchTask": "build-test",
+        "env": {
+          "NODE_ENV": "development"
+        },
+        "runtimeExecutable": null
       },
-        {
-          "type": "node",
-          "request": "launch",
-          "name": "node app.js",
-          "program": "${workspaceRoot}/dist/app/app.js",
-          "outFiles": [
-            "${workspaceRoot}/dist/**/*.js"
-          ],
-          "sourceMaps": true,
-          "preLaunchTask": "build-whim-server"
-        }
+
+      // RUN
+      {
+        "type": "node",
+        "request": "launch",
+        "name": "node app.js",
+        "program": "${workspaceRoot}/dist/app/app.js",
+        "outFiles": [
+          "${workspaceRoot}/dist/**/*.js"
+        ],
+        "sourceMaps": false,
+        "preLaunchTask": "build-whim-server"
+      }
+
     ]
 }

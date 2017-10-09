@@ -1,7 +1,6 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
-    "outDir": "./dist",
     "rootDir": ".",
     "baseUrl": ".",
     "declaration": false,

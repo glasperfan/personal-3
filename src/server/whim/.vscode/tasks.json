@@ -12,6 +12,11 @@
             "taskName": "build-whim-server",
             "type": "shell",
             "command": "gulp build-whim-server"
+        },
+        {
+            "taskName": "build-test",
+            "type": "shell",
+            "command": "gulp build-test"
         }
     ]
 }
