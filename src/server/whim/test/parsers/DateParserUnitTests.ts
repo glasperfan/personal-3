@@ -74,6 +74,24 @@ describe('Date parsers', () => {
       );
     });
 
+    it('everyday', () => {
+      const result = v1Parser.parseString('Start reminding me everyday.');
+      Utils.testRecurrentDate(
+        result,
+        Constants.StartOfToday(),
+        undefined
+      );
+    });
+
+    it('every day', () => {
+      const result = v1Parser.parseString('Every day check in with Jack and Jill while they are climbing.');
+      Utils.testRecurrentDate(
+        result,
+        Constants.StartOfToday(),
+        undefined
+      );
+    });
+
     it('every Wednesday', () => {
       const result = v1Parser.parseString('Make sure to text Ana every Wednesday.');
       Utils.testRecurrentDate(
@@ -93,34 +111,75 @@ describe('Date parsers', () => {
     });
 
     it('on August 25, 2018', () => {
+      const result = v1Parser.parseString('Plan to be there on August 25, 2018.');
+      Utils.testOneTimeDate(
+        result,
+        moment('August 25, 2018', 'MMMM D, YYYY'),
+        'on August 25, 2018'
+      );
     });
 
     it('starting Tuesday every week', () => {
-
+      const result = v1Parser.parseString(`I'll be going to the cafe starting Tuesday every week.`);
+      Utils.testRecurrentDate(
+        result,
+        Constants.NearestWeekday('Tuesday'),
+        'starting Tuesday'
+      );
     });
 
     it('starting Wednesday every week for 2 weeks', () => {
-
+      const result = v1Parser.parseString(`I'll be going for coffee starting Wednesday every week for 2 weeks.`);
+      Utils.testRecurrentDate(
+        result,
+        Constants.NearestWeekday('Wednesday'),
+        'starting Wednesday'
+      );
     });
 
     it('starting Thursday every day for 2 months', () => {
-
+      const result = v1Parser.parseString(`Patrick will be teaching yoga for everyone in the office starting Thursday every day for 2 months.`);
+      Utils.testRecurrentDate(
+        result,
+        Constants.NearestWeekday('Thursday'),
+        'starting Thursday'
+      );
     });
 
     it('every Friday for 2 days', () => {
-
+      const result = v1Parser.parseString(`I should follow up every Friday for 2 days...`);
+      Utils.testRecurrentDate(
+        result,
+        Constants.NearestWeekday('Friday'),
+        undefined
+      );
     });
 
     it('starting next Saturday until September 18, 2018', () => {
-
+      const result = v1Parser.parseString(`Danielle be working on this project for her team starting next Saturday until September 18, 2018`);
+      Utils.testRecurrentDate(
+        result,
+        Constants.NearestWeekday('Saturday').add(1, 'week'),
+        'starting next Saturday'
+      );
     });
 
     it('starting Sunday every day until next year', () => {
-
+      const result = v1Parser.parseString(`My goal, starting Sunday and continuing every day until next year, is to be a cool person.`);
+      Utils.testRecurrentDate(
+        result,
+        Constants.NearestWeekday('Sunday'),
+        'starting Sunday'
+      );
     });
 
     it('starting today every 2 days for 5 months', () => {
-
+      const result = v1Parser.parseString(`Every 2 days for 5 months, remind me to get in touch with Monica, starting today.`);
+      Utils.testRecurrentDate(
+        result,
+        Constants.StartOfToday(),
+        'starting today'
+      );
     });
   });
 });
