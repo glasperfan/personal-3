@@ -1,1 +1,1 @@
-export * from './CurrentDateParser';
+export { DateParser } from './parsing/v1/parser';

@@ -1,4 +1,5 @@
-import { parseString, Validator } from '../parsers';
+import { IDateParser } from '../parsers/dates/contracts/IDateParser';
+import { DateParser, Validator } from '../parsers';
 import {
     Birthday,
     IAddFriendArguments,
@@ -34,7 +35,7 @@ export class FriendManager {
   public static readonly TagIndex = 'tags';
 
   private readonly collectionTokenPrefix = 'friends';
-  constructor(private dbMgr: DatabaseManager) { };
+  constructor(private dbMgr: DatabaseManager, private dateParser: IDateParser) { };
 
 
   getAllFriends(userId: string): Promise<IFriend[]> {
@@ -112,7 +113,7 @@ export class FriendManager {
 
   private createFriend(userId: string, friendArg: IAddFriendArguments, id?: string): IFriend {
     this.validateArguments(friendArg); // TODO: validate birthday
-    const bday: IParsedDate = friendArg.birthday ? parseString(friendArg.birthday) : undefined;
+    const bday: IParsedDate = friendArg.birthday ? this.dateParser.parseString(friendArg.birthday) : undefined;
     return <IFriend>{
       _id: id || v4(),
       name: {

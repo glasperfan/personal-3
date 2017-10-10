@@ -1,7 +1,8 @@
-import { parseString } from './dates';
+import { DateParser } from './dates';
 import * as moment from 'moment';
 
 export class Validator {
+  public static DateParser = new DateParser();
   public static TagStartIdentifier = '#';
   public static NextWeekKeyword = 'next';
   public static EmailRegex = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
@@ -32,7 +33,7 @@ export class Validator {
   }
 
   public static isDate(s: string): boolean {
-    const result = parseString(s);
+    const result = this.DateParser.parseString(s);
     return !!result;
   }
 

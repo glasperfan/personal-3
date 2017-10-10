@@ -2,7 +2,6 @@ import { AddFriendParseResult } from './results/AddFriendParseResult';
 import { AddEventParseResult } from './results/AddEventParseResult';
 import { QueryFriendParseResult } from './results/QueryFriendParseResult';
 import { QueryEventParseResult } from './results/QueryEventParseResult';
-import { parseArray, parseString, Validator } from '../../parsers';
 import { IEvent, IFriend, IParseResult, WhimError } from '../../models';
 import { CalendarManager, FriendManager, DatabaseManager } from '../../managers';
 import * as moment from 'moment';

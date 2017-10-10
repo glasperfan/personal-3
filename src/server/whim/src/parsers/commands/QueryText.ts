@@ -1,10 +1,11 @@
+import { IDateParser } from '../dates/contracts/IDateParser';
 import { IEvent, IFriend } from '../../models';
-import { parseString } from '../dates';
+import { DateParser } from '../dates';
 import * as moment from 'moment';
 
 export class QueryText {
   /* TODO: implement caching system */
-
+  public static DateParser: IDateParser = new DateParser();
   public static ParseFriend(f: IFriend): ISnippet[] {
     return [
       { text: f.name.displayName, field: 'name' },
@@ -19,7 +20,7 @@ export class QueryText {
   }
 
   public static ParseEvent(e: IEvent): ISnippet[] {
-    const startDate = parseString(e.date && e.date.startDate && e.date.startDate.toString());
+    const startDate = this.DateParser.parseString(e.date && e.date.startDate && e.date.startDate.toString());
     const startMoment = startDate && moment(startDate.startDate);
     return [
       { text: e.title, field: 'title' },

@@ -1,3 +1,4 @@
+import { IDateParser } from '../parsers/dates/contracts/IDateParser';
 import {
     IAddEventsArguments,
     IAddFriendsArguments,
@@ -26,7 +27,7 @@ import {
   UserManager
 } from '../managers';
 import { IdeaGenerator } from '../generators';
-import { CommandParser } from '../parsers';
+import { CommandParser, DateParser } from '../parsers';
 
 import * as bodyParser from 'body-parser';
 import * as express from 'express';
@@ -47,6 +48,7 @@ interface IApp {
   UserManager: UserManager;
   IdeaGenerator: IdeaGenerator;
   CommandParser: CommandParser;
+  DateParser: IDateParser;
 }
 
 function errorHandler(err: IError, res: express.Response): void {
@@ -67,6 +69,7 @@ class App implements IApp {
   private methodMgr: MethodManager;
   private historyMgr: HistoryManager;
   private commandParser: CommandParser;
+  private dateParser: IDateParser;
 
   private readonly dbUrl: string;
 
@@ -87,6 +90,7 @@ class App implements IApp {
   public get HistoryManager(): HistoryManager { return this.historyMgr; }
   public get IdeaGenerator(): IdeaGenerator { return this.ideaGenerator; }
   public get CommandParser(): CommandParser { return this.commandParser; }
+  public get DateParser(): IDateParser { return this.dateParser; }
 
   public connectToMongo(): Promise<void> {
     return this.databaseMgr.connectToDb();
@@ -207,11 +211,12 @@ class App implements IApp {
   }
 
   private managers(): void {
+    this.dateParser = new DateParser();
     this.databaseMgr = new DatabaseManager(this.dbUrl);
     this.methodMgr = new MethodManager();
     this.historyMgr = new HistoryManager();
     this.userMgr = new UserManager(this.databaseMgr);
-    this.friendMgr = new FriendManager(this.databaseMgr);
+    this.friendMgr = new FriendManager(this.databaseMgr, this.dateParser);
     this.calendarMgr = new CalendarManager(this.databaseMgr);
     this.ideaGenerator = new IdeaGenerator(this.friendMgr, this.methodMgr, this.historyMgr);
     this.commandParser = new CommandParser(this.databaseMgr, this.friendMgr, this.calendarMgr);

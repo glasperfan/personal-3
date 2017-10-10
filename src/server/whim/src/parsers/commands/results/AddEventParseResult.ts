@@ -1,7 +1,7 @@
+import { DateParser } from '../../dates';
 import { splice } from '../splice';
 import { ParseResultWithValidator } from './ParseResult';
 import { IParsedDate, WindowView } from '../../../models';
-import { parseArray } from '../../dates';
 import { Validator } from '../../validator';
 import * as moment from 'moment';
 
@@ -15,7 +15,7 @@ import * as moment from 'moment';
   Arguments: { title, date, friends, tags }
  */
 export class AddEventParseResult extends ParseResultWithValidator {
-
+  public static DateParser = new DateParser();
   public static OnceDateKeyword = 'on';
   public static RecurrentKeyword = 'every';
   public static Keywords = [
@@ -113,7 +113,7 @@ export class AddEventParseResult extends ParseResultWithValidator {
   private extractDateComponents(components: string[]): boolean {
     let dateFound = false;
     if (!this._date) {
-      const parsed = parseArray(components);
+      const parsed = AddEventParseResult.DateParser.parseArray(components);
       dateFound = parsed !== undefined;
       if (dateFound) {
         this._date = parsed;

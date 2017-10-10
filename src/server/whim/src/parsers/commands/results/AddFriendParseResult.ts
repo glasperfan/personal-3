@@ -1,5 +1,5 @@
 import { IParsedDate } from '../../../models/date';
-import { parseArray, parseString } from '../../../parsers/dates';
+import { DateParser } from '../../../parsers/dates';
 import { Birthday, IAddFriendArguments, WindowView } from '../../../models';
 import { Validator } from '../../../parsers/validator';
 import { ParseResultWithValidator } from './ParseResult';
@@ -16,7 +16,8 @@ import * as moment from 'moment';
  */
 export class AddFriendParseResult extends ParseResultWithValidator {
 
-    public static AddKeyword = 'add';
+  public static DateParser = new DateParser();
+  public static AddKeyword = 'add';
     public static MetKeyword = 'met';
 
     public static validate(inputComponents: string[]): boolean {
@@ -110,11 +111,12 @@ export class AddFriendParseResult extends ParseResultWithValidator {
     }
 
     private extractDateComponents(idx: number): IParsedDate {
+      const parser = AddFriendParseResult.DateParser;
       if (this._birthday) {
         return undefined;
       }
-      return parseArray(this._components.slice(idx + 1, idx + 4))
-      || parseArray(this._components.slice(idx + 1, idx + 3))
-      || parseString(this._components[idx]);
+      return parser.parseArray(this._components.slice(idx + 1, idx + 4))
+      || parser.parseArray(this._components.slice(idx + 1, idx + 3))
+      || parser.parseString(this._components[idx]);
     }
   }

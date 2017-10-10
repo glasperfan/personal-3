@@ -3,20 +3,24 @@
     // for the documentation about the tasks.json format
     "version": "2.0.0",
     "tasks": [
-        {
-            "taskName": "build-whim-tests",
-            "type": "shell",
-            "command": "gulp build-whim-tests"
-        },
-        {
-            "taskName": "build-whim-server",
-            "type": "shell",
-            "command": "gulp build-whim-server"
-        },
-        {
-            "taskName": "build-test",
-            "type": "shell",
-            "command": "gulp build-test"
+      {
+        "taskName": "build-whim-tests",
+        "type": "shell",
+        "command": "gulp build-whim-tests"
+      },
+      {
+        "taskName": "build-whim-server",
+        "type": "shell",
+        "command": "gulp build-whim-server",
+        "group": {
+          "kind": "build",
+          "isDefault": true
         }
+      },
+      {
+        "taskName": "build-test",
+        "type": "shell",
+        "command": "gulp build-test"
+      }
     ]
-}
+  }
