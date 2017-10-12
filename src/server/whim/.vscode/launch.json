@@ -21,7 +21,11 @@
         ],
         "cwd": "${workspaceRoot}",
         "runtimeArgs": [ "--nolazy" ],
-        "sourceMaps": false,
+        "sourceMaps": true,
+        "outFiles": [
+          "${workspaceRoot}/dist/**/*.js"
+        ],
+        "protocol": "inspector",
         "internalConsoleOptions": "openOnSessionStart",
         "preLaunchTask": "build-test",
         "env": {

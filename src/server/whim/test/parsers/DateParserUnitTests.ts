@@ -5,8 +5,6 @@ import 'mocha';
 import { expect } from 'chai';
 import * as moment from 'moment';
 
-type DateInput = moment.Moment | { text: string, format: string };
-
 describe('Date parsers', () => {
   describe('V1 Date Parser', () => {
     let v1Parser: DateParser;
@@ -17,7 +15,7 @@ describe('Date parsers', () => {
 
     it('on September 7th', () => {
       const result = v1Parser.parseString(`John's birthday on September 7th`);
-      Utils.testOneTimeDate(result, { text: 'September 7th', format: 'MMMM Do' }, 'on September 7th');
+      Utils.testOneTimeDate(result, moment('September 7th', 'MMMM Do'), 'on September 7th');
     });
 
     it('on Monday', () => {
@@ -185,7 +183,7 @@ describe('Date parsers', () => {
 });
 
 class Utils {
-  static testOneTimeDate(result: IParsedDate, date: DateInput, startInputText: string, isRecurrent = false) {
+  static testOneTimeDate(result: IParsedDate, date: moment.Moment, startInputText: string, isRecurrent = false) {
     expect(result).to.not.be.null;
 
     const expectStart = moment.isMoment(date) ? date : moment((<any>date).text, (<any>date).format);
@@ -200,7 +198,7 @@ class Utils {
     expect(result.startInputText).to.equal(startInputText);
   }
 
-  static testRecurrentDate(result: IParsedDate, date: DateInput, startInputText: string) {
+  static testRecurrentDate(result: IParsedDate, date: moment.Moment, startInputText: string) {
     this.testOneTimeDate(result, date, startInputText, true);
   }
 }
