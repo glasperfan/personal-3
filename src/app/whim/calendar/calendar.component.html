@@ -6,7 +6,7 @@
       <div class="event">
         <div class="top-row">
           <div class="event-title">{{e.title}}</div>
-          <div class="event-date">{{e.date | date:'medium'}}</div>
+          <div class="event-date">{{e.date.startDate | dateFormat}}</div>
         </div>
         <div class="bottom-row" *ngIf="e.description">{{e.description}}</div>
       </div>

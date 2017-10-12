@@ -1,3 +1,4 @@
+import { DateParsingConstants as Constants } from '../parsers/dates/parsing/DateParsingConstants';
 import { IParsedDate } from '../models/date';
 import { IDateParser } from '../parsers/dates/contracts/IDateParser';
 import { OneTimeDate, RecurrentDate } from '../parsers/dates';
@@ -21,7 +22,7 @@ export class CalendarManager {
     const operation = this.getUserEventCollection(userId)
       .then(collection => collection.find({
         userId: userId,
-        date: { $gte: Date.now() }
+        'date.startDate': { $gte: Constants.StartOfToday().valueOf() }
       }).toArray());
     return operation.then(events => {
       if (!events || !events.length) {
@@ -63,12 +64,13 @@ export class CalendarManager {
   private parseInputDate(input: IParsedDate): IParsedDate {
     const isAlternating = input.recurrence.recurEvery.isAlternating;
     const isRecurrent = input.recurrence.isRecurrent;
+    const isForever = input.recurrence.recurFor.isForever;
     const recurEvery = input.recurrence.recurEvery;
     const recurFor = input.recurrence.recurFor;
     const parsed = this.dateParser.parseArray([
       input.startInputText,
-      isRecurrent ? `every ${recurEvery.pattern.amount} ${recurEvery.pattern.interval}(s)` : '',
-      isRecurrent ? `for ${recurFor.pattern.amount} ${recurFor.pattern.interval}(s)` : ''
+      isRecurrent ? `every ${recurEvery.pattern.amount} ${recurEvery.pattern.interval}` : '',
+      isRecurrent ? (isForever ? 'forever' : `for ${recurFor.pattern.amount} ${recurFor.pattern.interval}(s)`) : ''
     ]);
     if (!parsed) {
       throw new WhimError('Unable to parse a date from user input.');

@@ -39,7 +39,6 @@ export class AddCalendarEventsComponent implements OnInit {
     } else if (!this.args.date) {
       this.processMessage = 'A date is required';
     } else {
-      this.args.date.startDate = this.parseDate(<any>this.args.date);
       this.calendarService.addEvents([this.args])
         .then((addedEvents: IEvent[]) => {
           this.processMessage = `${addedEvents[0].title} on ${this.formatDate(addedEvents[0].date.startDate)}, got it!`;
@@ -61,10 +60,6 @@ export class AddCalendarEventsComponent implements OnInit {
 
   private getDefaultDate(): string {
     return moment(this.Now).format('YYYY-MM-DDTHH:mm');
-  }
-
-  private parseDate(dateString: string): number {
-    return new Date(dateString).getTime();
   }
 
   private get _recurrenceIntervals(): any[] {
