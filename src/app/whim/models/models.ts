@@ -1,3 +1,4 @@
+import { IParsedDate } from './date';
 import * as moment from 'moment';
 
 export type Guid = string;
@@ -19,20 +20,13 @@ export interface IEvent {
   _id: Guid;
   userId: string;
   title: string;
-  date: IEventDate;
+  date: IParsedDate;
   description?: string;
   relatedFriends: string[];
   tags: string[];
   whenAdded: Date;
   whenLastModified: Date;
 }
-
-export interface IEventDate {
-  recurrent: boolean;
-  baseDate: number;
-  recurrenceOffset?: 'day' | 'week' | 'month';
-}
-
 
 export interface IBirthday {
   timestamp: number;

@@ -1,3 +1,4 @@
+import { IAddEventArguments } from '../../../models/api';
 import { DateParser } from '../../dates';
 import { splice } from '../splice';
 import { ParseResultWithValidator } from './ParseResult';
@@ -70,9 +71,10 @@ export class AddEventParseResult extends ParseResultWithValidator {
     return desc;
   }
 
-  public get arguments(): any {
+  public get arguments(): IAddEventArguments {
     return {
       title: this._title,
+      description: undefined,
       date: this._date,
       tags: this._tags
     };

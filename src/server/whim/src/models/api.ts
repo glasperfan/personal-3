@@ -1,4 +1,5 @@
 // tslint:disable:no-empty-interface
+import { IParsedDate } from './date';
 import { IUser, WindowView } from './models';
 
 export enum WhimAPI {
@@ -99,7 +100,8 @@ export interface IGetEventsParams {
 export interface IAddEventArguments {
   title: string;
   description: string;
-  date: number;
+  date: IParsedDate;
+  tags: string[];
 }
 
 export interface IAddEventsArguments {

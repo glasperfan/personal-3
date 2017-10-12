@@ -1,4 +1,4 @@
-import { RecurrenceInterval } from '../../../models';
+import { RecurrenceInterval, IRecurEvery, IRecurFor } from '../../../models';
 import * as moment from 'moment';
 
 export class DateParsingConstants {
@@ -121,5 +121,66 @@ export class DateParsingConstants {
 
   public static IsValidTimestamp(timestamp: number): boolean {
     return !isNaN(new Date(timestamp).getTime());
+  }
+
+  public static get DefaultStartDate(): moment.Moment {
+    return this.StartOfToday();
+  }
+
+  public static get YearlyRecurrence(): IRecurEvery {
+    return {
+      pattern: {
+        amount: 1,
+        interval: 'year'
+      },
+      inputText: undefined,
+      isAlternating: false
+    };
+  }
+
+  public static get WeeklyRecurrence(): IRecurEvery {
+    return {
+      pattern: {
+        amount: 1,
+        interval: 'week'
+      },
+      inputText: undefined,
+      isAlternating: false
+    };
+  }
+
+  public static get DefaultRecurrence(): IRecurEvery {
+    return {
+      pattern: {
+        amount: 1,
+        interval: 'day'
+      },
+      inputText: undefined,
+      isAlternating: false
+    };
+  }
+
+  public static get NoRecurrence(): IRecurEvery {
+    return {
+      pattern: undefined,
+      isAlternating: false,
+      inputText: undefined
+    };
+  }
+
+  public static get DefaultDuration(): IRecurFor {
+    return {
+      pattern: undefined,
+      isForever: true,
+      inputText: undefined
+    };
+  }
+
+  public static get NoDuration(): IRecurFor {
+    return {
+      pattern: undefined,
+      isForever: false,
+      inputText: undefined
+    };
   }
 }

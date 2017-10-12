@@ -39,7 +39,7 @@
         "outFiles": [
           "${workspaceRoot}/dist/**/*.js"
         ],
-        "sourceMaps": false,
+        "sourceMaps": true,
         "preLaunchTask": "build-whim-server"
       }
 

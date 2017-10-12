@@ -164,9 +164,9 @@ class FragmentParser {
     }
 
     // Fill in defaults
-    this._startDate = this._startDate || this.DefaultStartDate;
-    this._recurEvery = this._recurEvery || (this._isRecurrent ? this.DefaultRecurrence : this.NoRecurrence);
-    this._recurFor = this._recurFor || (this._isRecurrent ? this.DefaultDuration : this.NoDuration);
+    this._startDate = this._startDate || Constants.DefaultStartDate;
+    this._recurEvery = this._recurEvery || (this._isRecurrent ? Constants.DefaultRecurrence : Constants.NoRecurrence);
+    this._recurFor = this._recurFor || (this._isRecurrent ? Constants.DefaultDuration : Constants.NoDuration);
 
     const endDate = this.calculateEndDate();
     this._result = {
@@ -199,7 +199,7 @@ class FragmentParser {
 
     if (s === 'everyday' || s === 'every day') {
       this._isRecurrent = true;
-      const recurrence = this.DefaultRecurrence; // daily
+      const recurrence = Constants.DefaultRecurrence; // daily
       recurrence.inputText = this.normalizeForDisplay(text);
       return recurrence;
     }
@@ -209,7 +209,7 @@ class FragmentParser {
 
     // default recurrence: 'every day'
     if (!everySomething && this._isRecurrent) {
-      return this.DefaultRecurrence;
+      return Constants.DefaultRecurrence;
     } else if (!everySomething) {
       return undefined;
     } else {
@@ -244,7 +244,7 @@ class FragmentParser {
     const s = this.normalizeFragment(text);
     if (s === 'forever') {
       this._isRecurrent = true;
-      const duration = this.DefaultDuration; // forever
+      const duration = Constants.DefaultDuration; // forever
       duration.inputText = this.normalizeForDisplay(text);
       return duration;
     }
@@ -252,7 +252,7 @@ class FragmentParser {
     const forSomething = s.startsWith('for ');
 
     if (!forSomething && this._isRecurrent) {
-      return this.DefaultDuration;
+      return Constants.DefaultDuration;
     } else if (!forSomething) {
       return undefined;
     } else {
@@ -271,7 +271,7 @@ class FragmentParser {
    * like 'every Wednesday'. We must infer that it should repeat weekly.
    */
   private inferRecurrenceFromDate(everyDate: string): IRecurEvery {
-    return Constants.Weekday.includes(everyDate) ? this.WeeklyRecurrence : this.YearlyRecurrence;
+    return Constants.Weekday.includes(everyDate) ? Constants.WeeklyRecurrence : Constants.YearlyRecurrence;
   }
 
   private parseDate(s: string): moment.Moment {
@@ -391,66 +391,5 @@ class FragmentParser {
 
   private get noDateDetected(): boolean {
     return !(this._startDate || this._recurEvery || this._recurFor);
-  }
-
-  private get DefaultStartDate(): moment.Moment {
-    return Constants.StartOfToday();
-  }
-
-  private get YearlyRecurrence(): IRecurEvery {
-    return {
-      pattern: {
-        amount: 1,
-        interval: 'year'
-      },
-      inputText: undefined,
-      isAlternating: false
-    };
-  }
-
-  private get WeeklyRecurrence(): IRecurEvery {
-    return {
-      pattern: {
-        amount: 1,
-        interval: 'week'
-      },
-      inputText: undefined,
-      isAlternating: false
-    };
-  }
-
-  private get DefaultRecurrence(): IRecurEvery {
-    return {
-      pattern: {
-        amount: 1,
-        interval: 'day'
-      },
-      inputText: undefined,
-      isAlternating: false
-    };
-  }
-
-  private get NoRecurrence(): IRecurEvery {
-    return {
-      pattern: undefined,
-      isAlternating: false,
-      inputText: undefined
-    };
-  }
-
-  private get DefaultDuration(): IRecurFor {
-    return {
-      pattern: undefined,
-      isForever: true,
-      inputText: undefined
-    };
-  }
-
-  private get NoDuration(): IRecurFor {
-    return {
-      pattern: undefined,
-      isForever: false,
-      inputText: undefined
-    };
   }
 }

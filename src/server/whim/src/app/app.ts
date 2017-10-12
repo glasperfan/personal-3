@@ -217,7 +217,7 @@ class App implements IApp {
     this.historyMgr = new HistoryManager();
     this.userMgr = new UserManager(this.databaseMgr);
     this.friendMgr = new FriendManager(this.databaseMgr, this.dateParser);
-    this.calendarMgr = new CalendarManager(this.databaseMgr);
+    this.calendarMgr = new CalendarManager(this.databaseMgr, this.dateParser);
     this.ideaGenerator = new IdeaGenerator(this.friendMgr, this.methodMgr, this.historyMgr);
     this.commandParser = new CommandParser(this.databaseMgr, this.friendMgr, this.calendarMgr);
   }

@@ -1,7 +1,8 @@
 import { CalendarService } from '../../services/calendar.service';
-import { IAddEventArguments, IError, IEvent, WindowView, WindowViewWithArgs, WhimErrorCode } from '../../models';
+import { IAddEventArguments, IError, IEvent, WhimErrorCode, WindowView, WindowViewWithArgs } from '../../models';
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import * as moment from 'moment';
+import * as _ from 'lodash';
 
 @Component({
   selector: 'p3-whim-add-events',
@@ -24,7 +25,7 @@ export class AddCalendarEventsComponent implements OnInit {
   constructor(private calendarService: CalendarService) { }
 
   ngOnInit() {
-    this.args = this.args || this.defaultInput();
+    this.args = this.args || <any>{};
   }
 
   private toDashboard(): void {
@@ -38,11 +39,11 @@ export class AddCalendarEventsComponent implements OnInit {
     } else if (!this.args.date) {
       this.processMessage = 'A date is required';
     } else {
-      this.args.date = this.parseDate(<any>this.args.date);
+      this.args.date.startDate = this.parseDate(<any>this.args.date);
       this.calendarService.addEvents([this.args])
         .then((addedEvents: IEvent[]) => {
-          this.processMessage = `${addedEvents[0].title} on ${this.formatDate(addedEvents[0].date.baseDate)}, got it!`;
-          this.args = this.defaultInput();
+          this.processMessage = `${addedEvents[0].title} on ${this.formatDate(addedEvents[0].date.startDate)}, got it!`;
+          this.args = <any>{};
         })
         .catch((err: IError) => {
           switch (err.errorMessage as WhimErrorCode) {
@@ -52,10 +53,6 @@ export class AddCalendarEventsComponent implements OnInit {
           Promise.resolve(undefined);
         });
     }
-  }
-
-  private defaultInput(): IAddEventArguments {
-    return <any>{ date: this.getDefaultDate() };
   }
 
   private formatDate(timestamp: number | string, format: string = 'MMMM Do YYYY, h:mm a'): string {
@@ -68,5 +65,104 @@ export class AddCalendarEventsComponent implements OnInit {
 
   private parseDate(dateString: string): number {
     return new Date(dateString).getTime();
+  }
+
+  private get _recurrenceIntervals(): any[] {
+    return [
+      { value: 'day', displayName: 'day(s)' },
+      { value: 'week', displayName: 'week(s)' },
+      { value: 'month', displayName: 'month(s)' },
+      { value: 'year', displayName: 'year(s)' }
+    ];
+  }
+
+  private get _startDate(): string {
+    return _.get(this.args, 'date.startDate', Date.now().toString());
+  }
+
+  private get _startInputText(): string {
+    return _.get(
+      this.args,
+      'date.startInputText',
+      moment(this._startDate, 'x').format('MMMM DD, YYYY')
+    );
+  }
+
+  private set _startInputText(s: string) {
+    _.set(this.args, 'date.startInputText', s);
+  }
+
+  private get _title(): string {
+    return _.get(this.args, 'title', undefined);
+  }
+
+  private set _title(s: string) {
+    _.set(this.args, 'title', s);
+  }
+
+  private get _description(): string {
+    return _.get(this.args, 'description', undefined);
+  }
+
+  private set _description(s: string) {
+    _.set(this.args, 'description', s);
+  }
+
+  private get _isRecurrent(): boolean {
+    return _.get(this.args, 'date.recurrence.isRecurrent', false);
+  }
+
+  private set _isRecurrent(b: boolean) {
+    _.set(this.args, 'date.recurrence.isRecurrent', b);
+  }
+
+  private get _recurEveryAmount(): number {
+    return _.get(this.args, 'date.recurrence.recurEvery.pattern.amount', 1);
+  }
+
+  private set _recurEveryAmount(n: number) {
+    n = n < 1 ? 1 : n; // minimum: 1
+    _.set(this.args, 'date.recurrence.recurEvery.pattern.amount', n);
+  }
+
+  private get _recurEveryInterval(): string {
+    return _.get(this.args, 'date.recurrence.recurEvery.pattern.interval', 'day');
+  }
+
+  private set _recurEveryInterval(s: string) {
+    _.set(this.args, 'date.recurrence.recurEvery.pattern.interval', s);
+  }
+
+  private get _isAlternating(): boolean {
+    return _.get(this.args, 'date.recurrence.recurEvery.isAlternating', false);
+  }
+
+  private set _isAlternating(b: boolean) {
+    _.set(this.args, 'date.recurrence.recurEvery.isAlternating', b);
+  }
+
+  private get _recurForAmount(): number {
+    return _.get(this.args, 'date.recurrence.recurFor.pattern.amount', 1);
+  }
+
+  private set _recurForAmount(n: number) {
+    n = n < 1 ? 1 : n; // minimum: 1
+    _.set(this.args, 'date.recurrence.recurFor.pattern.amount', n);
+  }
+
+  private get _recurForInterval(): string {
+    return _.get(this.args, 'date.recurrence.recurFor.pattern.interval', 'day');
+  }
+
+  private set _recurForInterval(s: string) {
+    _.set(this.args, 'date.recurrence.recurFor.pattern.interval', s);
+  }
+
+  private get _isForever(): boolean {
+    return _.get(this.args, 'date.recurrence.recurFor.isForever', true);
+  }
+
+  private set _isForever(b: boolean) {
+    _.set(this.args, 'date.recurrence.recurFor.isForever', b);
   }
 }

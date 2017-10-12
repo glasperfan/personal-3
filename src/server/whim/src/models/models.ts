@@ -24,8 +24,8 @@ export interface IEvent {
   description?: string;
   relatedFriends: string[];
   tags: string[];
-  whenAdded: Date;
-  whenLastModified: Date;
+  whenAdded: number;
+  whenLastModified: number;
 }
 
 export interface IBirthday {
