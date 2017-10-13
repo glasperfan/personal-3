@@ -1,5 +1,6 @@
+import { IRecurFor, IRecurrenceUnit } from '../../src/models/date';
 import { DateParsingConstants as Constants } from '../../src/parsers/dates/parsing/DateParsingConstants';
-import { IParsedDate } from '../../src/models';
+import { IParsedDate, IRecurEvery } from '../../src/models';
 import { DateParser } from '../../src/parsers/dates/parsing/v1/parser';
 import 'mocha';
 import { expect } from 'chai';
@@ -15,7 +16,7 @@ describe('Date parsers', () => {
 
     it('on September 7th', () => {
       const result = v1Parser.parseString(`John's birthday on September 7th`);
-      Utils.testOneTimeDate(result, moment('September 7th', 'MMMM Do'), 'on September 7th');
+      Utils.testOneTimeDate(result, moment('September 7th', 'MMMM Do', true), 'on September 7th');
     });
 
     it('on Monday', () => {
@@ -40,17 +41,40 @@ describe('Date parsers', () => {
 
     it('starting tomorrow', () => {
       const result = v1Parser.parseString('Joe is starting something starting tomorrow');
-      Utils.testRecurrentDate(result, Constants.StartOfTomorrow(), 'starting tomorrow');
+      Utils.testRecurrentDate(
+        result,
+        Constants.StartOfTomorrow(),
+        'starting tomorrow',
+        Constants.DefaultRecurrence,
+        Constants.DefaultDuration
+      );
     });
 
     it('starting Monday', () => {
       const result = v1Parser.parseString('Starting Monday, I will be working at Goldman Sachs');
-      Utils.testRecurrentDate(result, Constants.NearestWeekday('monday'), 'Starting Monday');
+      Utils.testRecurrentDate(
+        result,
+        Constants.NearestWeekday('monday'),
+        'Starting Monday',
+        Constants.DefaultRecurrence,
+        Constants.DefaultDuration
+      );
     });
 
     it('starting Friday', () => {
       const result = v1Parser.parseString(`I'll be visiting her frequently starting Friday.`);
-      Utils.testRecurrentDate(result, Constants.NearestWeekday('friday'), 'starting Friday');
+      Utils.testRecurrentDate(
+        result,
+        Constants.NearestWeekday('friday'),
+        'starting Friday',
+        Constants.DefaultRecurrence,
+        Constants.DefaultDuration
+      );
+    });
+
+    it('This week', () => {
+      const result = v1Parser.parseString(`This week he finds out about whether he got the job.`);
+      Utils.testOneTimeDate(result, Constants.StartOfWeek(), 'This week');
     });
 
     it('is this week', () => {
@@ -58,7 +82,7 @@ describe('Date parsers', () => {
       Utils.testOneTimeDate(result, Constants.StartOfWeek(), 'is this week');
     });
 
-    it('next week', () => {
+    it('is next week', () => {
       const result = v1Parser.parseString('That is next week, when he moves into his new office.');
       Utils.testOneTimeDate(result, Constants.StartOfNextWeek(), 'is next week');
     });
@@ -77,16 +101,20 @@ describe('Date parsers', () => {
       Utils.testRecurrentDate(
         result,
         Constants.StartOfToday(),
-        undefined
+        undefined,
+        { inputText: 'everyday', pattern: { amount: 1, interval: 'day'}, isAlternating: false },
+        Constants.DefaultDuration
       );
     });
 
-    it('every day', () => {
+    it('Every day', () => {
       const result = v1Parser.parseString('Every day check in with Jack and Jill while they are climbing.');
       Utils.testRecurrentDate(
         result,
         Constants.StartOfToday(),
-        undefined
+        undefined,
+        { inputText: 'Every day', pattern: { amount: 1, interval: 'day'}, isAlternating: false },
+        Constants.DefaultDuration
       );
     });
 
@@ -95,7 +123,9 @@ describe('Date parsers', () => {
       Utils.testRecurrentDate(
         result,
         Constants.NearestWeekday('wednesday'),
-        undefined
+        undefined,
+        { inputText: 'every Wednesday', pattern: { amount: 1, interval: 'week'}, isAlternating: false },
+        Constants.DefaultDuration
       );
     });
 
@@ -104,7 +134,9 @@ describe('Date parsers', () => {
       Utils.testRecurrentDate(
         result,
         Constants.NearestWeekday('thursday'),
-        undefined
+        undefined,
+        { inputText: 'every other Thursday', pattern: { amount: 1, interval: 'week' }, isAlternating: true },
+        Constants.DefaultDuration
       );
     });
 
@@ -112,7 +144,7 @@ describe('Date parsers', () => {
       const result = v1Parser.parseString('Plan to be there on August 25, 2018.');
       Utils.testOneTimeDate(
         result,
-        moment('August 25, 2018', 'MMMM D, YYYY'),
+        moment('August 25, 2018', 'MMMM D, YYYY', true),
         'on August 25, 2018'
       );
     });
@@ -122,16 +154,21 @@ describe('Date parsers', () => {
       Utils.testRecurrentDate(
         result,
         Constants.NearestWeekday('Tuesday'),
-        'starting Tuesday'
+        'starting Tuesday',
+        { inputText: 'every week', pattern: { amount: 1, interval: 'week' }, isAlternating: false },
+        Constants.DefaultDuration
       );
     });
 
-    it('starting Wednesday every week for 2 weeks', () => {
-      const result = v1Parser.parseString(`I'll be going for coffee starting Wednesday every week for 2 weeks.`);
+    it('starting Wednesday every other week for 2 weeks', () => {
+      const result = v1Parser.parseString(`I'll be going for coffee starting Wednesday every other week for 2 weeks.`);
       Utils.testRecurrentDate(
         result,
         Constants.NearestWeekday('Wednesday'),
-        'starting Wednesday'
+        'starting Wednesday',
+        { inputText: 'every other week', pattern: { amount: 1, interval: 'week' }, isAlternating: true },
+        { inputText: 'for 2 weeks', pattern: { amount: 2, interval: 'week' }, isForever: false },
+        Constants.DaysUntil(Constants.NearestWeekday('Wednesday').add(2, 'weeks'))
       );
     });
 
@@ -140,7 +177,10 @@ describe('Date parsers', () => {
       Utils.testRecurrentDate(
         result,
         Constants.NearestWeekday('Thursday'),
-        'starting Thursday'
+        'starting Thursday',
+        { inputText: 'every day', pattern: { amount: 1, interval: 'day' }, isAlternating: false },
+        { inputText: 'for 2 months', pattern: { amount: 2, interval: 'month' }, isForever: false },
+        Constants.DaysUntil(Constants.NearestWeekday('Thursday').add(2, 'months'))
       );
     });
 
@@ -149,7 +189,10 @@ describe('Date parsers', () => {
       Utils.testRecurrentDate(
         result,
         Constants.NearestWeekday('Friday'),
-        undefined
+        undefined,
+        { inputText: 'every Friday', pattern: { amount: 1, interval: 'week' }, isAlternating: false },
+        { inputText: 'for 2 days', pattern: { amount: 2, interval: 'day' }, isForever: false },
+        Constants.DaysUntil(Constants.NearestWeekday('Friday')) + 2
       );
     });
 
@@ -158,47 +201,106 @@ describe('Date parsers', () => {
       Utils.testRecurrentDate(
         result,
         Constants.NearestWeekday('Saturday').add(1, 'week'),
-        'starting next Saturday'
+        'starting next Saturday',
+        Constants.DefaultRecurrence,
+        { inputText: 'until September 18, 2018', pattern: { amount: Constants.DaysUntil(moment('September 18, 2018', 'MMMM DD, YYYY', true)), interval: 'day' }, isForever: false },
+        Constants.DaysUntil(moment('September 18, 2018', 'MMMM DD, YYYY', true))
       );
     });
 
-    it('starting Sunday every day until next year', () => {
-      const result = v1Parser.parseString(`My goal, starting Sunday and continuing every day until next year, is to be a cool person.`);
+    it('starting Sunday every other day until next year', () => {
+      const result = v1Parser.parseString(`My goal, starting Sunday and continuing every other day until next year, is to be a cool person.`);
       Utils.testRecurrentDate(
         result,
         Constants.NearestWeekday('Sunday'),
-        'starting Sunday'
+        'starting Sunday',
+        { inputText: 'every other day', pattern: { amount: 1, interval: 'day' }, isAlternating: true },
+        { inputText: 'until next year', pattern: { amount: Constants.DaysUntil(Constants.StartOfYear().add(1, 'year')), interval: 'day' }, isForever: false },
+        Constants.DaysUntil(Constants.StartOfYear().add(1, 'year'))
       );
     });
 
-    it('starting today every 2 days for 5 months', () => {
+    it('Every 2 days for 5 months... starting today.', () => {
       const result = v1Parser.parseString(`Every 2 days for 5 months, remind me to get in touch with Monica, starting today.`);
       Utils.testRecurrentDate(
         result,
         Constants.StartOfToday(),
-        'starting today'
+        'starting today',
+        { inputText: 'Every 2 days', pattern: { amount: 2, interval: 'day' }, isAlternating: false },
+        { inputText: 'for 5 months', pattern: { amount: 5, interval: 'month' }, isForever: false },
+        Constants.DaysUntil(Constants.StartOfToday().add(5, 'months'))
+      );
+    });
+
+    it('every day until tomorrow', () => {
+      const result = v1Parser.parseString(`Remind me every day until tomorrow.`);
+      Utils.testRecurrentDate(
+        result,
+        Constants.StartOfToday(),
+        undefined,
+        { inputText: 'every day', pattern: { amount: 1, interval: 'day' }, isAlternating: false },
+        { inputText: 'until tomorrow', pattern: { amount: 2, interval: 'day' }, isForever: false },
+        2
+      );
+    });
+
+    it('until tomorrow', () => {
+      const result = v1Parser.parseString(`Remind me to do this until tomorrow.`);
+      Utils.testRecurrentDate(
+        result,
+        Constants.StartOfToday(),
+        undefined,
+        Constants.DefaultRecurrence,
+        { inputText: 'until tomorrow', pattern: { amount: 2, interval: 'day' }, isForever: false },
+        2
       );
     });
   });
 });
 
 class Utils {
-  static testOneTimeDate(result: IParsedDate, date: moment.Moment, startInputText: string, isRecurrent = false) {
+  static testOneTimeDate(result: IParsedDate, expectStartDate: moment.Moment, startInputText: string, isRecurrent = false) {
     expect(result).to.not.be.null;
 
-    const expectStart = moment.isMoment(date) ? date : moment((<any>date).text, (<any>date).format);
-    const actualStart = moment(result.startDate, 'x');
-    expect(expectStart.isSame(actualStart, 'day'),
+    const actualStartDate = moment(result.startDate, 'x', true);
+    expect(expectStartDate.isSame(actualStartDate, 'second'),
       `
-       Expect: ${expectStart.format('dddd DD MMMM YYYY')}
-       Actual: ${actualStart.format('dddd DD MMMM YYYY')}
+       Expect: ${expectStartDate.format('dddd DD MMMM YYYY')}
+       Actual: ${actualStartDate.format('dddd DD MMMM YYYY')}
       `
     );
     expect(result.recurrence.isRecurrent).to.equal(isRecurrent);
     expect(result.startInputText).to.equal(startInputText);
+    if (!isRecurrent) {
+      expect(result.endDate).to.equal(result.startDate);
+    }
   }
 
-  static testRecurrentDate(result: IParsedDate, date: moment.Moment, startInputText: string) {
-    this.testOneTimeDate(result, date, startInputText, true);
+  static testRecurrentDate(result: IParsedDate, startDate: moment.Moment, startInputText: string, recurEvery: IRecurEvery, recurFor: IRecurFor, daysFromNowUntilEnd?: number) {
+    this.testOneTimeDate(result, startDate, startInputText, true);
+
+    expect(result.recurrence.recurEvery).to.not.be.null;
+    expect(result.recurrence.recurFor).to.not.be.null;
+
+    expect(result.recurrence.recurEvery.inputText).to.equal(recurEvery.inputText);
+    expect(result.recurrence.recurFor.inputText).to.equal(recurFor.inputText);
+    expect(result.recurrence.recurEvery.isAlternating).to.equal(recurEvery.isAlternating);
+    expect(result.recurrence.recurFor.isForever).to.equal(recurFor.isForever);
+    expect(result.recurrence.recurEvery.pattern).to.deep.equal(recurEvery.pattern);
+    expect(result.recurrence.recurFor.pattern).to.deep.equal(recurFor.pattern);
+    expect(startDate).to.not.equal(result.endDate);
+    if (!recurFor.isForever) {
+      const expectedEndDate = Constants.StartOfToday().add(daysFromNowUntilEnd, 'days');
+      const actualEndDate = moment(result.endDate, 'x', true);
+      const actualStartDate = moment(result.startDate, 'x', true);
+      expect(Constants.DaysUntil(actualEndDate)).to.equal(daysFromNowUntilEnd,
+        `
+          Expected end date: ${expectedEndDate.valueOf()} (${expectedEndDate.format('dddd DD MMMM YYYY')})
+          Actual end date: ${actualEndDate.valueOf()} (${actualEndDate.format('dddd DD MMMM YYYY')})
+          Expected start date: ${startDate.valueOf()} (${startDate.format('dddd DD MMMM YYYY')})
+          Actual start date: ${actualStartDate.valueOf()} (${actualStartDate.format('dddd DD MMMM YYYY')})
+        `
+      );
+    }
   }
 }

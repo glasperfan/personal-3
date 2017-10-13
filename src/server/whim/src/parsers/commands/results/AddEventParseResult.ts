@@ -53,7 +53,7 @@ export class AddEventParseResult extends ParseResultWithValidator {
   public get description(): string {
     let desc: string;
     if (this._date) {
-      const formattedDate = moment(this._date.startDate).format('MMMM D, YYYY');
+      const formattedDate = moment(this._date.startDate, 'x', true).format('MMMM D, YYYY');
       desc = `${formattedDate} (date)`;
       if (this._date.recurrence.isRecurrent) {
         desc += `\nRecurs <i>${this._date.recurrence.recurEvery.inputText}</i>`;

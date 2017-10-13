@@ -21,7 +21,7 @@ export class QueryText {
 
   public static ParseEvent(e: IEvent): ISnippet[] {
     const startDate = this.DateParser.parseString(e.date && e.date.startDate && e.date.startDate.toString());
-    const startMoment = startDate && moment(startDate.startDate);
+    const startMoment = startDate && moment(startDate.startDate, 'x', true);
     return [
       { text: e.title, field: 'title' },
       { text: startMoment && startMoment.format('MMMM D, YYYY'), field: 'date' },

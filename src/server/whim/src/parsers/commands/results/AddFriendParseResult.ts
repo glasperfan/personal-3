@@ -94,7 +94,7 @@ export class AddFriendParseResult extends ParseResultWithValidator {
         } else if (Validator.isPhoneNumber(component) && !this._phone) {
           this._phone = component;
         } else if (asDate) {
-          this._birthday = new Birthday(moment(asDate.startDate, 'x'));
+          this._birthday = new Birthday(moment(asDate.startDate, 'x', true));
           toSkip = (<any>asDate)._i.split(' ').length - 1;
         } else if (!this._firstName && !Validator.isTagStart(component)) {
           this._firstName = Validator.capitalize(component);

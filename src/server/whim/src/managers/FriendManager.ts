@@ -121,7 +121,7 @@ export class FriendManager {
         last: friendArg.last,
         displayName: `${friendArg.first} ${friendArg.last}`,
       },
-      birthday: friendArg ? new Birthday(moment(bday.startDate, 'x')) : undefined,
+      birthday: friendArg ? new Birthday(moment(bday.startDate, 'x', true)) : undefined,
       email: friendArg.email,
       phone: friendArg.phone,
       address: {

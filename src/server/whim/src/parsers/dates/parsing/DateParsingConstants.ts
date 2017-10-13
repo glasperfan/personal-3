@@ -64,12 +64,12 @@ export class DateParsingConstants {
   };
 
   public static AsDayOfWeek(s: string): moment.Moment {
-    const m = moment(s, 'dddd');
+    const m = moment(s, 'dddd', true);
     return m.isValid() ? m : undefined;
   }
 
   public static Now(): moment.Moment {
-    return moment(Date.now());
+    return moment();
   };
 
   public static StartOfDay(d?: moment.Moment): moment.Moment {
@@ -81,42 +81,50 @@ export class DateParsingConstants {
   }
 
   public static StartOfTomorrow(d?: moment.Moment): moment.Moment {
-    return (d || this.Now()).clone().startOf('day').add(1, 'day');
+    return (d || this.StartOfToday()).clone().startOf('day').add(1, 'day');
   }
 
   public static StartOfYesterday(d?: moment.Moment): moment.Moment {
-    return (d || this.Now()).clone().startOf('day').subtract(1, 'day');
+    return (d || this.StartOfToday()).clone().startOf('day').subtract(1, 'day');
   }
 
   public static StartOfWeek(d?: moment.Moment): moment.Moment {
-    return (d || this.Now()).clone().startOf('week');
+    return (d || this.StartOfToday()).clone().startOf('week');
   }
 
   public static StartOfNextWeek(d?: moment.Moment): moment.Moment {
-    return (d || this.Now()).clone().startOf('week').add(1, 'week');
+    return (d || this.StartOfToday()).clone().startOf('week').add(1, 'week');
   }
 
   public static StartOfMonth(d?: moment.Moment): moment.Moment {
-    return (d || this.Now()).clone().startOf('month');
+    return (d || this.StartOfToday()).clone().startOf('month');
   }
 
   public static StartOfYear(d?: moment.Moment): moment.Moment {
-    return (d || this.Now()).clone().startOf('year');
+    return (d || this.StartOfToday()).clone().startOf('year');
   }
 
   public static StartOfOneWeekBefore(d?: moment.Moment): moment.Moment {
-    return (d || this.Now()).clone().startOf('day').subtract(1, 'week');
+    return (d || this.StartOfToday()).clone().startOf('day').subtract(1, 'week');
   }
 
   public static NearestWeekday(weekday: string, d?: moment.Moment) {
     if (!this.Weekday.includes(weekday)) {
       throw TypeError('Not a valid weekday');
     }
-    const m = (d || moment()).day(weekday);
-    while (m < this.Now()) {
+    const m = (d || this.StartOfToday()).day(weekday);
+    while (m < this.StartOfToday()) {
       m.add(1, 'week');
     }
     return m;
+  }
+
+  public static DaysUntil(d: moment.Moment, starting?: moment.Moment): number {
+    return this.SafeDiff(starting || this.StartOfToday(), d) + 1;
+  }
+
+  public static SafeDiff(a: moment.Moment, b: moment.Moment): number {
+    return Math.abs(this.StartOfDay(a).diff(this.StartOfDay(b), 'days'));
   }
 
   public static IsValidTimestamp(timestamp: number): boolean {

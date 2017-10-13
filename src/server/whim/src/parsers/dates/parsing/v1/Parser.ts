@@ -31,7 +31,7 @@ import { DateParsingConstants as Constants } from '../DateParsingConstants';
  * fragments, since they form a composite date together.
  * */
 export class DateParser implements IDateParser {
-  private static keywords = ['for', 'every', 'starting', 'on', 'is'];
+  private static keywords = ['for', 'every', 'starting', 'on', 'is', 'until'];
   private static minorKeywords = ['next', 'this'];
   private _s: string;
 
@@ -117,6 +117,7 @@ class FragmentParser {
   private _recurEvery: IRecurEvery;
   private _recurFor: IRecurFor;
   private _startDate: moment.Moment;
+  private _endDate: moment.Moment;
   private _startInputText: string;
   private _result: IParsedDate;
   constructor(fragments: string[]) {
@@ -145,6 +146,7 @@ class FragmentParser {
           break;
         case 'forever':
         case 'for':
+        case 'until':
           if (!this._recurFor) {
             this._recurFor = this.extractRecurForComponents(fragment);
           }
@@ -231,6 +233,7 @@ class FragmentParser {
         if (startingDate) {
           this._startDate = startingDate;
           const recurrence = this.inferRecurrenceFromDate(withoutPrefix);
+          recurrence.isAlternating = this._isAlternating;
           recurrence.inputText = this.normalizeForDisplay(text);
           return recurrence;
         }
@@ -249,20 +252,36 @@ class FragmentParser {
       return duration;
     }
 
-    const forSomething = s.startsWith('for ');
+    const hasPrefix = s.startsWith('for ') || s.startsWith('until ');
 
-    if (!forSomething && this._isRecurrent) {
+    if (!hasPrefix && this._isRecurrent) {
       return Constants.DefaultDuration;
-    } else if (!forSomething) {
+    } else if (!hasPrefix) {
       return undefined;
     } else {
-      const withoutPrefix = s.replace('for ', '');
+      const withoutPrefix = s.replace('for ', '').replace('until ', '');
       const pattern = this.extractRecurrenceUnit(withoutPrefix);
-      return pattern ? {
-        pattern: pattern,
-        isForever: false,
-        inputText: this.normalizeForDisplay(text)
-      } : undefined;
+      if (pattern) { // for 2 days
+        this._isRecurrent = true;
+        return {
+          pattern: pattern,
+          isForever: false,
+          inputText: this.normalizeForDisplay(text)
+        };
+      }
+      if (!this._endDate && s.startsWith('until ')) { // until September 1st
+        const endDate = this.parseDate(withoutPrefix);
+        if (endDate) {
+          this._isRecurrent = true;
+          this._endDate = endDate;
+          return {
+            pattern: { amount: Constants.DaysUntil(endDate), interval: 'day' },
+            inputText: this.normalizeForDisplay(text),
+            isForever: false
+          };
+        }
+      }
+      return undefined;
     }
   }
 
@@ -300,13 +319,13 @@ class FragmentParser {
       case 'today':
         result = Constants.StartOfToday(); break;
       case 'tomorrow':
-        result = Constants.StartOfTomorrow(Constants.Now()); break;
+        result = Constants.StartOfTomorrow(); break;
       case 'week':
-        result = Constants.StartOfWeek(Constants.Now()).add(startsNext ? 1 : 0, 'day'); break;
+        result = Constants.StartOfWeek().add(startsNext ? 1 : 0, 'day'); break;
       case 'month':
-        result = Constants.StartOfMonth(Constants.Now()).add(startsNext ? 1 : 0, 'month'); break;
+        result = Constants.StartOfMonth().add(startsNext ? 1 : 0, 'month'); break;
       case 'year':
-        result = Constants.StartOfYear(Constants.Now()).add(startsNext ? 1 : 0, 'year'); break;
+        result = Constants.StartOfYear().add(startsNext ? 1 : 0, 'year'); break;
     }
 
     // Monday through Sunday
@@ -339,7 +358,7 @@ class FragmentParser {
     const components = s.split(' ').filter(x => !!x.length);
     let amount: number;
     let interval: RecurrenceInterval;
-    if (!components.length) {
+    if (!components.length || components.length > 2) {
       return undefined;
     }
     // every [amount] [interval]
@@ -363,6 +382,9 @@ class FragmentParser {
   }
 
   private calculateEndDate(): number {
+    if (this._endDate) {
+      return this._endDate.valueOf();
+    }
     if (!this._isRecurrent) {
       return this._startDate.valueOf();
     }
