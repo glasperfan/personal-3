@@ -1,6 +1,6 @@
 // tslint:disable:no-empty-interface
 import { IParsedDate } from './date';
-import { IUser, WindowView } from './models';
+import { IUser, WindowView, Guid } from './models';
 
 export enum WhimAPI {
   GetIdeasForDate = '/ideas',
@@ -10,10 +10,10 @@ export enum WhimAPI {
   AddFriends = '/friends',
   GetAllFriends = '/friends',
   UpdateFriends = '/friends',
-  GetAvailableFriends = '/friends/available',
   GetFriend = '/friend',
   GetEvents = '/events',
   AddEvents = '/events',
+  DeleteEvents = '/events',
   ParseSearch = '/parse'
 }
 
@@ -107,6 +107,11 @@ export interface IAddEventArguments {
 export interface IAddEventsArguments {
   userId: string;
   events: IAddEventArguments[];
+}
+
+export interface IDeleteEventsArguments {
+  userId: string;
+  events: Guid[];
 }
 
 export interface IParseSearchArguments {

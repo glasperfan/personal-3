@@ -1,3 +1,7 @@
+import { ICalendarManager } from '../managers/contracts/ICalendarManager';
+import { IFriendManager } from '../managers/contracts/IFriendManager';
+import { ICommandParser } from '../parsers/commands/contracts/ICommandParser';
+import { IDeleteEventsArguments } from '../models/api';
 import { IDateParser } from '../parsers/dates/contracts/IDateParser';
 import {
     IAddEventsArguments,
@@ -40,14 +44,14 @@ import { Settings } from './settings';
 
 interface IApp {
   Express: express.Application;
-  CalendarManager: CalendarManager;
+  CalendarManager: ICalendarManager;
   DatabaseManager: DatabaseManager;
-  FriendManager: FriendManager;
+  FriendManager: IFriendManager;
   HistoryManager: HistoryManager;
   MethodManager: MethodManager;
   UserManager: UserManager;
   IdeaGenerator: IdeaGenerator;
-  CommandParser: CommandParser;
+  CommandParser: ICommandParser;
   DateParser: IDateParser;
 }
 
@@ -63,12 +67,12 @@ class App implements IApp {
   public userMgr: UserManager;
   private express: express.Application;
   private databaseMgr: DatabaseManager;
-  private friendMgr: FriendManager;
+  private friendMgr: IFriendManager;
   private ideaGenerator: IdeaGenerator;
-  private calendarMgr: CalendarManager;
+  private calendarMgr: ICalendarManager;
   private methodMgr: MethodManager;
   private historyMgr: HistoryManager;
-  private commandParser: CommandParser;
+  private commandParser: ICommandParser;
   private dateParser: IDateParser;
 
   private readonly dbUrl: string;
@@ -83,13 +87,13 @@ class App implements IApp {
 
   public get Express(): express.Application { return this.express; }
   public get DatabaseManager(): DatabaseManager { return this.databaseMgr; }
-  public get FriendManager(): FriendManager { return this.friendMgr; }
+  public get FriendManager(): IFriendManager { return this.friendMgr; }
   public get MethodManager(): MethodManager { return this.methodMgr; }
   public get UserManager(): UserManager { return this.userMgr; }
-  public get CalendarManager(): CalendarManager { return this.calendarMgr; }
+  public get CalendarManager(): ICalendarManager { return this.calendarMgr; }
   public get HistoryManager(): HistoryManager { return this.historyMgr; }
   public get IdeaGenerator(): IdeaGenerator { return this.ideaGenerator; }
-  public get CommandParser(): CommandParser { return this.commandParser; }
+  public get CommandParser(): ICommandParser { return this.commandParser; }
   public get DateParser(): IDateParser { return this.dateParser; }
 
   public connectToMongo(): Promise<void> {
@@ -155,18 +159,10 @@ class App implements IApp {
         .catch((error: IError) => errorHandler(error, res));
     });
 
-    router.get(WhimAPI.GetAvailableFriends, (req, res, next) => {
-      // TODO: merge with GetFriends
-      const args: IGetAvailableFriendsArguments = req.body;
-      this.friendMgr.getAvailableFriends(args.userId)
-        .then(friends => res.json(friends))
-        .catch((error: IError) => errorHandler(error, res));
-    });
-
     router.get(WhimAPI.GetFriend, (req, res, next) => {
       const args: IGetFriendArguments = req.body;
-      this.friendMgr.getRemovedFriends(args.userId)
-        .then(friends => res.json(friends))
+      this.friendMgr.getFriend(args)
+        .then(friend => res.json(friend))
         .catch((error: IError) => errorHandler(error, res));
     });
 
@@ -200,6 +196,13 @@ class App implements IApp {
         .catch((error: IError) => errorHandler(error, res));
     });
 
+    router.post(WhimAPI.DeleteEvents, (req, res, next) => {
+      const args: IDeleteEventsArguments = req.body;
+      this.calendarMgr.deleteEvents(args)
+        .then(_ => res.json(undefined))
+        .catch((error: IError) => errorHandler(error, res));
+    });
+
     router.get(WhimAPI.ParseSearch, (req, res, next) => {
       const params: IParseSearchArguments = req.query;
       this.commandParser.parseForSearchResults(params.searchTerm, params.userId)
@@ -219,7 +222,7 @@ class App implements IApp {
     this.friendMgr = new FriendManager(this.databaseMgr, this.dateParser);
     this.calendarMgr = new CalendarManager(this.databaseMgr, this.dateParser);
     this.ideaGenerator = new IdeaGenerator(this.friendMgr, this.methodMgr, this.historyMgr);
-    this.commandParser = new CommandParser(this.databaseMgr, this.friendMgr, this.calendarMgr);
+    this.commandParser = new CommandParser(this.friendMgr, this.calendarMgr);
   }
 }
 

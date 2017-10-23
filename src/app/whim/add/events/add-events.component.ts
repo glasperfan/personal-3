@@ -55,11 +55,7 @@ export class AddCalendarEventsComponent implements OnInit {
   }
 
   private formatDate(timestamp: number | string, format: string = 'MMMM Do YYYY, h:mm a'): string {
-    return moment(timestamp).format(format);
-  }
-
-  private getDefaultDate(): string {
-    return moment(this.Now).format('YYYY-MM-DDTHH:mm');
+    return moment(timestamp, 'x', true).format(format);
   }
 
   private get _recurrenceIntervals(): any[] {

@@ -28,20 +28,6 @@ export interface IEvent {
   whenLastModified: number;
 }
 
-export interface IBirthday {
-  timestamp: number;
-  birthdate: string;
-}
-
-export class Birthday {
-  public timestamp: number;
-  public birthdate: string;
-  constructor(moment: moment.Moment) {
-    this.timestamp = moment.valueOf();
-    this.birthdate = moment.format('MMMM D, YYYY');
-  }
-}
-
 export interface IName {
   first: string;
   last: string;
@@ -66,7 +52,7 @@ export interface IFriend {
   _id: Guid;
   userId: string;
   name: IName;
-  birthday?: IBirthday;
+  birthday?: number;
   email?: string;
   phone?: string;
   address: IAddress;

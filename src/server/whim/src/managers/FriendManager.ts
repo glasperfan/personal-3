@@ -1,9 +1,10 @@
+import { IFriendManager } from './contracts/IFriendManager';
 import { IDateParser } from '../parsers/dates/contracts/IDateParser';
 import { DateParser, Validator } from '../parsers';
 import {
-    Birthday,
     IAddFriendArguments,
     IAddFriendsArguments,
+    IGetFriendArguments,
     IFriend,
     IParsedDate,
     IUser,
@@ -15,14 +16,13 @@ import * as MongoDB from 'mongodb';
 import { v4 } from 'uuid';
 import * as moment from 'moment';
 
-export class FriendManager {
+export class FriendManager implements IFriendManager {
 
   // Note: 'text' fields must all be adjacent
   public static readonly QueryIndexes: { [field: string]: string | number } = {
     'name.displayName': 'text',
     email: 'text',
     phone: 'text',
-    'birthday.birthdate': 'text',
     'address.address1': 'text',
     'address.address2': 'text',
     'address.city': 'text',
@@ -40,28 +40,15 @@ export class FriendManager {
 
   getAllFriends(userId: string): Promise<IFriend[]> {
     return this.getUserFriendCollection(userId).then(collection =>
-      collection.find({ userId: userId }).toArray());
+      collection.find({ userId: userId }).toArray()
+    );
   }
 
-  getAvailableFriends(userId: string): Promise<IFriend[]> {
-    return this.getUserFriendCollection(userId)
-      .then(collection => {
-        return collection.find().toArray();
-      })
-      .catch(e => {
-        throw e;
-      });
-  }
-
-  getRemovedFriends(userId: string): Promise<IFriend[]> {
-    try {
-      return this.getUserFriendCollection(userId).then(collection =>
-        collection.find({ userId: userId, wasRemoved: true }).toArray());
-    } catch (e) {
-      console.log(e);
-      throw e;
-    }
-  }
+  public getFriend(args: IGetFriendArguments): Promise<IFriend> {
+    return this.getUserFriendCollection(args.userId).then(collection =>
+      collection.findOne({ _id: args.friendId })
+    );
+}
 
   createFriends(args: IAddFriendsArguments): Promise<IFriend[]> {
     let newFriends: IFriend[];
@@ -101,7 +88,17 @@ export class FriendManager {
     return Promise.all(ops).then(_ => _[0]);
   }
 
-  getUserFriendCollection(userId: string): Promise<MongoDB.Collection<IFriend>> {
+  searchByText(userId: string, searchComponents: string[]): Promise<IFriend[]> {
+    return this.getUserFriendCollection(userId).then(collection =>
+      collection.find({ '$text': { '$search': searchComponents.join(' ') } }).toArray()
+    ).catch(e => {
+      console.log('SEARCH BY TEXT ERROR');
+      console.log(e);
+      return [];
+    });
+  }
+
+  private getUserFriendCollection(userId: string): Promise<MongoDB.Collection<IFriend>> {
     return this.getUserCollection<IFriend>(userId);
   }
 
@@ -112,8 +109,8 @@ export class FriendManager {
   }
 
   private createFriend(userId: string, friendArg: IAddFriendArguments, id?: string): IFriend {
-    this.validateArguments(friendArg); // TODO: validate birthday
-    const bday: IParsedDate = friendArg.birthday ? this.dateParser.parseString(friendArg.birthday) : undefined;
+    this.validateArguments(friendArg);
+    const bday = this.extractBirthday(friendArg.birthday);
     return <IFriend>{
       _id: id || v4(),
       name: {
@@ -121,7 +118,7 @@ export class FriendManager {
         last: friendArg.last,
         displayName: `${friendArg.first} ${friendArg.last}`,
       },
-      birthday: friendArg ? new Birthday(moment(bday.startDate, 'x', true)) : undefined,
+      birthday: bday && bday.startDate.valueOf(),
       email: friendArg.email,
       phone: friendArg.phone,
       address: {
@@ -143,6 +140,17 @@ export class FriendManager {
     };
   }
 
+  private extractBirthday(birthdayStr: string): IParsedDate {
+    if (!birthdayStr) {
+      return undefined;
+    }
+    const parsed = this.dateParser.parseString(birthdayStr);
+    if (!parsed) {
+      throw new WhimError(`Cannot parse ${birthdayStr} as a recognizable birthday date.`);
+    }
+    return parsed;
+  }
+
   private validateArguments(args: IAddFriendArguments): void {
     if (!args.first) {
       throw new WhimError('Friends must have a first name.');
@@ -156,9 +164,6 @@ export class FriendManager {
     if (args.phone && !Validator.isPhoneNumber(args.phone)) {
       throw new WhimError(`Cannot parse ${args.phone} as a recognizable phone number.`);
     }
-    if (args.birthday && !Validator.isDate(args.birthday.toString())) {
-      throw new WhimError(`Cannot parse ${args.birthday} as a recognizable birthday.`);
-    }
   }
 
   private genUserCollectionToken(userId: string): string {
@@ -171,6 +176,11 @@ export class FriendManager {
     return collection.createIndex(
       FriendManager.QueryIndexes,
       { name: 'textQuery' }
-    ).then(_ => collection);
+    ).then(_ => collection)
+      .catch((e: Error) => {
+        console.log('Error creating text indexes in FriendManager. Reason: ' + e.message);
+        console.log('Stack:' + e.stack);
+        throw e;
+      });
   }
 }

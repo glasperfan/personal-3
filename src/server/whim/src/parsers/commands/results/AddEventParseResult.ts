@@ -1,3 +1,4 @@
+import { DateParsingConstants } from '../../dates/parsing/DateParsingConstants';
 import { IAddEventArguments } from '../../../models/api';
 import { DateParser } from '../../dates';
 import { splice } from '../splice';
@@ -5,6 +6,7 @@ import { ParseResultWithValidator } from './ParseResult';
 import { IParsedDate, WindowView } from '../../../models';
 import { Validator } from '../../validator';
 import * as moment from 'moment';
+import { keyBy } from 'lodash';
 
 /**
  * AddEvent result:
@@ -17,20 +19,15 @@ import * as moment from 'moment';
  */
 export class AddEventParseResult extends ParseResultWithValidator {
   public static DateParser = new DateParser();
-  public static OnceDateKeyword = 'on';
-  public static RecurrentKeyword = 'every';
-  public static Keywords = [
-    AddEventParseResult.OnceDateKeyword,
-    AddEventParseResult.RecurrentKeyword,
-    'today',
-    'tomorrow',
-    'next week'
-  ];
+  public static ExcludedKeywords: string[] = ['is', 'every', 'for', 'this', 'next'];
 
   public static validate(inputComponents: string[]): boolean {
-    for (const keyword in this.Keywords) {
-      if (keyword in inputComponents) {
-        return true;
+    for (const component of inputComponents) {
+      const normalized = Validator.normalize(component);
+      if (DateParsingConstants.TimeKeywordLookup[normalized]) {
+        if (!this.ExcludedKeywords.includes(normalized)) {
+          return true;
+        }
       }
     }
     return false;
@@ -91,9 +88,12 @@ export class AddEventParseResult extends ParseResultWithValidator {
         this.removeDateComponents();
         continue;
       }
-      this.extractDescription(component);
+      this.extractTitle(component);
       this._components.shift();
     }
+
+    // Remove duplicate tags
+    this._tags = Array.from(new Set(this._tags));
   }
 
   private extractTag(term: string): boolean {
@@ -104,10 +104,10 @@ export class AddEventParseResult extends ParseResultWithValidator {
     return match;
   }
 
-  private extractDescription(term: string): boolean {
+  private extractTitle(term: string): boolean {
     const match: boolean = !Validator.isTagStart(term);
     if (match) {
-        this._title += ` ${term}`;
+        this._title += `${this._title.length ? ' ' : ''}${term}`;
     }
     return match;
   }

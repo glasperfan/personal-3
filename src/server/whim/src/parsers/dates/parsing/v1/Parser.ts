@@ -31,8 +31,9 @@ import { DateParsingConstants as Constants } from '../DateParsingConstants';
  * fragments, since they form a composite date together.
  * */
 export class DateParser implements IDateParser {
-  private static keywords = ['for', 'every', 'starting', 'on', 'is', 'until'];
-  private static minorKeywords = ['next', 'this'];
+  private static Keywords = ['for', 'every', 'starting', 'on', 'is', 'until'];
+  private static MinorKeywords = ['next', 'this'];
+  private static CommonDateTerms = ['today', 'tomorrow', 'yesterday'].concat(Constants.Weekday);
   private _s: string;
 
   public parseArray(sArr: string[]): IParsedDate {
@@ -62,14 +63,26 @@ export class DateParser implements IDateParser {
     const words = sentence.split(' ');
     for (const word of words) {
       const lc = word.toLowerCase();
-      if (DateParser.keywords.includes(lc)) { // start of fragment
+      if (DateParser.Keywords.includes(lc)) { // start of fragment
         if (currentFragment.length) {
           fragments = fragments.concat(this.explode(currentFragment));
         }
         currentFragment = [word];
       } else if (currentFragment.length) { // continuation of fragment
         currentFragment.push(word);
-      } else if (DateParser.minorKeywords.includes(lc)) {
+      } else if (DateParser.MinorKeywords.includes(lc)) {
+        if (currentFragment.length) {
+          fragments = fragments.concat(this.explode(currentFragment));
+        }
+        currentFragment = [word];
+      } else if (DateParser.CommonDateTerms.includes(lc)) {
+        // 'today', 'tomorrow', 'yesterday', 'Friday', 'tuesday'...
+        if (currentFragment.length) {
+          fragments = fragments.concat(this.explode(currentFragment));
+        }
+        currentFragment = [word];
+      } else if (Constants.Month.includes(lc)) {
+        // 'October', 'november', 'may'
         if (currentFragment.length) {
           fragments = fragments.concat(this.explode(currentFragment));
         }
@@ -321,7 +334,7 @@ class FragmentParser {
       case 'tomorrow':
         result = Constants.StartOfTomorrow(); break;
       case 'week':
-        result = Constants.StartOfWeek().add(startsNext ? 1 : 0, 'day'); break;
+        result = Constants.StartOfWeek().add(startsNext ? 1 : 0, 'week'); break;
       case 'month':
         result = Constants.StartOfMonth().add(startsNext ? 1 : 0, 'month'); break;
       case 'year':
@@ -339,7 +352,7 @@ class FragmentParser {
   }
 
   private parseExactDate(input: string): moment.Moment {
-    let s = input.trim(), startsNext = false;
+    let s = input.trim().toLowerCase(), startsNext = false;
     if (s.startsWith('next')) {
       startsNext = true;
       s = s.slice('next'.length + 1);
@@ -347,7 +360,7 @@ class FragmentParser {
 
     for (const format of FragmentParser.Formats) {
       const parsed = moment(s, format, true);
-      if (parsed.isValid()) {
+      if (parsed.isValid() && (format !== 'x' || Math.abs(parseInt(s, 10)) >= 31)) {
         return startsNext ? parsed.add(startsNext ? 1 : 0, 'year') : parsed;
       }
     }

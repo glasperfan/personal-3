@@ -1,3 +1,4 @@
+import { IDeleteEventsArguments } from '../models/api';
 import { DateParsingConstants as Constants } from '../parsers/dates/parsing/DateParsingConstants';
 import { IParsedDate } from '../models/date';
 import { IDateParser } from '../parsers/dates/contracts/IDateParser';
@@ -9,7 +10,7 @@ import { v4 } from 'uuid';
 
 export class CalendarManager {
 
-  public static readonly QueryIndexes: { [field: string]: string | number } = {
+  private static readonly QueryIndexes: { [field: string]: string | number } = {
     title: 'text',
     description: 'text'
   };
@@ -32,7 +33,7 @@ export class CalendarManager {
     });
   }
 
-  createEvents(args: IAddEventsArguments) {
+  createEvents(args: IAddEventsArguments): Promise<IEvent[]> {
     const newEvents: IEvent[] = args.events.map(e => this.createEvent(e, args.userId));
     const operation = this.getUserEventCollection(args.userId)
       .then(collection => collection.insertMany(newEvents));
@@ -44,7 +45,30 @@ export class CalendarManager {
     });
   }
 
-  getUserEventCollection(userId: string): Promise<MongoDB.Collection<IEvent>> {
+  deleteEvents(args: IDeleteEventsArguments): Promise<void> {
+    const operation = this.getUserEventCollection(args.userId)
+      .then(collection => collection.deleteMany({
+        _id: { $in: args.events }
+      }));
+    return operation.then(deleted => {
+      if (!deleted.result.ok || deleted.deletedCount !== args.events.length) {
+        throw new WhimError(`CalendarManager: unable to delete events (attempted ${args.events.length}, succeeded for ${deleted.deletedCount}`);
+      }
+      return undefined;
+    });
+  }
+
+  searchByText(userId: string, searchComponents: string[]): Promise<IEvent[]> {
+    return this.getUserEventCollection(userId).then(collection =>
+      collection.find({ '$text': { '$search': searchComponents.join(' ') } }).toArray()
+    ).catch(e => {
+      console.log('SEARCH BY TEXT ERROR');
+      console.log(e);
+      return [];
+    });
+  }
+
+  private getUserEventCollection(userId: string): Promise<MongoDB.Collection<IEvent>> {
     return this.getEventCollection<IEvent>(userId);
   }
 
@@ -88,6 +112,11 @@ export class CalendarManager {
     return collection.createIndex(
       CalendarManager.QueryIndexes,
       { name: 'textQuery' }
-    ).then(_ => collection);
+    ).then(_ => collection)
+      .catch((e: Error) => {
+        console.log('Error creating text indexes in FriendManager. Reason: ' + e.message);
+        console.log('Stack:' + e.stack);
+        throw e;
+      });
   }
 }

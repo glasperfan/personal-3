@@ -1,3 +1,4 @@
+import { ISnippet } from './contracts/ISnippet';
 import { IDateParser } from '../dates/contracts/IDateParser';
 import { IEvent, IFriend } from '../../models';
 import { DateParser } from '../dates';
@@ -9,7 +10,7 @@ export class QueryText {
   public static ParseFriend(f: IFriend): ISnippet[] {
     return [
       { text: f.name.displayName, field: 'name' },
-      { text: f.birthday && f.birthday.birthdate, field: 'birthday' },
+      { text: f.birthday && moment(f.birthday, 'x', true).format('MMMM Do'), field: 'birthday' },
       { text: f.email, field: 'email' },
       { text: f.phone, field: 'phone' },
       { text: f.address && f.address.city, field: 'location' },

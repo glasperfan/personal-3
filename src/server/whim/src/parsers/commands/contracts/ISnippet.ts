@@ -1,4 +1,4 @@
-interface ISnippet {
+export interface ISnippet {
   field: string;
   text: string;
 }

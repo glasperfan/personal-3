@@ -1,5 +1,6 @@
 import { RecurrenceInterval, IRecurEvery, IRecurFor } from '../../../models';
 import * as moment from 'moment';
+import { keyBy } from 'lodash';
 
 export class DateParsingConstants {
   public static readonly SkipOneKeyword = 'next';
@@ -52,6 +53,21 @@ export class DateParsingConstants {
     'Sunday', 'sunday'
   ];
 
+  public static readonly Month: string[] = [
+    'January', 'january',
+    'Feburary', 'february',
+    'March', 'march',
+    'April', 'april',
+    'May', 'may',
+    'June', 'june',
+    'July', 'july',
+    'August', 'august',
+    'September', 'september',
+    'October', 'october',
+    'November', 'november',
+    'December', 'december'
+  ];
+
   public static readonly DateUnitToRecurrenceInterval: { [unit: string]: RecurrenceInterval } = {
     'day': 'day',
     'days': 'day',
@@ -62,6 +78,26 @@ export class DateParsingConstants {
     'year': 'year',
     'years': 'year'
   };
+
+  public static readonly TimeKeywordLookup = Object.assign(
+    DateParsingConstants.DateUnitToRecurrenceInterval, keyBy(
+    DateParsingConstants.Weekday
+      .concat(DateParsingConstants.Month)
+      .concat([
+        // common phrases
+        'today',
+        'yesterday',
+        'tomorrow',
+        // common keywords (i.e. '*is* Friday', '*every* week')
+        'is',
+        'on',
+        'every',
+        'for',
+        'until',
+        'this',
+        'next'
+      ])
+  ));
 
   public static AsDayOfWeek(s: string): moment.Moment {
     const m = moment(s, 'dddd', true);

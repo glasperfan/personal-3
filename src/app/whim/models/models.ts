@@ -24,22 +24,8 @@ export interface IEvent {
   description?: string;
   relatedFriends: string[];
   tags: string[];
-  whenAdded: Date;
-  whenLastModified: Date;
-}
-
-export interface IBirthday {
-  timestamp: number;
-  birthdate: string;
-}
-
-export class Birthday {
-  public timestamp: number;
-  public birthdate: string;
-  constructor(moment: moment.Moment) {
-    this.timestamp = moment.valueOf();
-    this.birthdate = moment.format('MMMM D, YYYY');
-  }
+  whenAdded: number;
+  whenLastModified: number;
 }
 
 export interface IName {
@@ -66,7 +52,7 @@ export interface IFriend {
   _id: Guid;
   userId: string;
   name: IName;
-  birthday?: IBirthday;
+  birthday?: number;
   email?: string;
   phone?: string;
   address: IAddress;

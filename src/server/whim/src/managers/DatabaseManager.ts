@@ -15,13 +15,6 @@ export class DatabaseManager {
     return !!this.dbObject;
   }
 
-  public get db(): MongoDB.Db {
-    if (!this.dbObject) {
-      throw new Error('Connect to the database first.');
-    }
-    return this.dbObject;
-  }
-
   public connectToDb(): Promise<void> {
     return MongoClient.connect(this.dbUrl)
       .then((db: MongoDB.Db) => {

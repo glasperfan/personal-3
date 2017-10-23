@@ -5,7 +5,8 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "build": "ng build && gulp",
+    "build": "ng build",
+    "build-all": "ng build && gulp",
     "whim": "gulp && node src/server/whim/dist/app.js",
     "whim-debug": "gulp && node debug src/server/whim/dist/app.js",
     "mongod-setup": "npm run mongod-teardown && mkdir -p /data/db && rm -f /data/db/mongod.log && mongod --dbpath /data/db --logpath /data/db/mongod.log --fork",

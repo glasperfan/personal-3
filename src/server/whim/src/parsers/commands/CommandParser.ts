@@ -1,3 +1,6 @@
+import { ICalendarManager } from '../../managers/contracts/ICalendarManager';
+import { IFriendManager } from '../../managers/contracts/IFriendManager';
+import { ICommandParser } from './contracts/ICommandParser';
 import { AddFriendParseResult } from './results/AddFriendParseResult';
 import { AddEventParseResult } from './results/AddEventParseResult';
 import { QueryFriendParseResult } from './results/QueryFriendParseResult';
@@ -7,11 +10,10 @@ import { CalendarManager, FriendManager, DatabaseManager } from '../../managers'
 import * as moment from 'moment';
 import * as MongoDB from 'mongodb';
 
-export class CommandParser {
+export class CommandParser implements ICommandParser {
   constructor(
-    private db: DatabaseManager,
-    private friendMgr: FriendManager,
-    private calendarMgr: CalendarManager) { }
+    private friendMgr: IFriendManager,
+    private calendarMgr: ICalendarManager) { }
 
   public parseForSearchResults(searchTerm: string, userId: string): Promise<IParseResult[]> {
     if (!searchTerm || !searchTerm.length || !userId) {
@@ -30,12 +32,9 @@ export class CommandParser {
     }
 
     return Promise.all([
-      this.friendMgr.getUserFriendCollection(userId),
-      this.calendarMgr.getUserEventCollection(userId)
-    ]).then((collections: MongoDB.Collection[]) => Promise.all([
-      this.searchByText<IFriend>(collections[0], searchComponents),
-      this.searchByText<IEvent>(collections[1], searchComponents)
-    ])).then(aggregateResults => {
+      this.friendMgr.searchByText(userId, searchComponents),
+      this.calendarMgr.searchByText(userId, searchComponents)
+    ]).then(aggregateResults => {
       results = results.concat(aggregateResults[0].map(f =>
         new QueryFriendParseResult(f, searchComponents).AsResult()));
       results = results.concat(aggregateResults[1].map(e =>

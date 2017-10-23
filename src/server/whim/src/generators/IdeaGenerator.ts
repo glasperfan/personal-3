@@ -1,3 +1,4 @@
+import { IFriendManager } from '../managers/contracts/IFriendManager';
 import { WhimError, WhimErrorCode, IIdea, IIdeaSelection, IFriend } from '../models';
 import {
   DatabaseManager,
@@ -12,7 +13,7 @@ import { v4 } from 'uuid';
 export class IdeaGenerator {
 
   constructor(
-    private friendMgr: FriendManager,
+    private friendMgr: IFriendManager,
     private methodMgr: MethodManager,
     private historyMgr: HistoryManager) {}
 
@@ -25,7 +26,7 @@ export class IdeaGenerator {
       if (archivedIdeas && archivedIdeas.length === ideaCount) {
         return Promise.resolve(archivedIdeas);
       }
-      return this.friendMgr.getAvailableFriends(userId).then((friends: IFriend[]) => {
+      return this.friendMgr.getAllFriends(userId).then((friends: IFriend[]) => {
         if (friends.length < ideaCount) {
           throw new WhimError(WhimErrorCode.InsufficientFriends);
         }

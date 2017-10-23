@@ -8,24 +8,27 @@ import { Component, Input, Output, EventEmitter } from '@angular/core';
 export class AddTagsComponent {
 
   @Output() public tagsChange = new EventEmitter<string[]>();
-  private _values: string;
+  private _tagArr: string[];
+  private _tagStr: string;
 
-  @Input() set tags(newTags: string[]) {
-    this.values = (newTags && newTags.join(' ')) || '';
+  // tags allows others to bind to the output array
+  @Input() public get tags(): string[] {
+    return this._tagArr;
   }
 
-  private get values(): string {
-    return this._values;
+  public set tags(newTags: string[]) {
+    this._tagArr = newTags;
   }
 
-  private set values(newTags: string) {
-    const tagArr = newTags && newTags.trim().length ? newTags.split(' ') : [];
-    for (let i = tagArr.length - 1; i >= 0; i--) {
-      if (!tagArr[i].startsWith('#')) {
-        tagArr[i] = '#' + tagArr[i];
-      }
-    }
-    this.tagsChange.emit(tagArr);
-    this._values = newTags;
+  // _tags parses the input string (_tagStr) into an array of tags (_tagArr)
+  private get _tags(): string {
+    return this._tagStr;
+  }
+
+  private set _tags(s: string) {
+    const components = (s && s.trim().split(/[\s,]+/)) || [];
+    components.map(c => c.startsWith('#') ? c : '#' + c);
+    this.tags = components;
+    this.tagsChange.emit(this.tags);
   }
 }

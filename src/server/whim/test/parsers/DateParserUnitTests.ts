@@ -77,6 +77,11 @@ describe('Date parsers', () => {
       Utils.testOneTimeDate(result, Constants.StartOfWeek(), 'This week');
     });
 
+    it('Next week', () => {
+      const result = v1Parser.parseString(`Next week go to the supermarket.`);
+      Utils.testOneTimeDate(result, Constants.StartOfNextWeek(), 'Next week');
+    });
+
     it('is this week', () => {
       const result = v1Parser.parseString(`All of his research is this week.`);
       Utils.testOneTimeDate(result, Constants.StartOfWeek(), 'is this week');

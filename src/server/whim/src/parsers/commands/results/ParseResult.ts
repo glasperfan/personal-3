@@ -1,3 +1,4 @@
+import { ISnippet } from '../contracts/ISnippet';
 import { IParseResult, WindowView } from '../../../models';
 
 export abstract class ParseResultWithValidator implements IParseResult {

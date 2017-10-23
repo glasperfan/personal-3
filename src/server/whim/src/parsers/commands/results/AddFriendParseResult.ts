@@ -1,9 +1,10 @@
-import { IParsedDate } from '../../../models/date';
+import { DateParsingConstants } from '../../dates/parsing/DateParsingConstants';
 import { DateParser } from '../../../parsers/dates';
-import { Birthday, IAddFriendArguments, WindowView } from '../../../models';
+import { IAddFriendArguments, IParsedDate, WindowView } from '../../../models';
 import { Validator } from '../../../parsers/validator';
 import { ParseResultWithValidator } from './ParseResult';
 import * as moment from 'moment';
+import { uniqBy } from 'lodash';
 
 /**
  * AddFriend result:
@@ -21,7 +22,8 @@ export class AddFriendParseResult extends ParseResultWithValidator {
     public static MetKeyword = 'met';
 
     public static validate(inputComponents: string[]): boolean {
-      const keyword = inputComponents[0].trim().toLocaleLowerCase();
+      let keyword = inputComponents.length ? inputComponents[0] : '';
+      keyword = keyword.trim().toLocaleLowerCase();
       return [this.AddKeyword, this.MetKeyword].some(k => k === keyword);
     }
 
@@ -30,7 +32,7 @@ export class AddFriendParseResult extends ParseResultWithValidator {
     private _lastName: string;
     private _email: string;
     private _phone: string;
-    private _birthday: Birthday;
+    private _birthday: moment.Moment;
     private _firstNote: string;
     private _tags: string[] = [];
 
@@ -58,7 +60,7 @@ export class AddFriendParseResult extends ParseResultWithValidator {
         desc += `%%${this._phone} (phone)`;
       }
       if (this._birthday) {
-        desc += `%%${this._birthday.birthdate} (birthday)`;
+        desc += `%%${this._birthday.format('MMMM Do')} (birthday)`;
       }
       if (this._tags.length) {
         desc += `%%${this._tags.join(', ')} (tags)`;
@@ -72,51 +74,80 @@ export class AddFriendParseResult extends ParseResultWithValidator {
         last: this._lastName,
         email: this._email,
         phone: this._phone,
-        birthday: this._birthday && this._birthday.birthdate,
+        birthday: this._birthday && this._birthday.valueOf().toString(),
         firstNote: this._firstNote,
         tags: this._tags
       };
     }
 
     protected extractData(): void {
-      let toSkip = 0;
-      this._components.slice(1).forEach((component, idx) => {
-        if (toSkip > 0) {
-          --toSkip;
-          return;
-        }
-        // Parsing in reverse order of length since May 22 will match before May 22 1990
-        const asDate = this.extractDateComponents(idx);
+      // Search for phone numbers first, which can get mistaken as date timestamps.
+      const componentStr = this._components.slice(1).join(' '); // remove 'add' or 'met'
+      this._phone = Validator.firstPhoneNumber(componentStr);
+
+      this._components = this._phone
+        ? componentStr.replace(this._phone, '').split(' ').filter(s => !!s.length)
+        : this._components.slice(1);
+
+      for (let idx = 0; idx < this._components.length; idx++) {
+        const component = this._components[idx];
         if (Validator.isTag(component)) {
           this._tags.push(component);
-        } else if (Validator.isEmail(component) && !this._email) {
-          this._email = component;
-        } else if (Validator.isPhoneNumber(component) && !this._phone) {
-          this._phone = component;
-        } else if (asDate) {
-          this._birthday = new Birthday(moment(asDate.startDate, 'x', true));
-          toSkip = (<any>asDate)._i.split(' ').length - 1;
-        } else if (!this._firstName && !Validator.isTagStart(component)) {
-          this._firstName = Validator.capitalize(component);
-        } else if (!this._lastName && !Validator.isTagStart(component)) {
-          this._lastName = Validator.capitalize(component);
-        } else {
-          if (!this._firstNote) {
-            this._firstNote = component;
-          } else {
-            this._firstNote += ` ${component}`;
-          }
+          continue;
         }
-      });
+        if (Validator.isEmail(component) && !this._email) {
+          this._email = component;
+          continue;
+        }
+
+        const parsedDate = this.extractDateComponents(idx);
+        const asDate = parsedDate[0];
+        const numComponents = parsedDate[1];
+        if (asDate && asDate.startInputText !== this._phone) {
+          this._birthday = moment(asDate.startDate, 'x', true);
+          idx += numComponents;
+          continue;
+        }
+
+        if (!this._firstName && !Validator.isTagStart(component)) {
+          this._firstName = Validator.capitalize(component);
+          continue;
+        }
+
+        if (!this._lastName && !Validator.isTagStart(component) && idx === 1) {
+          this._lastName = Validator.capitalize(component);
+          continue;
+        }
+
+        if (!this._firstNote) {
+          this._firstNote = component;
+        } else {
+          this._firstNote += ` ${component}`;
+        }
+      }
+
+      // Remove duplicate tags
+      this._tags = Array.from(new Set(this._tags));
     }
 
-    private extractDateComponents(idx: number): IParsedDate {
-      const parser = AddFriendParseResult.DateParser;
+    /**
+     * Parsing in reverse order of length since May 22 will match before May 22 1990
+     * Returns the number of components used to successfully parse.
+     */
+    private extractDateComponents(idx: number): [IParsedDate, number] {
       if (this._birthday) {
-        return undefined;
+        return [undefined, 0];
       }
-      return parser.parseArray(this._components.slice(idx + 1, idx + 4))
-      || parser.parseArray(this._components.slice(idx + 1, idx + 3))
-      || parser.parseString(this._components[idx]);
+      const startsWithDateInfo = !!DateParsingConstants.TimeKeywordLookup[this._components[idx]];
+      if (startsWithDateInfo) {
+        const parser = AddFriendParseResult.DateParser;
+        for (let substrLen = 3; substrLen > 0; substrLen--) {
+          const result = parser.parseArray(this._components.slice(idx, idx + substrLen));
+          if (result) {
+            return [result, substrLen];
+          }
+        }
+      }
+      return [undefined, 0];
     }
   }

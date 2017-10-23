@@ -1,3 +1,4 @@
+import { ISnippet } from '../contracts/ISnippet';
 import { IEvent, WindowView } from '../../../models';
 import { ParseResultWithValidator } from './ParseResult';
 import { Validator } from '../../validator';
