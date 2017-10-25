@@ -1,0 +1,18 @@
+<div class="field string-field" *ngIf="shouldShow">
+  <div class="data">
+    <label class ="label"[attr.for]="label">{{label}}</label>
+    <div *ngIf="!editMode">
+      <div class="value" *ngIf="value && value.length">
+        <div class="tags">
+          <div class="tag" *ngFor="let tag of value">{{tag}}</div>
+        </div>
+      </div>
+      <div class="value empty" *ngIf="!value || !value.length">{{emptyProperty}}</div>
+    </div>
+    <input *ngIf="editMode" class="value editable form-control" type="text" [name]="field" [(ngModel)]="tags" />
+  </div>
+  <div class="actions" *ngIf="showControls">
+    <div class="action" *ngIf="editMode" (click)="finishEdit()">show</div>
+    <div class="action" *ngIf="!editMode" (click)="edit()">edit</div>
+  </div>
+</div>

@@ -16,7 +16,7 @@ export class QueryText {
       { text: f.address && f.address.city, field: 'location' },
       { text: f.organization, field: 'organization' },
       { text: f.skills && f.skills.join(', '), field: 'skills' },
-      { text: f.notes.map(note => note.text).join(' '), field: 'notes' }
+      { text: f.notes && f.notes.map(note => note.text).join(' '), field: 'notes' }
     ].map(s => this.Normalize(s));
   }
 

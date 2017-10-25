@@ -21,6 +21,7 @@ export class CalendarComponent implements OnInit {
     this.accountService.currentUser$.then(user => {
       if (user) {
         this.userEvents$ = this.calendarService.getAllEvents(user._id)
+          .then(events => events.sort((a, b) => a.date.startDate - b.date.startDate)) // sort by date
           .catch((err: IError) => {
             switch (err.errorMessage as WhimErrorCode) {
               case WhimErrorCode.NoEvents:

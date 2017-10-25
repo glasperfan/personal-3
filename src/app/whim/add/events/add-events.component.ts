@@ -32,6 +32,10 @@ export class AddCalendarEventsComponent implements OnInit {
     this.switchTo.emit(new WindowViewWithArgs(WindowView.Dashboard));
   }
 
+  private toEditEvent(event: IEvent): void {
+    this.switchTo.emit(new WindowViewWithArgs(WindowView.ShowEvents, event));
+  }
+
   private addCalendarEvent(): void {
     // quick validation
     if (!this.args.title) {
@@ -41,7 +45,7 @@ export class AddCalendarEventsComponent implements OnInit {
     } else {
       this.calendarService.addEvents([this.args])
         .then((addedEvents: IEvent[]) => {
-          this.processMessage = `${addedEvents[0].title} on ${this.formatDate(addedEvents[0].date.startDate)}, got it!`;
+          this.toEditEvent(addedEvents[0]);
           this.args = <any>{};
         })
         .catch((err: IError) => {

@@ -25,6 +25,10 @@ export class AddFriendsComponent implements OnInit {
     this.switchTo.emit(new WindowViewWithArgs(WindowView.Dashboard));
   }
 
+  private toEditFriend(friend: IFriend): void {
+    this.switchTo.emit(new WindowViewWithArgs(WindowView.ShowFriends, friend));
+  }
+
   private addFriend(): void {
     // quick validation
     if (!this.args.first || !this.args.first.length
@@ -35,15 +39,17 @@ export class AddFriendsComponent implements OnInit {
       .then((addedFriends: IFriend[]) => {
         this.processMessage = `${addedFriends[0].name.displayName}, got it!`;
         this.args = <any>{};
-        // TODO: smoother transition here
-        // this.toDashboard();
+        this.toEditFriend(addedFriends[0]);
       })
       .catch((err: IError) => this.processMessage = err.errorMessage);
     }
   }
 
-  private formatDate(timestamp: number | string, format: string = 'MMMM Do YYYY'): string {
-    return moment(timestamp, 'x', true).format(format);
+  private formatDate(date: string, format: string = 'MMMM Do YYYY'): string {
+    if (!isNaN(+date)) {
+      return moment(date, 'x', true).format(format); // timestamp
+    }
+    return date;
   }
 
   private get _first(): string {

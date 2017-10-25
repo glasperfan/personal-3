@@ -101,6 +101,15 @@ describe('Date parsers', () => {
       );
     });
 
+    it('Wednesday #tag', () => {
+      const result = v1Parser.parseString(`Start contacting people Wednesday #tag'`);
+      Utils.testOneTimeDate(
+        result,
+        Constants.NearestWeekday('wednesday', Constants.StartOfNextWeek()),
+        'Wednesday'
+      );
+    });
+
     it('everyday', () => {
       const result = v1Parser.parseString('Start reminding me everyday.');
       Utils.testRecurrentDate(

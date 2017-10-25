@@ -18,6 +18,7 @@ export class AddTagsComponent {
 
   public set tags(newTags: string[]) {
     this._tagArr = newTags;
+    this._tagStr = newTags.join(' ');
   }
 
   // _tags parses the input string (_tagStr) into an array of tags (_tagArr)

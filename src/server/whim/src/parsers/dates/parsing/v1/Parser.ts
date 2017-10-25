@@ -1,3 +1,4 @@
+import { Validator } from '../../../validator';
 import { splice } from '../../../commands/splice';
 import { IDateParser } from '../../contracts/IDateParser';
 import { IParsedDate, IRecurEvery, IRecurFor, IRecurrence, IRecurrenceUnit, RecurrenceInterval } from '../../../../models';
@@ -69,7 +70,9 @@ export class DateParser implements IDateParser {
         }
         currentFragment = [word];
       } else if (currentFragment.length) { // continuation of fragment
-        currentFragment.push(word);
+        if (!Validator.isTagStart(word)) { // exclude tags
+          currentFragment.push(word);
+        }
       } else if (DateParser.MinorKeywords.includes(lc)) {
         if (currentFragment.length) {
           fragments = fragments.concat(this.explode(currentFragment));

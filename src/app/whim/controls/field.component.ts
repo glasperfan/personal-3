@@ -2,6 +2,7 @@ import { Input, Output, EventEmitter } from '@angular/core';
 import { IField } from 'app/whim/models';
 
 export class FieldComponent<T> {
+  value: T;
   @Input() label: string;
   @Input() field: string;
   @Input() editMode: boolean;
@@ -12,9 +13,17 @@ export class FieldComponent<T> {
     this.value = initialValue;
   }
 
+  // Override for non-primitive (for value existence check)
   get shouldShow(): boolean {
     return this.showIfEmpty || this.editMode || !!this.value;
   }
 
-  protected value: T;
+
+  edit(): void {
+    this.editMode = true;
+  }
+
+  finishEdit(): void {
+    this.editMode = false;
+  }
 }

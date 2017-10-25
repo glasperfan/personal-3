@@ -20,6 +20,7 @@ import { FriendService } from './services/friend.service';
 import { IdeaGeneratorService } from './services/idea-generator.service';
 import { StringFieldComponent } from './controls/string-field.component';
 import { NotesFieldComponent } from './controls/notes-field.component';
+import { TagsFieldComponent } from './controls/tags-field.component';
 import { DateFormatPipe } from './controls/date.pipe';
 import { MarkdownPipe } from './controls/markdown.pipe';
 import { Autosize } from 'angular2-autosize/src/autosize.directive';
@@ -53,6 +54,7 @@ export const API_URL = new InjectionToken<string>('API_URL');
     /* Controls */
     StringFieldComponent,
     NotesFieldComponent,
+    TagsFieldComponent,
     DateFormatPipe,
     MarkdownPipe,
     Autosize

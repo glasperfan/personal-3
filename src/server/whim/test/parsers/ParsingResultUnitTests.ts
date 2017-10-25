@@ -1,8 +1,10 @@
+import { QueryFriendParseResult } from '../../src/parsers/commands/results/QueryFriendParseResult';
 import { AddEventParseResult } from '../../src/parsers/commands/results/AddEventParseResult';
 import { DateParsingConstants } from '../../src/parsers/dates/parsing/DateParsingConstants';
 import { AddFriendParseResult } from '../../src/parsers/commands/results/AddFriendParseResult';
 import { expect } from 'chai';
 import * as moment from 'moment';
+import { IFriend, MethodCode } from '../../src/models';
 
 describe('Parsing results', () => {
 
@@ -172,6 +174,9 @@ describe('Parsing results', () => {
       it(`Parses 'Start contacting people Wednesday'`, () => {
         parseEventDate(`Start contacting people Wednesday`, DateParsingConstants.NearestWeekday('Wednesday'));
       });
+      it(`Parses 'Start contacting people Wednesday #tag'`, () => {
+        parseEventDate(`Start contacting people Wednesday #tag`, DateParsingConstants.NearestWeekday('Wednesday'));
+      });
       it(`Parses 'Next week go to the supermarket'`, () => {
         parseEventDate(`Next week go to the supermarket`, DateParsingConstants.StartOfNextWeek());
       });
@@ -192,6 +197,61 @@ describe('Parsing results', () => {
   });
 
   describe('Querying friends', () => {
+
+    const friendJoe: IFriend = {
+      _id: '1',
+      userId: '11',
+      name: { first: 'Joe', last: 'Schmoe', displayName: 'Joe Schmoe' },
+      address: {
+        address1: '14 Elm St',
+        address2: 'Unit 2',
+        city: 'Austin',
+        state: 'TX',
+        country: 'USA'
+      },
+      tags: ['#tag', '#tag2'],
+      methods: [], // TODO: improve methods
+      whenAdded: moment('May 11th, 2017', 'MMMM Do, YYYY', true).valueOf(),
+      whenLastModified: moment('Septembmer 24th, 2017', 'MMMM Do, YYYY', true).valueOf()
+    };
+
+    const friendSally: IFriend = {
+      _id: '2',
+      userId: '22',
+      name: { first: 'Sally', last: 'Fields', displayName: 'Sally Fields' },
+      address: {},
+      tags: ['#boston', '#2k17'],
+      methods: [],
+      whenAdded: Date.now(),
+      whenLastModified: Date.now()
+    };
+
+    const friendMark: IFriend = {
+      _id: '3',
+      userId: '33',
+      name: { first: 'Mark', last: 'Hamil', displayName: 'Mark Hamil' },
+      address: { city: 'New York City' },
+      tags: [],
+      methods: [
+        { message: 'Send an email', methodCode: MethodCode.Email },
+        { message: 'You should call', methodCode: MethodCode.Call }
+      ],
+      whenAdded: Date.now(),
+      whenLastModified: Date.now()
+    };
+
+    describe('Extracting headers', () => {
+      const parseTitle = (input: IFriend, components: string[], expectedHeader: string) => {
+        const result = new QueryFriendParseResult(input, components).AsResult();
+        expect(result.header).to.equal(expectedHeader);
+      };
+
+      it('Uses the display name as the header', () => {
+        parseTitle(friendJoe, ['Joe', 'Schmoe'], friendJoe.name.displayName);
+        parseTitle(friendMark, ['Mark'], friendMark.name.displayName);
+        parseTitle(friendSally, [], friendSally.name.displayName);
+      });
+    });
 
   });
 

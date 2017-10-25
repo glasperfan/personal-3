@@ -82,6 +82,14 @@
 (onChange)="updateField($event)">
 </p3-whim-string-field>
 
+<p3-whim-tags-field
+[label]="'tags'"
+[field]="'tags'"
+[initialValue]="args.tags"
+[editMode]="editMode"
+(onChange)="updateField($event)">
+</p3-whim-tags-field>
+
 <p3-whim-notes-field
 [label]="'notes'"
 [field]="'notes'"

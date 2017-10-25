@@ -18,7 +18,9 @@ export class NotesFieldComponent extends FieldComponent<INote[]> {
       if (event.preventDefault) {
         event.preventDefault();
       }
-      this.addNote();
+      if (this.hasContent) {
+        this.addNote();
+      }
     }
   }
 
@@ -35,5 +37,13 @@ export class NotesFieldComponent extends FieldComponent<INote[]> {
 
   emit(): void {
     this.onChange.emit({ field: this.field, value: this.value });
+  }
+
+  private get hasContent(): boolean {
+    return !!this.newNoteText.trim().length;
+  }
+
+  get shouldShow(): boolean {
+    return this.showIfEmpty || this.editMode || !!this.value && !!this.value.length;
   }
 }
