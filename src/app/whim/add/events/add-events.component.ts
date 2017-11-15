@@ -19,6 +19,8 @@ export class AddCalendarEventsComponent implements OnInit {
   private readonly UnableToParseDateErrorMessage = `Not sure what date that is. Try 'today', 'now', 'tomorrow', 'next week', or a date like 'Feb 27 2017`;
   private readonly UnknownErrorMessage = 'Something went wrong... contact Hugh :/';
   private readonly Now: Date = new Date();
+  private _lastStartDate: Date;
+  private _startDateChanged = false;
   private processMessage: string;
 
 
@@ -71,20 +73,19 @@ export class AddCalendarEventsComponent implements OnInit {
     ];
   }
 
-  private get _startDate(): string {
-    return _.get(this.args, 'date.startDate', Date.now().toString());
+  // To prevent change detection cycles from freezing the app, we cache the Date object
+  // rather than create a new one with each call.
+  private get _startDate(): Date {
+    if (!this._lastStartDate || this._startDateChanged) {
+      this._lastStartDate = new Date(_.get(this.args, 'date.startDate', Date.now()));
+      this._startDateChanged = false;
+    }
+    return this._lastStartDate;
   }
 
-  private get _startInputText(): string {
-    return _.get(
-      this.args,
-      'date.startInputText',
-      moment(this._startDate, 'x').format('MMMM DD, YYYY')
-    );
-  }
-
-  private set _startInputText(s: string) {
-    _.set(this.args, 'date.startInputText', s);
+  private set _startDate(d: Date) {
+    _.set(this.args, 'date.startDate', d.getTime());
+    this._startDateChanged = true;
   }
 
   private get _title(): string {
@@ -109,6 +110,11 @@ export class AddCalendarEventsComponent implements OnInit {
 
   private set _isRecurrent(b: boolean) {
     _.set(this.args, 'date.recurrence.isRecurrent', b);
+    if (b) {
+      this._recurEveryAmount = this._recurEveryAmount || 1;
+      this._recurEveryInterval = this._recurEveryInterval || 'day';
+      this._isForever = true;
+    }
   }
 
   private get _recurEveryAmount(): number {

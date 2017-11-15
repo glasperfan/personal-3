@@ -13,7 +13,8 @@ export enum WhimAPI {
   GetFriend = '/friend',
   GetEvents = '/events',
   AddEvents = '/events',
-  DeleteEvents = '/events',
+  UpdateEvents = '/events',
+  DeleteEvents = '/events/delete',
   ParseSearch = '/parse'
 }
 

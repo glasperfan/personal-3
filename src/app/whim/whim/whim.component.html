@@ -22,13 +22,14 @@
     <p3-whim-add-friends *ngSwitchCase="WindowView.AddFriends"    [args]="viewArgs" (switchTo)="switchTo($event)"></p3-whim-add-friends>
     <p3-whim-add-events *ngSwitchCase="WindowView.AddEvents"      [args]="viewArgs" (switchTo)="switchTo($event)"></p3-whim-add-events>
     <p3-whim-show-friends *ngSwitchCase="WindowView.ShowFriends"  [args]="viewArgs" (switchTo)="switchTo($event)"></p3-whim-show-friends>
+    <p3-whim-show-events *ngSwitchCase="WindowView.ShowEvents"    [args]="viewArgs" (switchTo)="switchTo($event)"></p3-whim-show-events>
     <p3-whim-dashboard *ngSwitchDefault                           [args]="viewArgs" (switchTo)="switchTo($event)"></p3-whim-dashboard>
   </div>
 
   <div class="break"></div>
 
-  <div class="footer">
-    <div class="internal-link" (click)="logout()">Logout</div>
-    <div class="internal-link">Settings</div>
+  <div class="button-group centered">
+    <div class="button" (click)="logout()">Logout</div>
+    <div class="button">Settings</div>
   </div>
 </div>

@@ -18,4 +18,8 @@ export class FakeCalendarManager implements ICalendarManager {
   public searchByText(userId: string, searchComponents: string[]): Promise<IEvent[]> {
       throw new Error('Not implemented yet.');
   }
+
+  public updateEvents(args: IEvent[]): Promise<void> {
+      throw new Error('Not implemented yet.');
+  }
 }

@@ -90,7 +90,7 @@ export class HttpService {
   }
 
   private checkForServerError(response: any): void {
-    if (response.error) {
+    if (response && response.error) {
       throw new WhimError(response.error.errorMessage, response.error.httpCode);
     }
   }

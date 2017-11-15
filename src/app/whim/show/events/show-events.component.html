@@ -1,0 +1,33 @@
+<div class="whim-header">
+  <div class="whim-title">{{args.title}}</div>
+  <div class="whim-subtitle" (click)="toEditMode()" *ngIf="!editMode">{{description}}</div>
+</div>
+
+<p3-whim-string-field
+[label]="'title'"
+[field]="'title'"
+[initialValue]="args.title"
+[editMode]="editMode"
+(onChange)="updateField($event)">
+</p3-whim-string-field>
+
+<!-- DATE FIELD -->
+
+<p3-whim-multiline-field
+[label]="'description'"
+[field]="'description'"
+[initialValue]="args.description"
+[editMode]="editMode"
+(onChange)="updateField($event)">
+
+</p3-whim-multiline-field>
+
+<div class="button-group">
+  <button type="submit" *ngIf="editMode" (click)="submitChanges()">Update</button>
+  <div class="button" *ngIf="editMode" (click)="cancel()">Cancel</div>
+  <div class="button" *ngIf="!editMode" (click)="toEditMode()">Edit</div>
+  <div class="button" *ngIf="!editMode" (click)="delete()">Delete</div>
+  <div class="button nav-away-button" *ngIf="!editMode" (click)="toDashboard()">Back to dashboard</div>
+</div>
+
+<div class="process-message">{{processMessage}}</div>

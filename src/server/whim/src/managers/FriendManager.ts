@@ -102,6 +102,7 @@ export class FriendManager implements IFriendManager {
     return this.getUserCollection<IFriend>(userId);
   }
 
+  // Updating internal data only
   private updateFriend(friend: IFriend): IFriend {
     friend.name.displayName = `${friend.name.first} ${friend.name.last}`;
     friend.whenLastModified = Date.now();

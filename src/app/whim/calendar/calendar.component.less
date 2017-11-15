@@ -1,3 +1,5 @@
+@import '../controls/common';
+
 :host {
   display: block;
   margin-top: 10%;
@@ -11,13 +13,31 @@
       margin: 10px 0;
       line-height: 2em;
 
-      .top-row {
-        display: flex;
-        justify-content: space-between;
+      .event-title {
+        cursor: pointer;
       }
 
-      .bottom-row {
-        font-size: 0.8em;
+
+      // prevent shrinking
+      .event-recurrence {
+        flex-shrink: 0;
+        margin-left: 20px;
+      }
+
+      .row {
+        display: flex;
+        justify-content: space-between;
+
+        &.bottom-row {
+          font-size: 0.8em;
+        }
+
+        > * {
+          min-width: 0;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
       }
     }
   }

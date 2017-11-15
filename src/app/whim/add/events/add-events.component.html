@@ -9,8 +9,13 @@
   </div>
 
   <div class="form-group">
-    <label for="date">Date</label>
-    <input type="text" name="date" class="form-control" [(ngModel)]="_startInputText" />
+    <label for="startDate">Date</label>
+    <material-datepicker
+    name="startDate"
+    class="form-control"
+    [fontFamily]="'Open Sans'"
+    [accentColor]="'#1896e4'"
+    [(ngModel)]="_startDate"></material-datepicker>
   </div>
 
   <div class="form-group">
@@ -59,7 +64,7 @@
 
   <div class="button-group">
       <button type="submit">Add {{_title}}</button>
-      <div class="nav-away-button" (click)="toDashboard()">Back to dashboard</div>
+      <div class="button nav-away-button" (click)="toDashboard()">Back to dashboard</div>
   </div>
 
   <div class="process-message">{{processMessage}}</div>

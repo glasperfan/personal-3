@@ -11,10 +11,10 @@ export class DateParsingConstants {
     'MMMM Do, YYYY',    // September 7th, 1994
     'MMMM D YYYY',      // September 7 1994
     'MMMM D, YYYY',     // September 7, 1994
-    'M/D/YYYY',         // 09/8/2017,
-    'M-D-YYYY',         // 09-8-2017,
-    'M/D/YY',           // 09/8/17
-    'M-D-YY',           // 09-8-17
+    'M/D/YYYY',         // 9/8/2017
+    'M/D/YY',           // 9/8/17
+    'M-D-YYYY',         // 9-8-2017
+    'M-D-YY',           // 9-8-17
     'MMMM Do',          // September 9th
     'MMMM D',           // September 9
     'MMM Do',           // Sep 9th, Sept 9th
@@ -88,6 +88,7 @@ export class DateParsingConstants {
         'today',
         'yesterday',
         'tomorrow',
+        'everyday',
         // common keywords (i.e. '*is* Friday', '*every* week')
         'is',
         'on',

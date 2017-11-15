@@ -7,7 +7,9 @@
 [ngClass]="{'active-search': isActiveSearch}"></p3-whim-ideas>
 
 
-<p3-whim-calendar [ngClass]="{'active-search': isActiveSearch}"></p3-whim-calendar>
+<p3-whim-calendar
+(switchTo)="switchToView($event)"
+[ngClass]="{'active-search': isActiveSearch}"></p3-whim-calendar>
 
 <!-- <p3-whim-settings></p3-whim-settings> -->
 

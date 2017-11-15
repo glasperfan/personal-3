@@ -21,6 +21,7 @@ import {
     WhimAPI,
     WhimError,
     IFriend,
+    IEvent,
 } from '../models';
 import {
   CalendarManager,
@@ -200,6 +201,13 @@ class App implements IApp {
       const args: IDeleteEventsArguments = req.body;
       this.calendarMgr.deleteEvents(args)
         .then(_ => res.json(undefined))
+        .catch((error: IError) => errorHandler(error, res));
+    });
+
+    router.put(WhimAPI.UpdateEvents, (req, res, next) => {
+      const args: IEvent[] = req.body;
+      this.calendarMgr.updateEvents(args)
+        .then(_ => res.json({ successful: args.length, failed: 0 }))
         .catch((error: IError) => errorHandler(error, res));
     });
 

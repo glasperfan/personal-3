@@ -49,52 +49,55 @@
       }
     }
   }
-
 }
 
 select, option {
   font: 0.75em 'Open Sans', sans-serif;
 }
 
-input.form-control {
+.form-control {
   width: 300px;
   outline: none;
+  border-top: none;
+  border-left: none;
+  border-right: none;
   border-bottom: 1px solid #666;
   font: 1em 'Open Sans', 'sans-serif';
   margin-left: 16px;
 }
 
 textarea.form-control {
-  width: 300px;
   border: 1px solid #666;
   margin-top: 8px;
   padding: 4px;
-  font: 1em 'Open Sans', 'sans-serif';
   resize: vertical;
-  margin-left: 16px;
 }
 
 .button-group {
   margin-top: 45px;
   display: flex;
-  justify-content: center;
+  justify-content: flex-end;
   align-items: center;
   position: relative;
 
-  button {
+  &.centered {
+    justify-content: center;
+  }
+
+  button, .button {
     background-color: white;
-    font: 1em 'Open Sans', 'sans-serif';
-    border: 1px solid black;
+    font: 0.85em 'Open Sans', 'sans-serif';
     padding: 2px 8px;
     margin: 0 20px;
     text-transform: uppercase;
+    cursor: pointer;
+    box-shadow: 0.5px 1.5px 2px 1px #DDD;
+    transition: all ease-out 0.2s;
   }
 
-  .nav-away-button {
-    position: absolute;
-    right: 0;
-    cursor: pointer;
-    font-weight: bold;
+  button:hover, .button:hover {
+    background-color: #149ae8;
+    color: #fff;
   }
 }
 

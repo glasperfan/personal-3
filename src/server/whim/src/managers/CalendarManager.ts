@@ -58,6 +58,32 @@ export class CalendarManager {
     });
   }
 
+  updateEvents(args: IEvent[]): Promise<void> {
+    const ops: Promise<void>[] = [];
+    for (const ev of args) {
+      let event = Object.assign({}, ev) as IEvent;
+      event = this.updateEvent(event);
+      ops.push(this.getUserEventCollection(event.userId).then(collection => {
+        return collection.replaceOne({ _id: event._id }, event)
+          .then(result => {
+            if (!!result.result.ok) {
+              return Promise.resolve();
+            }
+            return Promise.reject(`Failed to update friend document (id: ${event._id}).`);
+          })
+          .catch(err => Promise.reject(err));
+      }));
+    }
+    return Promise.all(ops).then(_ => _[0]);
+  }
+
+  // Updating internal data only
+  updateEvent(event: IEvent): IEvent {
+    // TODO: handle date
+    event.whenLastModified = Date.now();
+    return event;
+  }
+
   searchByText(userId: string, searchComponents: string[]): Promise<IEvent[]> {
     return this.getUserEventCollection(userId).then(collection =>
       collection.find({ '$text': { '$search': searchComponents.join(' ') } }).toArray()
@@ -94,7 +120,7 @@ export class CalendarManager {
     const parsed = this.dateParser.parseArray([
       input.startInputText,
       isRecurrent ? `every ${recurEvery.pattern.amount} ${recurEvery.pattern.interval}` : '',
-      isRecurrent ? (isForever ? 'forever' : `for ${recurFor.pattern.amount} ${recurFor.pattern.interval}(s)`) : ''
+      isRecurrent ? (isForever ? 'forever' : `for ${recurFor.pattern.amount} ${recurFor.pattern.interval}s`) : ''
     ]);
     if (!parsed) {
       throw new WhimError('Unable to parse a date from user input.');

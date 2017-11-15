@@ -2,6 +2,8 @@ import { NgModule, ModuleWithProviders, InjectionToken } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
+import { DatepickerModule } from 'angular-mat-datepicker';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { HttpService } from './services/http.service';
 import { PasscodeComponent } from './login/passcode/passcode.component';
@@ -16,9 +18,12 @@ import { DashboardComponent } from './dashboard/dashboard.component';
 import { AddCalendarEventsComponent } from './add/events/add-events.component';
 import { AddFriendsComponent } from './add/friends/add-friends.component';
 import { ShowFriendsComponent } from './show/friends/show-friends.component';
+import { ShowEventsComponent } from './show/events/show-events.component';
 import { FriendService } from './services/friend.service';
+import { CalendarService } from './services/calendar.service';
 import { IdeaGeneratorService } from './services/idea-generator.service';
 import { StringFieldComponent } from './controls/string-field.component';
+import { MultilineFieldComponent } from './controls/multiline-field.component';
 import { NotesFieldComponent } from './controls/notes-field.component';
 import { TagsFieldComponent } from './controls/tags-field.component';
 import { DateFormatPipe } from './controls/date.pipe';
@@ -36,6 +41,8 @@ export const API_URL = new InjectionToken<string>('API_URL');
     CommonModule,
     FormsModule,
     HttpClientModule,
+    DatepickerModule,
+    BrowserAnimationsModule,
     whim_routing
   ],
   declarations: [
@@ -50,9 +57,11 @@ export const API_URL = new InjectionToken<string>('API_URL');
     AddFriendsComponent,
     AddCalendarEventsComponent,
     ShowFriendsComponent,
+    ShowEventsComponent,
     AddTagsComponent,
     /* Controls */
     StringFieldComponent,
+    MultilineFieldComponent,
     NotesFieldComponent,
     TagsFieldComponent,
     DateFormatPipe,
@@ -67,6 +76,7 @@ export class WhimModule {
       ngModule: WhimModule,
       providers: [
         FriendService,
+        CalendarService,
         IdeaGeneratorService,
         AccountService,
         HttpService,

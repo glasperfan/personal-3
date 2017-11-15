@@ -124,6 +124,12 @@ describe('Parsing results', () => {
       it(`Yoga starting Saturday every week for 2 months.`, () => {
         expect(AddEventParseResult.validate(`Yoga starting Saturday every week for 2 months.`.split(' '))).to.be.true;
       });
+      it(`Start reminding me every day.`, () => {
+        expect(AddEventParseResult.validate(`Start reminding me every day.`.split(' '))).to.be.true;
+      });
+      it(`Everyday I be shufflin'.`, () => {
+        expect(AddEventParseResult.validate(`Everyday I be shufflin'.`.split(' '))).to.be.true;
+      });
       it(`This should not be an event.`, () => {
         expect(AddEventParseResult.validate(`This should not be an event.`.split(' '))).to.be.false;
       });

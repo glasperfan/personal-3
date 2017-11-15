@@ -10,10 +10,12 @@ export enum WhimAPI {
   AddFriends = '/friends',
   GetAllFriends = '/friends',
   UpdateFriends = '/friends',
+  DeleteFriends = '/friends',
   GetFriend = '/friend',
   GetEvents = '/events',
   AddEvents = '/events',
-  DeleteEvents = '/events',
+  UpdateEvents = '/events',
+  DeleteEvents = '/events/delete',
   ParseSearch = '/parse'
 }
 

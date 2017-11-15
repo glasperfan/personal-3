@@ -19,14 +19,18 @@
   margin-bottom: 5px;
 }
 
-.internal-link {
-  text-decoration: underline;
-  cursor: pointer;
-}
-
 .break {
   border-bottom: 1px dashed #ccc;
   height: 1px;
   width: 100%;
   margin: 15px 0;
+}
+
+ /* Date picker */
+ .datepicker__input {
+  border: none !important;
+  padding: 0 !important;
+  font-size: 1em !important;
+  color: black !important;
+  font: 1em 'Open Sans', sans-serif !important;
 }

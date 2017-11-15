@@ -1,7 +1,7 @@
 import { AccountService } from '../services/account.service';
-import { IError, IEvent, IUser, WhimErrorCode } from '../models';
+import { IError, IEvent, IUser, WhimErrorCode, WindowView, WindowViewWithArgs } from '../models';
 import { CalendarService } from '../services/calendar.service';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 
 @Component({
   selector: 'p3-whim-calendar',
@@ -10,6 +10,7 @@ import { Component, OnInit } from '@angular/core';
   providers: [CalendarService]
 })
 export class CalendarComponent implements OnInit {
+  @Output() switchTo = new EventEmitter<WindowViewWithArgs>();
   private userEvents$: Promise<IEvent[]>;
   private errorMessage: string;
   private readonly noEventsErrorMessage = 'You have no upcoming events! (Not even a friend\'s birthday?) Add one above.';
@@ -34,5 +35,9 @@ export class CalendarComponent implements OnInit {
           });
       }
     });
+  }
+
+  goToEvent(e: IEvent): void {
+    this.switchTo.emit({ window: WindowView.ShowEvents, args: e });
   }
 }

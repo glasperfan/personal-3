@@ -17,6 +17,7 @@
   },
   "private": true,
   "dependencies": {
+    "@angular/animations": "^4.3.2",
     "@angular/common": "^4.3.2",
     "@angular/compiler": "^4.3.2",
     "@angular/compiler-cli": "^4.3.2",
@@ -26,6 +27,7 @@
     "@angular/platform-browser": "^4.3.2",
     "@angular/platform-browser-dynamic": "^4.3.2",
     "@angular/router": "^4.3.2",
+    "angular-mat-datepicker": "0.0.2",
     "angular2-autosize": "^1.0.1",
     "body-parser": "^1.17.1",
     "core-js": "^2.4.1",

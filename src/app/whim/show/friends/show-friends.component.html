@@ -99,11 +99,8 @@
 </p3-whim-notes-field>
 
 <div class="button-group">
-  <button
-  type="submit"
-  *ngIf="editMode"
-  (click)="submitChanges()">Update {{args.name.first}}</button>
-  <div class="nav-away-button" (click)="toDashboard()">Back to dashboard</div>
+  <button type="submit" *ngIf="editMode" (click)="submitChanges()">Update {{args.name.first}}</button>
+  <div class="button nav-away-button" (click)="toDashboard()">Back to dashboard</div>
 </div>
 
 <div class="process-message">{{processMessage}}</div>
