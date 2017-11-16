@@ -3,10 +3,10 @@
 <div *ngIf="userEvents$ | async as events; else cannotLoad">
   <div class="calendar" *ngIf="events.length > 0; else cannotLoad">
     <div class="events" *ngFor="let e of events">
-      <div class="event" (click)="goToEvent(e)">
+      <div class="event">
         <div class="row top-row">
-          <div class="event-title">{{e.title}}</div>
-          <div class="event-date">{{e.date.startDate | dateFormat}}</div>
+          <div class="event-title" (click)="goToEvent(e)">{{e.title}}</div>
+          <div class="event-date">{{e.date.startDate | dateRel}}</div>
         </div>
         <div class="row bottom-row">
           <div class="event-desc text-overflow" *ngIf="e.description">{{e.description}}</div>
@@ -18,7 +18,7 @@
             (every {{e.date.recurrence.recurEvery.pattern.amount}} {{e.date.recurrence.recurEvery.pattern.interval}})
             </span>
             <span class="event-recurFor" *ngIf="e.date.startDate !== e.date.endDate">
-              (ends {{e.date.endDate | dateFormat:'MMMM D'}})
+              (ends {{e.date.endDate | dateRel}})
             </span>
           </div>
         </div>

@@ -1,6 +1,5 @@
 <div class="whim-header">
   <div class="whim-title">{{title}}</div>
-  <div class="whim-subtitle" (click)="toEditMode()" *ngIf="!editMode">{{description}}</div>
 </div>
 
 <p3-whim-string-field
@@ -99,7 +98,10 @@
 </p3-whim-notes-field>
 
 <div class="button-group">
-  <button type="submit" *ngIf="editMode" (click)="submitChanges()">Update {{args.name.first}}</button>
+  <button type="submit" *ngIf="editMode" (click)="submitChanges()">Update</button>
+  <div class="button" *ngIf="editMode" (click)="cancel()">Cancel</div>
+  <div class="button" *ngIf="!editMode" (click)="toEditMode()">Edit</div>
+  <div class="button" *ngIf="!editMode" (click)="delete()">Delete</div>
   <div class="button nav-away-button" (click)="toDashboard()">Back to dashboard</div>
 </div>
 

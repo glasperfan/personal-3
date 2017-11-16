@@ -26,7 +26,10 @@ import { StringFieldComponent } from './controls/string-field.component';
 import { MultilineFieldComponent } from './controls/multiline-field.component';
 import { NotesFieldComponent } from './controls/notes-field.component';
 import { TagsFieldComponent } from './controls/tags-field.component';
-import { DateFormatPipe } from './controls/date.pipe';
+import { DatetimeRelativeFormatPipe } from './controls/datetime-relative.pipe';
+import { DatetimeAbsoluteFormatPipe } from './controls/datetime-absolute.pipe';
+import { DateRelativeFormatPipe } from './controls/date-relative.pipe';
+import { DateAbsoluteFormatPipe } from './controls/date-absolute.pipe';
 import { MarkdownPipe } from './controls/markdown.pipe';
 import { Autosize } from 'angular2-autosize/src/autosize.directive';
 import { whim_routing } from './whim.routing';
@@ -64,7 +67,10 @@ export const API_URL = new InjectionToken<string>('API_URL');
     MultilineFieldComponent,
     NotesFieldComponent,
     TagsFieldComponent,
-    DateFormatPipe,
+    DatetimeRelativeFormatPipe,
+    DatetimeAbsoluteFormatPipe,
+    DateRelativeFormatPipe,
+    DateAbsoluteFormatPipe,
     MarkdownPipe,
     Autosize
   ],

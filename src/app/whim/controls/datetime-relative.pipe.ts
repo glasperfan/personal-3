@@ -1,15 +1,16 @@
 import { Pipe, PipeTransform } from '@angular/core';
 import * as moment from 'moment';
 
-@Pipe({name: 'dateFormat'})
-export class DateFormatPipe implements PipeTransform {
-  transform(timestamp: number, format?: string): string {
-    const momentObj = moment(timestamp, 'x');
-    if (format) {
-      return momentObj.format(format);
+@Pipe({name: 'datetimeRel'})
+export class DatetimeRelativeFormatPipe implements PipeTransform {
+  transform(timestamp: number, standardFormat = 'M/D/YY h:mm a'): string {
+    if (timestamp === Number.MAX_SAFE_INTEGER) {
+      return 'never';
     }
+
+    const momentObj = moment(timestamp, 'x');
     const now = moment(Date.now(), 'x');
-    // Check for 1) just now, 2) today, and 3) yesterday, and 4) same year
+
     if (now.isSame(momentObj, 'minute')) {
       return 'just now';
     } else if (momentObj.isSame(now, 'day')) {
@@ -19,7 +20,7 @@ export class DateFormatPipe implements PipeTransform {
     } else if (momentObj.isSame(now.clone().startOf('year'), 'year')) {
       return momentObj.format('MMMM D, h:mm a');
     } else {
-      return momentObj.format('M/D/YY h:mm a');
+      return momentObj.format(standardFormat);
     }
   }
 }

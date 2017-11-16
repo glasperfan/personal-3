@@ -6,7 +6,6 @@ export abstract class ShowComponent<T> {
   @Input() args: T;
   @Output() switchTo = new EventEmitter<WindowViewWithArgs>();
   protected title: string;
-  protected description = 'click here to edit';
   protected editMode = false;
   protected snapshot: T;
   protected processMessage: string;
