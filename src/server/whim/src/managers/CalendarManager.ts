@@ -23,7 +23,7 @@ export class CalendarManager {
     const operation = this.getUserEventCollection(userId)
       .then(collection => collection.find({
         userId: userId,
-        'date.startDate': { $gte: Constants.StartOfToday().valueOf() }
+        'date.endDate': { $gt: Constants.StartOfToday().valueOf() }
       }).toArray());
     return operation.then(events => {
       if (!events || !events.length) {
@@ -99,33 +99,15 @@ export class CalendarManager {
   }
 
   private createEvent(args: IAddEventArguments, userId: string): IEvent {
-    const parsedDate = this.parseInputDate(args.date);
     return <IEvent>{
       _id: v4(),
       userId: userId,
       title: args.title,
-      date: parsedDate,
+      date: args.date,
       description: args.description,
       whenAdded: Date.now(),
       whenLastModified: Date.now()
     };
-  }
-
-  private parseInputDate(input: IParsedDate): IParsedDate {
-    const isAlternating = input.recurrence.recurEvery.isAlternating;
-    const isRecurrent = input.recurrence.isRecurrent;
-    const isForever = input.recurrence.recurFor.isForever;
-    const recurEvery = input.recurrence.recurEvery;
-    const recurFor = input.recurrence.recurFor;
-    const parsed = this.dateParser.parseArray([
-      input.startInputText,
-      isRecurrent ? `every ${recurEvery.pattern.amount} ${recurEvery.pattern.interval}` : '',
-      isRecurrent ? (isForever ? 'forever' : `for ${recurFor.pattern.amount} ${recurFor.pattern.interval}s`) : ''
-    ]);
-    if (!parsed) {
-      throw new WhimError('Unable to parse a date from user input.');
-    }
-    return parsed;
   }
 
   private genEventCollectionToken(userId: string): string {

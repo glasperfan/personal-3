@@ -64,7 +64,7 @@ export class AddCalendarEventsComponent implements OnInit {
     return moment(timestamp, 'x', true).format(format);
   }
 
-  private get _recurrenceIntervals(): any[] {
+  private get _recurrenceIntervals(): [{ value: moment.unitOfTime.Base, displayName: string }] {
     return [
       { value: 'day', displayName: 'day(s)' },
       { value: 'week', displayName: 'week(s)' },
@@ -86,6 +86,7 @@ export class AddCalendarEventsComponent implements OnInit {
   private set _startDate(d: Date) {
     _.set(this.args, 'date.startDate', d.getTime());
     this._startDateChanged = true;
+    this.updateEndDate();
   }
 
   private get _title(): string {
@@ -115,6 +116,7 @@ export class AddCalendarEventsComponent implements OnInit {
       this._recurEveryInterval = this._recurEveryInterval || 'day';
       this._isForever = true;
     }
+    this.updateEndDate();
   }
 
   private get _recurEveryAmount(): number {
@@ -126,11 +128,11 @@ export class AddCalendarEventsComponent implements OnInit {
     _.set(this.args, 'date.recurrence.recurEvery.pattern.amount', n);
   }
 
-  private get _recurEveryInterval(): string {
+  private get _recurEveryInterval(): moment.unitOfTime.Base {
     return _.get(this.args, 'date.recurrence.recurEvery.pattern.interval', 'day');
   }
 
-  private set _recurEveryInterval(s: string) {
+  private set _recurEveryInterval(s: moment.unitOfTime.Base) {
     _.set(this.args, 'date.recurrence.recurEvery.pattern.interval', s);
   }
 
@@ -149,14 +151,16 @@ export class AddCalendarEventsComponent implements OnInit {
   private set _recurForAmount(n: number) {
     n = n < 1 ? 1 : n; // minimum: 1
     _.set(this.args, 'date.recurrence.recurFor.pattern.amount', n);
+    this.updateEndDate();
   }
 
-  private get _recurForInterval(): string {
+  private get _recurForInterval(): moment.unitOfTime.Base {
     return _.get(this.args, 'date.recurrence.recurFor.pattern.interval', 'day');
   }
 
-  private set _recurForInterval(s: string) {
+  private set _recurForInterval(s: moment.unitOfTime.Base) {
     _.set(this.args, 'date.recurrence.recurFor.pattern.interval', s);
+    this.updateEndDate();
   }
 
   private get _isForever(): boolean {
@@ -165,5 +169,21 @@ export class AddCalendarEventsComponent implements OnInit {
 
   private set _isForever(b: boolean) {
     _.set(this.args, 'date.recurrence.recurFor.isForever', b);
+    this.updateEndDate();
+  }
+
+  private updateEndDate() {
+    let endDate: number;
+    if (!this._isRecurrent) {
+      endDate = this._startDate.getTime();
+    } else if (this._isForever) {
+      endDate = Number.MAX_SAFE_INTEGER;
+    } else {
+      // start date + duration
+      endDate = moment(this._startDate, 'x', true)
+        .add(this._recurForAmount, this._recurForInterval)
+        .valueOf();
+    }
+    _.set(this.args, 'date.endDate', endDate);
   }
 }

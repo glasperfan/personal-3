@@ -1,7 +1,8 @@
 import { AccountService } from '../services/account.service';
-import { IError, IEvent, IUser, WhimErrorCode, WindowView, WindowViewWithArgs } from '../models';
+import { IError, IEvent, IUser, WhimErrorCode, WindowView, WindowViewWithArgs, IParsedDate } from '../models';
 import { CalendarService } from '../services/calendar.service';
 import { Component, OnInit, Output, EventEmitter } from '@angular/core';
+import * as moment from 'moment';
 
 @Component({
   selector: 'p3-whim-calendar',
@@ -35,6 +36,30 @@ export class CalendarComponent implements OnInit {
           });
       }
     });
+  }
+
+  // Return a timestamp
+  nextOccurrence(d: IParsedDate): number {
+    if (!d.recurrence.isRecurrent) {
+      return d.startDate;
+    }
+    if (!d.recurrence.recurEvery || !d.recurrence.recurEvery.pattern) {
+      throw new Error('Missing recurrence pattern on a recurring date!');
+    }
+    const startOfToday = moment().startOf('day');
+    const current = moment(d.startDate, 'x', true);
+    const alternatingFactor = d.recurrence.recurEvery.isAlternating ? 2 : 1;
+    while (current < startOfToday) {
+      current.add(
+        d.recurrence.recurEvery.pattern.amount * alternatingFactor,
+        d.recurrence.recurEvery.pattern.interval
+      );
+    }
+    const nextOccurrence = current.valueOf();
+    if (nextOccurrence > d.endDate) {
+      throw new Error('Something is wrong with this date...');
+    }
+    return nextOccurrence;
   }
 
   goToEvent(e: IEvent): void {

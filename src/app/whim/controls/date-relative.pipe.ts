@@ -8,8 +8,8 @@ export class DateRelativeFormatPipe implements PipeTransform {
       return 'never';
     }
 
-    const momentObj = moment(timestamp, 'x');
-    const now = moment(Date.now(), 'x');
+    const momentObj = moment(timestamp, 'x', true);
+    const now = moment();
 
     if (momentObj.isSame(now, 'day')) {
       return 'today';
