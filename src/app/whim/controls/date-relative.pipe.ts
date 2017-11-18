@@ -17,8 +17,10 @@ export class DateRelativeFormatPipe implements PipeTransform {
       return 'yesterday';
     } else if (momentObj.isSame(now.clone().add(1, 'days'), 'day')) {
       return 'tomorrow';
+    } else if (momentObj < now.clone().add(1, 'week').startOf('day')) {
+      return momentObj.format('MMM D (dddd)');
     } else if (momentObj.isSame(now.clone().startOf('year'), 'year')) {
-      return momentObj.format('MMMM D');
+      return momentObj.format('MMM D');
     } else {
       return momentObj.format(standardFormat);
     }

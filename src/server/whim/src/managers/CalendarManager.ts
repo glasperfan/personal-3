@@ -79,7 +79,6 @@ export class CalendarManager {
 
   // Updating internal data only
   updateEvent(event: IEvent): IEvent {
-    // TODO: handle date
     event.whenLastModified = Date.now();
     return event;
   }

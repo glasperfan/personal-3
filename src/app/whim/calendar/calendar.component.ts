@@ -1,5 +1,5 @@
 import { AccountService } from '../services/account.service';
-import { IError, IEvent, IUser, WhimErrorCode, WindowView, WindowViewWithArgs, IParsedDate } from '../models';
+import { IError, IEvent, IUser, WhimErrorCode, WindowView, WindowViewWithArgs, IParsedDate, IRecurrenceUnit } from '../models';
 import { CalendarService } from '../services/calendar.service';
 import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import * as moment from 'moment';
@@ -60,6 +60,20 @@ export class CalendarComponent implements OnInit {
       throw new Error('Something is wrong with this date...');
     }
     return nextOccurrence;
+  }
+
+  // 1 day/week/month/year => daily/weekly/monthly/yearly
+  // 2 days/weeks/months/years => every other day/week/month/year
+  // 3+(N) days/weeks/months/years => every N days/weeks/months/years
+  formatRecurrence(pattern: IRecurrenceUnit): string {
+    switch (pattern.amount) {
+      case 1:
+        return pattern.interval === 'day' ? 'daily' : pattern.interval + 'ly';
+      case 2:
+        return 'every other ' + pattern.interval;
+      default:
+        return `every ${pattern.amount} ${pattern.interval}s`;
+    }
   }
 
   goToEvent(e: IEvent): void {

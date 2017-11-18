@@ -15,7 +15,7 @@
             <span class="event-recurs">recurs</span>
             <span class="event-recurEvery"
             *ngIf="e.date.recurrence.recurEvery && e.date.recurrence.recurEvery.pattern">
-            (every {{e.date.recurrence.recurEvery.pattern.amount}} {{e.date.recurrence.recurEvery.pattern.interval}})
+            {{formatRecurrence(e.date.recurrence.recurEvery.pattern)}}
             </span>
             <span class="event-recurFor" *ngIf="e.date.startDate !== e.date.endDate">
               (ends {{e.date.endDate | dateRel}})
