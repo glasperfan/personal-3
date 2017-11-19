@@ -29,7 +29,11 @@ export abstract class ParseResultWithValidator implements IParseResult {
       return this.formatSnippet(snippet, snippetRegex);
     }
     const match = snippetRegex.exec(currentSnippet.text);
-    currentSnippet.text = currentSnippet.text.replace(match[0], `<b>${match[0]}</b>`);
+    if (match && match[0]) { // to Boston => to Bos<b>to</b>n => "Boston" doesn't match now
+      currentSnippet.text = currentSnippet.text.replace(match[0], `<b>${match[0]}</b>`);
+    } else {
+      console.log(`Edge case in regex`, snippetRegex.source, currentSnippet, match);
+    }
     return currentSnippet;
   }
 

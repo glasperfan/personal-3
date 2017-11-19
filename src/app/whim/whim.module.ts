@@ -26,6 +26,7 @@ import { StringFieldComponent } from './controls/string-field.component';
 import { MultilineFieldComponent } from './controls/multiline-field.component';
 import { NotesFieldComponent } from './controls/notes-field.component';
 import { TagsFieldComponent } from './controls/tags-field.component';
+import { DateFieldComponent } from './controls/date-field.component';
 import { DatetimeRelativeFormatPipe } from './controls/datetime-relative.pipe';
 import { DatetimeAbsoluteFormatPipe } from './controls/datetime-absolute.pipe';
 import { DateRelativeFormatPipe } from './controls/date-relative.pipe';
@@ -67,6 +68,7 @@ export const API_URL = new InjectionToken<string>('API_URL');
     MultilineFieldComponent,
     NotesFieldComponent,
     TagsFieldComponent,
+    DateFieldComponent,
     DatetimeRelativeFormatPipe,
     DatetimeAbsoluteFormatPipe,
     DateRelativeFormatPipe,

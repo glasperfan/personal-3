@@ -1,6 +1,5 @@
 <div class="whim-header">
   <div class="whim-title">{{title}}</div>
-  <div class="whim-subtitle">{{description}}</div>
 </div>
 <form (ngSubmit)="addCalendarEvent()">
   <div class="form-group">
@@ -8,53 +7,13 @@
     <input type="text" name="title" class="form-control" [(ngModel)]="_title" required />
   </div>
 
-  <div class="form-group">
-    <label for="startDate">Date</label>
-    <material-datepicker
-    name="startDate"
-    class="form-control"
-    [fontFamily]="'Open Sans'"
-    [accentColor]="'#1896e4'"
-    [(ngModel)]="_startDate"></material-datepicker>
-  </div>
-
-  <div class="form-group">
-    <label for="isRecurrent">Recurring event?</label>
-    <input type="checkbox" name="isRecurrent" class="form-control" [(ngModel)]="_isRecurrent" />
-  </div>
-
-  <div class="form-group" *ngIf="_isRecurrent">
-    <label for="recur-every">How often?</label>
-    <div class="form-subgroups">
-      <div class="form-subgroup">
-        <input #everyAmount type="number" name="amount" min="1" class="form-control" [(ngModel)]="_recurEveryAmount" />
-        <select name="recur-every-interval" [(ngModel)]="_recurEveryInterval">
-          <option *ngFor="let i of _recurrenceIntervals" [value]="i.value">{{i.displayName}}</option>
-        </select>
-      </div>
-      <div class="form-subgroup">
-        <input type="checkbox" name="alternating" class="form-control" [(ngModel)]="_isAlternating" />
-        <label for="alternating">Alternating? (i.e. every <i>other</i> week)</label>
-      </div>
-    </div>
-  </div>
-
-  <div class="form-group" *ngIf="_isRecurrent">
-    <label for="recur-for">Ends?</label>
-    <div class="form-subgroups">
-      <div class="form-subgroup">
-        <input type="checkbox" name="forever" class="form-control" [(ngModel)]="_isForever" />
-        <label for="forever">Never</label>
-      </div>
-      <div class="form-subgroup" *ngIf="!_isForever">
-        <label for="interval" class="before-input">Ends in</label>
-        <input type="number" min="1" name="amount" class="form-control" [(ngModel)]="_recurForAmount" />
-        <select name="recur-for-interval" [(ngModel)]="_recurForInterval">
-          <option *ngFor="let i of _recurrenceIntervals" [value]="i.value">{{i.displayName}}</option>
-        </select>
-      </div>
-    </div>
-  </div>
+  <p3-whim-date-field
+  [label]="'date'"
+  [field]="'date'"
+  [initialValue]="args.date"
+  [editMode]="true"
+  (onChange)="updateField($event)">
+  </p3-whim-date-field>
 
   <div class="form-group multi-line">
     <label for="description">Description</label>

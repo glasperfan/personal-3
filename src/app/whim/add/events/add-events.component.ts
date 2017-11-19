@@ -1,8 +1,8 @@
+import { AddComponent } from '../add.component';
 import { CalendarService } from '../../services/calendar.service';
 import { IAddEventArguments, IError, IEvent, WhimErrorCode, WindowView, WindowViewWithArgs } from '../../models';
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
-import * as moment from 'moment';
-import * as _ from 'lodash';
+import { Component } from '@angular/core';
+import { get } from 'lodash';
 
 @Component({
   selector: 'p3-whim-add-events',
@@ -10,29 +10,12 @@ import * as _ from 'lodash';
   styleUrls: ['./add-events.component.less'],
   providers: [CalendarService]
 })
-export class AddCalendarEventsComponent implements OnInit {
-  @Input() args: IAddEventArguments;
-  @Output() switchTo = new EventEmitter<WindowViewWithArgs>();
-
-  private readonly title = 'Add Events';
-  private readonly description = `A friend's birthday? A reminder to send a note of support? Remember that important moment in a friend's life.`;
+export class AddCalendarEventsComponent extends AddComponent<IAddEventArguments> {
+  protected readonly title = 'Add Events';
   private readonly UnableToParseDateErrorMessage = `Not sure what date that is. Try 'today', 'now', 'tomorrow', 'next week', or a date like 'Feb 27 2017`;
   private readonly UnknownErrorMessage = 'Something went wrong... contact Hugh :/';
-  private readonly Now: Date = new Date();
-  private _lastStartDate: Date;
-  private _startDateChanged = false;
-  private processMessage: string;
 
-
-  constructor(private calendarService: CalendarService) { }
-
-  ngOnInit() {
-    this.args = this.args || <any>{};
-  }
-
-  private toDashboard(): void {
-    this.switchTo.emit(new WindowViewWithArgs(WindowView.Dashboard));
-  }
+  constructor(private calendarService: CalendarService) { super(); }
 
   private toEditEvent(event: IEvent): void {
     this.switchTo.emit(new WindowViewWithArgs(WindowView.ShowEvents, event));
@@ -60,130 +43,19 @@ export class AddCalendarEventsComponent implements OnInit {
     }
   }
 
-  private formatDate(timestamp: number | string, format: string = 'MMMM Do YYYY, h:mm a'): string {
-    return moment(timestamp, 'x', true).format(format);
-  }
-
-  private get _recurrenceIntervals(): [{ value: moment.unitOfTime.Base, displayName: string }] {
-    return [
-      { value: 'day', displayName: 'day(s)' },
-      { value: 'week', displayName: 'week(s)' },
-      { value: 'month', displayName: 'month(s)' },
-      { value: 'year', displayName: 'year(s)' }
-    ];
-  }
-
-  // To prevent change detection cycles from freezing the app, we cache the Date object
-  // rather than create a new one with each call.
-  private get _startDate(): Date {
-    if (!this._lastStartDate || this._startDateChanged) {
-      this._lastStartDate = new Date(_.get(this.args, 'date.startDate', Date.now()));
-      this._startDateChanged = false;
-    }
-    return this._lastStartDate;
-  }
-
-  private set _startDate(d: Date) {
-    _.set(this.args, 'date.startDate', d.getTime());
-    this._startDateChanged = true;
-    this.updateEndDate();
-  }
-
   private get _title(): string {
-    return _.get(this.args, 'title', undefined);
+    return get(this.args, 'title', undefined);
   }
 
   private set _title(s: string) {
-    _.set(this.args, 'title', s);
+    this.updateField({ field: 'title', value: s });
   }
 
   private get _description(): string {
-    return _.get(this.args, 'description', undefined);
+    return get(this.args, 'description', undefined);
   }
 
   private set _description(s: string) {
-    _.set(this.args, 'description', s);
-  }
-
-  private get _isRecurrent(): boolean {
-    return _.get(this.args, 'date.recurrence.isRecurrent', false);
-  }
-
-  private set _isRecurrent(b: boolean) {
-    _.set(this.args, 'date.recurrence.isRecurrent', b);
-    if (b) {
-      this._recurEveryAmount = this._recurEveryAmount || 1;
-      this._recurEveryInterval = this._recurEveryInterval || 'day';
-      this._isForever = true;
-    }
-    this.updateEndDate();
-  }
-
-  private get _recurEveryAmount(): number {
-    return _.get(this.args, 'date.recurrence.recurEvery.pattern.amount', 1);
-  }
-
-  private set _recurEveryAmount(n: number) {
-    n = n < 1 ? 1 : n; // minimum: 1
-    _.set(this.args, 'date.recurrence.recurEvery.pattern.amount', n);
-  }
-
-  private get _recurEveryInterval(): moment.unitOfTime.Base {
-    return _.get(this.args, 'date.recurrence.recurEvery.pattern.interval', 'day');
-  }
-
-  private set _recurEveryInterval(s: moment.unitOfTime.Base) {
-    _.set(this.args, 'date.recurrence.recurEvery.pattern.interval', s);
-  }
-
-  private get _isAlternating(): boolean {
-    return _.get(this.args, 'date.recurrence.recurEvery.isAlternating', false);
-  }
-
-  private set _isAlternating(b: boolean) {
-    _.set(this.args, 'date.recurrence.recurEvery.isAlternating', b);
-  }
-
-  private get _recurForAmount(): number {
-    return _.get(this.args, 'date.recurrence.recurFor.pattern.amount', 1);
-  }
-
-  private set _recurForAmount(n: number) {
-    n = n < 1 ? 1 : n; // minimum: 1
-    _.set(this.args, 'date.recurrence.recurFor.pattern.amount', n);
-    this.updateEndDate();
-  }
-
-  private get _recurForInterval(): moment.unitOfTime.Base {
-    return _.get(this.args, 'date.recurrence.recurFor.pattern.interval', 'day');
-  }
-
-  private set _recurForInterval(s: moment.unitOfTime.Base) {
-    _.set(this.args, 'date.recurrence.recurFor.pattern.interval', s);
-    this.updateEndDate();
-  }
-
-  private get _isForever(): boolean {
-    return _.get(this.args, 'date.recurrence.recurFor.isForever', true);
-  }
-
-  private set _isForever(b: boolean) {
-    _.set(this.args, 'date.recurrence.recurFor.isForever', b);
-    this.updateEndDate();
-  }
-
-  private updateEndDate() {
-    let endDate: number;
-    if (!this._isRecurrent) {
-      endDate = this._startDate.getTime();
-    } else if (this._isForever) {
-      endDate = Number.MAX_SAFE_INTEGER;
-    } else {
-      // start date + duration
-      endDate = moment(this._startDate, 'x', true)
-        .add(this._recurForAmount, this._recurForInterval)
-        .valueOf();
-    }
-    _.set(this.args, 'date.endDate', endDate);
+    this.updateField({ field: 'description', value: s });
   }
 }
