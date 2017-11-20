@@ -1,5 +1,5 @@
 import { FieldComponent } from './field.component';
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { IField, INote, Note } from 'app/whim/models';
 
 @Component({
@@ -7,10 +7,13 @@ import { IField, INote, Note } from 'app/whim/models';
   templateUrl: './notes-field.component.html',
   styleUrls: ['./notes-field.component.less']
 })
-export class NotesFieldComponent extends FieldComponent<INote[]> {
-
+export class NotesFieldComponent extends FieldComponent<INote[]> implements OnInit {
   private newNoteText: string;
   private readonly placeholderText = 'Add a note...';
+
+  ngOnInit() {
+    this.label = this.label || 'Notes';
+  }
 
   listenForSubmit(event: KeyboardEvent) {
     // Shift + Enter
@@ -26,17 +29,12 @@ export class NotesFieldComponent extends FieldComponent<INote[]> {
 
   deleteNote(noteIdx: number): void {
     this.value.splice(noteIdx, 1);
-    this.emit();
+    this.data = this.value; // emit
   }
 
   addNote(): void {
-    this.value.unshift(new Note(this.newNoteText));
+    this.data = [new Note(this.newNoteText)].concat(this.value); // append to front and emit
     this.newNoteText = undefined;
-    this.emit();
-  }
-
-  emit(): void {
-    this.onChange.emit({ field: this.field, value: this.value });
   }
 
   private get hasContent(): boolean {

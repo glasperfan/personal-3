@@ -14,10 +14,6 @@ export abstract class ShowComponent<T> {
     this.switchTo.emit(new WindowViewWithArgs(WindowView.Dashboard));
   }
 
-  protected updateField(update: IField): void {
-    set(this.args, update.field, update.value);
-  }
-
   protected toEditMode(): void {
     this.editMode = true;
     this.snapshot = JSON.parse(JSON.stringify(this.args)); // deep clones (only properties, not functions)
@@ -31,6 +27,6 @@ export abstract class ShowComponent<T> {
     this.toShowMode();
   }
 
-  protected abstract submitChanges(): void;
+  protected abstract update(): void;
   protected abstract delete(): void;
 }

@@ -52,9 +52,20 @@ export class CalendarManager {
       }));
     return operation.then(deleted => {
       if (!deleted.result.ok || deleted.deletedCount !== args.events.length) {
-        throw new WhimError(`CalendarManager: unable to delete events (attempted ${args.events.length}, succeeded for ${deleted.deletedCount}`);
+        throw new WhimError(
+          `CalendarManager: unable to delete events.
+          Attempted: ${args.events.length}
+          Deleted: ${deleted.deletedCount}`
+        );
       }
       return undefined;
+    }).catch(err => {
+      throw new WhimError(
+        `FriendManager: uncaught exception deleting events.
+          UserId: ${args.userId}
+          EventIds: ${args.events.toString}
+          Error: ${err}`
+      );
     });
   }
 

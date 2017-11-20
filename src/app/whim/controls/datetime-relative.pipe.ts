@@ -1,7 +1,7 @@
 import { Pipe, PipeTransform } from '@angular/core';
 import * as moment from 'moment';
 
-@Pipe({name: 'datetimeRel'})
+@Pipe({ name: 'datetimeRel' })
 export class DatetimeRelativeFormatPipe implements PipeTransform {
   transform(timestamp: number, standardFormat = 'M/D/YY h:mm a'): string {
     if (timestamp === Number.MAX_SAFE_INTEGER) {

@@ -1,8 +1,16 @@
 import { AddComponent } from '../add.component';
 import { CalendarService } from '../../services/calendar.service';
-import { IAddEventArguments, IError, IEvent, WhimErrorCode, WindowView, WindowViewWithArgs } from '../../models';
+import {
+    IAddEventArguments,
+    IError,
+    IEvent,
+    IParsedDate,
+    WhimErrorCode,
+    WindowView,
+    WindowViewWithArgs,
+} from '../../models';
 import { Component } from '@angular/core';
-import { get } from 'lodash';
+import { get, set } from 'lodash';
 
 @Component({
   selector: 'p3-whim-add-events',
@@ -17,11 +25,7 @@ export class AddCalendarEventsComponent extends AddComponent<IAddEventArguments>
 
   constructor(private calendarService: CalendarService) { super(); }
 
-  private toEditEvent(event: IEvent): void {
-    this.switchTo.emit(new WindowViewWithArgs(WindowView.ShowEvents, event));
-  }
-
-  private addCalendarEvent(): void {
+  protected add(): void {
     // quick validation
     if (!this.args.title) {
       this.processMessage = 'An event title is required';
@@ -43,19 +47,33 @@ export class AddCalendarEventsComponent extends AddComponent<IAddEventArguments>
     }
   }
 
+  private toEditEvent(event: IEvent): void {
+    this.switchTo.emit(new WindowViewWithArgs(WindowView.ShowEvents, event));
+  }
+
   private get _title(): string {
     return get(this.args, 'title', undefined);
   }
 
   private set _title(s: string) {
-    this.updateField({ field: 'title', value: s });
+    set(this.args, 'title', s);
   }
 
   private get _description(): string {
-    return get(this.args, 'description', undefined);
+    return get(this.args, 'description');
   }
 
   private set _description(s: string) {
-    this.updateField({ field: 'description', value: s });
+    set(this.args, 'description', s);
   }
+
+  private get _date(): IParsedDate {
+    return get(this.args, 'date');
+  }
+
+  private set _date(d: IParsedDate) {
+    set(this.args, 'date', d);
+  }
+
+  // TODO: tags
 }

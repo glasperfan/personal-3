@@ -1,5 +1,5 @@
 import { IGetFriendArguments } from '../../src/models/api';
-import { IFriend, IAddFriendsArguments } from '../../src/models';
+import { IFriend, IAddFriendsArguments, IDeleteFriendsArguments } from '../../src/models';
 import { IFriendManager } from '../../src/managers/contracts/IFriendManager';
 
 export class FakeFriendManager implements IFriendManager {
@@ -18,11 +18,15 @@ export class FakeFriendManager implements IFriendManager {
       throw new Error('Not implemented yet.');
   }
 
-  public updateFriends(args: IFriend[]): Promise<void> {
+  public updateFriends(args: IFriend[]): Promise<IFriend[]> {
       throw new Error('Not implemented yet.');
   }
 
   public searchByText(userId: string, searchComponents: string[]): Promise<IFriend[]> {
+      throw new Error('Not implemented yet.');
+  }
+
+  public deleteFriends(args: IDeleteFriendsArguments): Promise<void> {
       throw new Error('Not implemented yet.');
   }
 }

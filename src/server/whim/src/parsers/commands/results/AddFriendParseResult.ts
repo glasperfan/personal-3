@@ -74,7 +74,7 @@ export class AddFriendParseResult extends ParseResultWithValidator {
         last: this._lastName,
         email: this._email,
         phone: this._phone,
-        birthday: this._birthday && this._birthday.valueOf().toString(),
+        birthday: this._birthday && this._birthday.valueOf(),
         firstNote: this._firstNote,
         tags: this._tags
       };

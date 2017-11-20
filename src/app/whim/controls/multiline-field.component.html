@@ -6,11 +6,10 @@
       <div class="value empty" *ngIf="!value || !value.length">{{emptyProperty}}</div>
     </div>
     <div class="border" *ngIf="editMode">
-      <textarea #text
+      <textarea
       autosize
       class="value editable form-control"
-      (ngModelChange)="updateValue(text.value)"
-      [ngModel]="value">
+      [(ngModel)]="data">
       </textarea>
     </div>
   </div>

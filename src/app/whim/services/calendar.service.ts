@@ -27,7 +27,10 @@ export class CalendarService {
 
   public deleteEvents(events: IEvent[]): Promise<void> {
     return this.accountService.currentUser$.then(currentUser => {
-      const payload = { userId: currentUser._id, events: events.map(e => e._id) };
+      const payload: IDeleteEventsArguments = {
+        userId: currentUser._id,
+        events: events.map(e => e._id)
+      };
       return this.http.postOrThrow<IDeleteEventsArguments>(WhimAPI.DeleteEvents, payload);
     });
   }

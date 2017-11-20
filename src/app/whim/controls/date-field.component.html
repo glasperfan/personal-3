@@ -1,47 +1,26 @@
-<div class="form-group">
-    <label for="startDate">Date</label>
+<div class="field date-field" *ngIf="shouldShow">
+  <div class="data">
+    <label class="label" [attr.for]="label">{{label}}</label>
+
+    <div *ngIf="!editMode">
+      <div class="value" *ngIf="value">{{value | dateAbs:dateFormat}}</div>
+      <div class="value empty" *ngIf="!value">{{emptyProperty}}</div>
+    </div>
+
     <material-datepicker
-    name="startDate"
+    *ngIf="editMode"
+    name="date"
     class="form-control"
     [fontFamily]="'Open Sans'"
     [accentColor]="'#1896e4'"
-    [(ngModel)]="_startDate"></material-datepicker>
+    [dateFormat]="dateFormat"
+    [(ngModel)]="_date">
+    </material-datepicker>
+
   </div>
 
-  <div class="form-group">
-    <label for="isRecurrent">Recurring event?</label>
-    <input type="checkbox" name="isRecurrent" class="form-control" [(ngModel)]="_isRecurrent" />
+  <div class="actions" *ngIf="showControls">
+    <div class="action" *ngIf="editMode" (click)="finishEdit()">show</div>
+    <div class="action" *ngIf="!editMode" (click)="edit()">edit</div>
   </div>
-
-  <div class="form-group" *ngIf="_isRecurrent">
-    <label for="recur-every">How often?</label>
-    <div class="form-subgroups">
-      <div class="form-subgroup">
-        <input #everyAmount type="number" name="amount" min="1" class="form-control" [(ngModel)]="_recurEveryAmount" />
-        <select name="recur-every-interval" [(ngModel)]="_recurEveryInterval">
-          <option *ngFor="let i of _recurrenceIntervals" [value]="i.value">{{i.displayName}}</option>
-        </select>
-      </div>
-      <div class="form-subgroup">
-        <input type="checkbox" name="alternating" class="form-control" [(ngModel)]="_isAlternating" />
-        <label for="alternating">Alternating? (i.e. every <i>other</i> week)</label>
-      </div>
-    </div>
-  </div>
-
-  <div class="form-group" *ngIf="_isRecurrent">
-    <label for="recur-for">Ends?</label>
-    <div class="form-subgroups">
-      <div class="form-subgroup">
-        <input type="checkbox" name="forever" class="form-control" [(ngModel)]="_isForever" />
-        <label for="forever">Never</label>
-      </div>
-      <div class="form-subgroup" *ngIf="!_isForever">
-        <label for="interval" class="before-input">Ends in</label>
-        <input type="number" min="1" name="amount" class="form-control" [(ngModel)]="_recurForAmount" />
-        <select name="recur-for-interval" [(ngModel)]="_recurForInterval">
-          <option *ngFor="let i of _recurrenceIntervals" [value]="i.value">{{i.displayName}}</option>
-        </select>
-      </div>
-    </div>
-  </div>
+</div>

@@ -1,69 +1,85 @@
 <div class="whim-header">
   <div class="whim-title">{{title}}</div>
-  <div class="whim-subtitle">{{description}}</div>
 </div>
-<form (ngSubmit)="addFriend()">
-  <div class="form-group">
-    <label for="first">First name</label>
-    <input type="text" name="first" class="form-control" [(ngModel)]="_first" required />
-  </div>
+<form (ngSubmit)="add()">
 
-  <div class="form-group">
-    <label for="last">Last name</label>
-    <input type="text" name="last" class="form-control" [(ngModel)]="_last" required />
-  </div>
+  <p3-whim-string-field
+  [label]="'First name'"
+  [editMode]="true"
+  [(data)]="_first">
+  </p3-whim-string-field>
 
-  <div class="form-group">
-    <label for="email">Email</label>
-    <input type="email" name="email" class="form-control" [(ngModel)]="_email" />
-  </div>
+  <p3-whim-string-field
+  [label]="'Last name'"
+  [editMode]="true"
+  [(data)]="_last">
+  </p3-whim-string-field>
 
-  <div class="form-group">
-    <label for="last">Phone</label>
-    <input type="tel" name="phone" class="form-control" [(ngModel)]="_phone" />
-  </div>
+  <p3-whim-string-field
+  [label]="'Email'"
+  [editMode]="true"
+  [(data)]="_email">
+  </p3-whim-string-field>
 
-  <div class="form-group">
-    <label for="last">Birthday</label>
-    <input type="text" name="birthday" class="form-control" [(ngModel)]="_birthday" />
-  </div>
+  <p3-whim-string-field
+  [label]="'Phone'"
+  [editMode]="true"
+  [(data)]="_phone">
+  </p3-whim-string-field>
 
-  <div class="form-group">
-    <label for="address">Address</label>
-    <input type="text" name="address" class="form-control" [(ngModel)]="_address1" />
-  </div>
+  <p3-whim-date-field
+  [label]="'Birthday'"
+  [(data)]="_birthday"
+  [editMode]="true">
+  </p3-whim-date-field>
 
-  <div class="form-group">
-    <label for="address2">Address (Line 2)</label>
-    <input type="text" name="address2" class="form-control" [(ngModel)]="_address2" />
-  </div>
+  <p3-whim-string-field
+  [label]="'address'"
+  [(data)]="_address1"
+  [editMode]="true">
+  </p3-whim-string-field>
 
-  <div class="form-group">
-    <label for="city">City</label>
-    <input type="text" name="city" class="form-control" [(ngModel)]="_city" />
-  </div>
+  <p3-whim-string-field
+  [label]="'address (line 2)'"
+  [(data)]="_address2"
+  [editMode]="true">
+  </p3-whim-string-field>
 
-  <div class="form-group">
-    <label for="state">State</label>
-    <input type="text" name="state" class="form-control" [(ngModel)]="_state" />
-  </div>
+  <p3-whim-string-field
+  [label]="'city'"
+  [(data)]="_city"
+  [editMode]="true">
+  </p3-whim-string-field>
 
-  <div class="form-group">
-    <label for="country">Country</label>
-    <input type="text" name="country" class="form-control" [(ngModel)]="_country" />
-  </div>
+  <p3-whim-string-field
+  [label]="'state'"
+  [(data)]="_state"
+  [editMode]="true">
+  </p3-whim-string-field>
 
-  <div class="form-group">
-    <label for="organization">Organization</label>
-    <input type="text" name="organization" class="form-control" [(ngModel)]="_organization" />
-  </div>
+  <p3-whim-string-field
+  [label]="'country'"
+  [(data)]="_country"
+  [editMode]="true">
+  </p3-whim-string-field>
 
-  <p3-whim-add-tags [(tags)]="_tags"></p3-whim-add-tags>
+  <p3-whim-string-field
+  [label]="'organization'"
+  [(data)]="_organization"
+  [editMode]="true">
+  </p3-whim-string-field>
 
-  <div class="form-group multi-line">
-    <label for="notes">Notes</label>
-    <textarea name="notes" class="form-control" [(ngModel)]="_firstNote" placeholder="What's their favorite color?"></textarea>
-  </div>
+  <p3-whim-tags-field
+  [label]="'tags'"
+  [(data)]="_tags"
+  [editMode]="true">
+  </p3-whim-tags-field>
+
+  <p3-whim-multiline-field
+  [label]="'Notes'"
+  [(data)]="_firstNote"
+  [editMode]="true">
+  </p3-whim-multiline-field>
 
   <div class="button-group">
       <button type="submit">Add {{_first}}</button>

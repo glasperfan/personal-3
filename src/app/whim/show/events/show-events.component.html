@@ -4,25 +4,24 @@
 
 <p3-whim-string-field
 [label]="'title'"
-[field]="'title'"
-[initialValue]="args.title"
-[editMode]="editMode"
-(onChange)="updateField($event)">
+[(data)]="_title"
+[editMode]="editMode">
 </p3-whim-string-field>
 
-<!-- DATE FIELD -->
+<p3-whim-date-recurring-field
+[label]="'date'"
+[(data)]="_date"
+[editMode]="editMode">
+</p3-whim-date-recurring-field>
 
 <p3-whim-multiline-field
 [label]="'description'"
-[field]="'description'"
-[initialValue]="args.description"
-[editMode]="editMode"
-(onChange)="updateField($event)">
-
+[(data)]="_description"
+[editMode]="editMode">
 </p3-whim-multiline-field>
 
 <div class="button-group">
-  <button type="submit" *ngIf="editMode" (click)="submitChanges()">Update</button>
+  <button type="submit" *ngIf="editMode" (click)="update()">Update</button>
   <div class="button" *ngIf="editMode" (click)="cancel()">Cancel</div>
   <div class="button" *ngIf="!editMode" (click)="toEditMode()">Edit</div>
   <div class="button" *ngIf="!editMode" (click)="delete()">Delete</div>

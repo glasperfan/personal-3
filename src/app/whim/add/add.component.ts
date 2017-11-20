@@ -16,7 +16,5 @@ export abstract class AddComponent<T> implements OnInit {
     this.switchTo.emit(new WindowViewWithArgs(WindowView.Dashboard));
   }
 
-  protected updateField(update: IField): void {
-    set(this.args, update.field, update.value);
-  }
+  protected abstract add(): void;
 }

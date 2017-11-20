@@ -65,7 +65,7 @@ describe('Parsing results', () => {
         const input = ['add', 'Joe', 'Schmoe'].concat(birthday.split(' '));
         const result = new AddFriendParseResult(input).arguments;
         expect(shouldSucceed
-          ? result.birthday === resultTimestamp.valueOf().toString()
+          ? result.birthday === resultTimestamp.valueOf()
           : result.birthday === undefined,
           `Comparing ${result.birthday} and ${resultTimestamp && resultTimestamp.valueOf().toString()}`
         ).to.be.true;

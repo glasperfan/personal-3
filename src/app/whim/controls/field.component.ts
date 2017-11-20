@@ -1,23 +1,34 @@
 import { Input, Output, EventEmitter } from '@angular/core';
 import { IField } from 'app/whim/models';
+import { get, set } from 'lodash';
 
 export class FieldComponent<T> {
   value: T;
   @Input() label: string;
-  @Input() field: string;
   @Input() editMode: boolean;
   @Input() showControls = false;
-  @Output() onChange = new EventEmitter<IField>();
   @Input() showIfEmpty = false;
-  @Input() set initialValue(initialValue: T) {
-    this.value = initialValue;
+
+  // Two-way binding
+  @Input() get data(): T { return this.value; }
+  @Output() dataChange = new EventEmitter<T>();
+  set data(val: T) {
+    this.value = val;
+    this.dataChange.emit(val);
+  }
+
+  // Set object
+  set(field: string, value: any) {
+    if (get(this.value, field) !== value) {
+      set(this.value, field, value);
+      this.dataChange.emit(this.value);
+    }
   }
 
   // Override for non-primitive (for value existence check)
   get shouldShow(): boolean {
     return this.showIfEmpty || this.editMode || !!this.value;
   }
-
 
   edit(): void {
     this.editMode = true;

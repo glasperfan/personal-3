@@ -1,7 +1,7 @@
 import { AccountService } from './account.service';
 import { HttpService } from './http.service';
 import { Injectable } from '@angular/core';
-import { IAddFriendArguments, IAddFriendsArguments, IFriend, WhimAPI } from '../models';
+import { IAddFriendArguments, IAddFriendsArguments, IDeleteFriendsArguments, IFriend, WhimAPI } from '../models';
 
 @Injectable()
 export class FriendService {
@@ -19,9 +19,19 @@ export class FriendService {
     });
   }
 
-  updateFriends(friends: IFriend[]): Promise<void> {
+  updateFriends(friends: IFriend[]): Promise<IFriend[]> {
     return this.accountService.currentUser$.then(currentUser => {
-      return this.http.putOrThrow<IFriend[]>(WhimAPI.UpdateFriends, friends);
+      return this.http.put<IFriend[], IFriend[]>(WhimAPI.UpdateFriends, friends);
+    });
+  }
+
+  deleteFriends(friends: IFriend[]): Promise<void> {
+    return this.accountService.currentUser$.then(currentUser => {
+      const payload: IDeleteFriendsArguments = {
+        userId: currentUser._id,
+        friendIds: friends.map(e => e._id)
+      };
+      return this.http.postOrThrow<IDeleteFriendsArguments>(WhimAPI.DeleteFriends, payload);
     });
   }
 

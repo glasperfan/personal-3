@@ -1,7 +1,8 @@
 import { Component } from '@angular/core';
-import { IEvent, IError } from '../../models';
+import { IError, IEvent, IParsedDate } from '../../models';
 import { CalendarService } from '../../services/calendar.service';
 import { ShowComponent } from '../show.component';
+import { get, set } from 'lodash';
 
 @Component({
   selector: 'p3-whim-show-events',
@@ -11,7 +12,7 @@ import { ShowComponent } from '../show.component';
 export class ShowEventsComponent extends ShowComponent<IEvent> {
   constructor(private calendarService: CalendarService) { super(); }
 
-  protected submitChanges(): void {
+  protected update(): void {
     this.calendarService.updateEvents([this.args])
     .then(_ => this.toShowMode())
     .catch((e: IError) => {
@@ -27,5 +28,29 @@ export class ShowEventsComponent extends ShowComponent<IEvent> {
         console.log(e);
         this.processMessage = `Uh oh! Failed to delete, please let Hugh know.`;
       });
+  }
+
+  private get _title(): string {
+    return get(this.args, 'title');
+  }
+
+  private set _title(s: string) {
+    set(this.args, 'title', s);
+  }
+
+  private get _date(): IParsedDate {
+    return get(this.args, 'date');
+  }
+
+  private set _date(d: IParsedDate) {
+    set(this.args, 'date', d);
+  }
+
+  private get _description(): string {
+    return get(this.args, 'description');
+  }
+
+  private set _description(s: string) {
+    set(this.args, 'description', s);
   }
 }

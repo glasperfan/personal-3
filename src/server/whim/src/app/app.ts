@@ -1,7 +1,7 @@
 import { ICalendarManager } from '../managers/contracts/ICalendarManager';
 import { IFriendManager } from '../managers/contracts/IFriendManager';
 import { ICommandParser } from '../parsers/commands/contracts/ICommandParser';
-import { IDeleteEventsArguments } from '../models/api';
+import { IDeleteEventsArguments, IDeleteFriendsArguments } from '../models/api';
 import { IDateParser } from '../parsers/dates/contracts/IDateParser';
 import {
     IAddEventsArguments,
@@ -170,7 +170,14 @@ class App implements IApp {
     router.put(WhimAPI.UpdateFriends, (req, res, next) => {
       const args: IFriend[] = req.body;
       this.friendMgr.updateFriends(args)
-        .then(_ => res.json({ successful: args.length, failed: 0 }))
+        .then(friends => res.json(friends))
+        .catch((error: IError) => errorHandler(error, res));
+    });
+
+    router.post(WhimAPI.DeleteFriends, (req, res, next) => {
+      const args: IDeleteFriendsArguments = req.body;
+      this.friendMgr.deleteFriends(args)
+        .then(_ => res.json(undefined))
         .catch((error: IError) => errorHandler(error, res));
     });
 

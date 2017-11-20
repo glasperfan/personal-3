@@ -1,25 +1,25 @@
 <div class="whim-header">
   <div class="whim-title">{{title}}</div>
 </div>
-<form (ngSubmit)="addCalendarEvent()">
-  <div class="form-group">
-    <label for="title">Title</label>
-    <input type="text" name="title" class="form-control" [(ngModel)]="_title" required />
-  </div>
+<form (ngSubmit)="add()">
 
-  <p3-whim-date-field
-  [label]="'date'"
-  [field]="'date'"
-  [initialValue]="args.date"
-  [editMode]="true"
-  (onChange)="updateField($event)">
-  </p3-whim-date-field>
+  <p3-whim-string-field
+  [label]="'Title'"
+  [(data)]="_title"
+  [editMode]="true">
+  </p3-whim-string-field>
 
-  <div class="form-group multi-line">
-    <label for="description">Description</label>
-    <textarea name="description" class="form-control" [(ngModel)]="_description"
-    placeholder="Any details to add..."></textarea>
-  </div>
+  <p3-whim-date-recurring-field
+  [label]="'Date'"
+  [(data)]="_date"
+  [editMode]="true">
+  </p3-whim-date-recurring-field>
+
+  <p3-whim-multiline-field
+  [label]="'Description'"
+  [(data)]="_description"
+  [editMode]="true">
+  </p3-whim-multiline-field>
 
   <div class="button-group">
       <button type="submit">Add {{_title}}</button>

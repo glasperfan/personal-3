@@ -1,15 +1,18 @@
+import { Component, OnInit } from '@angular/core';
 import { FieldComponent } from './field.component';
-import { Component } from '@angular/core';
 
 @Component({
   selector: 'p3-whim-tags-field',
   templateUrl: './tags-field.component.html',
   styleUrls: ['./tags-field.component.less']
 })
-export class TagsFieldComponent extends FieldComponent<string[]> {
-
+export class TagsFieldComponent extends FieldComponent<string[]> implements OnInit {
   private readonly emptyProperty = '';
   private _tags: string;
+
+  ngOnInit() {
+    this.label = this.label || 'Tags';
+  }
 
   private get tags(): string {
     if (!this._tags) {
@@ -21,8 +24,7 @@ export class TagsFieldComponent extends FieldComponent<string[]> {
   private set tags(s: string) {
     const components = (s && s.trim().split(/[\s,]+/)) || [];
     components.map(c => c.startsWith('#') ? c : '#' + c);
-    this.value = components;
-    this.onChange.emit({ field: this.field, value: components });
+    this.data = components;
   }
 
   get shouldShow(): boolean {

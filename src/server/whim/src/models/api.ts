@@ -10,7 +10,7 @@ export enum WhimAPI {
   AddFriends = '/friends',
   GetAllFriends = '/friends',
   UpdateFriends = '/friends',
-  DeleteFriends = '/friends',
+  DeleteFriends = '/friends/delete',
   GetFriend = '/friend',
   GetEvents = '/events',
   AddEvents = '/events',
@@ -65,7 +65,7 @@ export interface IAddFriendArguments {
   last: string;
   email?: string;
   phone?: string;
-  birthday?: string;
+  birthday?: number;
   address1?: string;
   address2?: string;
   city?: string;
@@ -92,6 +92,11 @@ export interface IGetAvailableFriendsArguments {
 export interface IGetFriendArguments {
   userId: string;
   friendId: string;
+}
+
+export interface IDeleteFriendsArguments {
+  userId: string;
+  friendIds: Guid[];
 }
 
 export interface IGetEventsParams {

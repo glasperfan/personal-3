@@ -5,7 +5,11 @@
       <div class="value" *ngIf="value && value.length">{{value}}</div>
       <div class="value empty" *ngIf="!value || !value.length">{{emptyProperty}}</div>
     </div>
-    <input *ngIf="editMode" class="value editable form-control" type="text" [name]="field" [ngModel]="value" (ngModelChange)="update($event)" />
+    <input *ngIf="editMode"
+    class="value editable form-control"
+    type="text"
+    [name]="field"
+    [(ngModel)]="data"/>
   </div>
   <div class="actions" *ngIf="showControls">
     <div class="action" *ngIf="editMode" (click)="finishEdit()">show</div>

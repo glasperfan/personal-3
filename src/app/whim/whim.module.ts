@@ -9,7 +9,6 @@ import { HttpService } from './services/http.service';
 import { PasscodeComponent } from './login/passcode/passcode.component';
 import { SignupComponent } from './login/signup/signup.component';
 import { LoginComponent } from './login/login/login.component';
-import { AddTagsComponent } from './add/tags/tags.component';
 import { CommandLineComponent } from './cmd-line/cmd-line.component';
 import { CalendarComponent } from './calendar/calendar.component';
 import { IdeasComponent } from './ideas/ideas.component';
@@ -27,6 +26,7 @@ import { MultilineFieldComponent } from './controls/multiline-field.component';
 import { NotesFieldComponent } from './controls/notes-field.component';
 import { TagsFieldComponent } from './controls/tags-field.component';
 import { DateFieldComponent } from './controls/date-field.component';
+import { RecurringDateFieldComponent } from './controls/date-recurring-field.component';
 import { DatetimeRelativeFormatPipe } from './controls/datetime-relative.pipe';
 import { DatetimeAbsoluteFormatPipe } from './controls/datetime-absolute.pipe';
 import { DateRelativeFormatPipe } from './controls/date-relative.pipe';
@@ -62,13 +62,13 @@ export const API_URL = new InjectionToken<string>('API_URL');
     AddCalendarEventsComponent,
     ShowFriendsComponent,
     ShowEventsComponent,
-    AddTagsComponent,
     /* Controls */
     StringFieldComponent,
     MultilineFieldComponent,
     NotesFieldComponent,
     TagsFieldComponent,
     DateFieldComponent,
+    RecurringDateFieldComponent,
     DatetimeRelativeFormatPipe,
     DatetimeAbsoluteFormatPipe,
     DateRelativeFormatPipe,
@@ -76,7 +76,7 @@ export const API_URL = new InjectionToken<string>('API_URL');
     MarkdownPipe,
     Autosize
   ],
-  exports: [ ] /* components referenced in RootModule */
+  exports: [] /* components referenced in RootModule */
 })
 export class WhimModule {
   static forRoot(): ModuleWithProviders {

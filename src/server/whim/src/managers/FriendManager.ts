@@ -1,15 +1,16 @@
+import { IDeleteFriendsArguments } from '../models/api';
 import { IFriendManager } from './contracts/IFriendManager';
 import { IDateParser } from '../parsers/dates/contracts/IDateParser';
 import { DateParser, Validator } from '../parsers';
 import {
-    IAddFriendArguments,
-    IAddFriendsArguments,
-    IGetFriendArguments,
-    IFriend,
-    IParsedDate,
-    IUser,
-    Note,
-    WhimError,
+  IAddFriendArguments,
+  IAddFriendsArguments,
+  IGetFriendArguments,
+  IFriend,
+  IParsedDate,
+  IUser,
+  Note,
+  WhimError,
 } from '../models';
 import { DatabaseManager } from '../managers';
 import * as MongoDB from 'mongodb';
@@ -48,7 +49,7 @@ export class FriendManager implements IFriendManager {
     return this.getUserFriendCollection(args.userId).then(collection =>
       collection.findOne({ _id: args.friendId })
     );
-}
+  }
 
   createFriends(args: IAddFriendsArguments): Promise<IFriend[]> {
     let newFriends: IFriend[];
@@ -69,11 +70,13 @@ export class FriendManager implements IFriendManager {
     });
   }
 
-  updateFriends(args: IFriend[]): Promise<void> {
+  updateFriends(args: IFriend[]): Promise<IFriend[]> {
     const ops: Promise<void>[] = [];
-    for (const el of args) {
-      let friend = Object.assign({}, el) as IFriend;
-      friend = this.updateFriend(friend);
+    const updated = args.map(el => {
+      const f = Object.assign({}, el) as IFriend;
+      return this.updateFriend(f);
+    });
+    for (const friend of updated) {
       ops.push(this.getUserFriendCollection(friend.userId).then(collection => {
         return collection.replaceOne({ _id: friend._id }, friend)
           .then(result => {
@@ -85,7 +88,31 @@ export class FriendManager implements IFriendManager {
           .catch(err => Promise.reject(err));
       }));
     }
-    return Promise.all(ops).then(_ => _[0]);
+    return Promise.all(ops).then(_ => updated).catch(err => { throw new WhimError(err); });
+  }
+
+  deleteFriends(args: IDeleteFriendsArguments): Promise<void> {
+    const operation = this.getUserFriendCollection(args.userId)
+      .then(collection => collection.deleteMany({
+        _id: { $in: args.friendIds }
+      }));
+    return operation.then(deleted => {
+      if (!deleted.result.ok || deleted.deletedCount !== args.friendIds.length) {
+        throw new WhimError(
+          `FriendManager: unable to delete friends.
+          Attempted: ${args.friendIds.length}
+          Deleted: ${deleted.deletedCount}`
+        );
+      }
+      return undefined;
+    }).catch(err => {
+      throw new WhimError(
+        `FriendManager: uncaught exception deleting friends.
+          UserId: ${args.userId}
+          FriendIds: ${args.friendIds.toString}
+          Error: ${err}`
+      );
+    });
   }
 
   searchByText(userId: string, searchComponents: string[]): Promise<IFriend[]> {
@@ -111,7 +138,6 @@ export class FriendManager implements IFriendManager {
 
   private createFriend(userId: string, friendArg: IAddFriendArguments, id?: string): IFriend {
     this.validateArguments(friendArg);
-    const bday = this.extractBirthday(friendArg.birthday);
     return <IFriend>{
       _id: id || v4(),
       name: {
@@ -119,7 +145,7 @@ export class FriendManager implements IFriendManager {
         last: friendArg.last,
         displayName: `${friendArg.first} ${friendArg.last}`,
       },
-      birthday: bday && bday.startDate.valueOf(),
+      birthday: friendArg.birthday,
       email: friendArg.email,
       phone: friendArg.phone,
       address: {
@@ -139,17 +165,6 @@ export class FriendManager implements IFriendManager {
       whenAdded: Date.now(),
       whenLastModified: Date.now()
     };
-  }
-
-  private extractBirthday(birthdayStr: string): IParsedDate {
-    if (!birthdayStr) {
-      return undefined;
-    }
-    const parsed = this.dateParser.parseString(birthdayStr);
-    if (!parsed) {
-      throw new WhimError(`Cannot parse ${birthdayStr} as a recognizable birthday date.`);
-    }
-    return parsed;
   }
 
   private validateArguments(args: IAddFriendArguments): void {

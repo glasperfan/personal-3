@@ -1,0 +1,59 @@
+<p3-whim-date-field [label]="'Date'" [editMode]="editMode" [(data)]="_startDate"></p3-whim-date-field>
+
+<div class="field checkbox-field">
+  <div class="data">
+    <label class="label" [attr.for]="label">Recurs?</label>
+
+    <div class="data-container">
+      <div class="main-input">
+        <input *ngIf="editMode"
+        type="checkbox"
+        name="isRecurrent"
+        class="form-control"
+        [(ngModel)]="_isRecurrent"/>
+
+        <div *ngIf="!editMode">
+          <div class="value" *ngIf="value">{{_recurrenceDescription}}</div>
+        </div>
+      </div>
+
+      <div class="details" *ngIf="_isRecurrent && editMode">
+
+        <div class="field sub-field">
+          <label class="label sub-label" [attr.for]="recur-every">How often?</label>
+          <div class="sub-field-options">
+            <div class="sub-field-option">
+              <input #everyAmount type="number" name="amount" min="1" class="form-control" [(ngModel)]="_recurEveryAmount" />
+              <select name="recur-every-interval" [(ngModel)]="_recurEveryInterval">
+                <option *ngFor="let i of _recurrenceIntervals" [value]="i.value">{{i.displayName}}</option>
+              </select>
+            </div>
+            <div class="sub-field-option">
+              <input type="checkbox" name="alternating" class="form-control" [(ngModel)]="_isAlternating" />
+              <label class="label sub-label" [attr.for]="alternating">Alternating?</label>
+            </div>
+          </div>
+        </div>
+
+        <div class="field sub-field">
+          <label class="label sub-label" [attr.for]="recur-for">Ends?</label>
+          <div class="sub-field-options">
+            <div class="sub-field-option">
+              <input type="checkbox" name="forever" class="form-control" [(ngModel)]="_isForever" />
+              <label class="label sub-label" [attr.for]="forever">Never</label>
+            </div>
+            <div class="sub-field-option" *ngIf="!_isForever">
+              <label class="label sub-label" [attr.for]="interval" class="before-input">Ends in</label>
+              <input type="number" min="1" name="amount" class="form-control" [(ngModel)]="_recurForAmount" />
+              <select name="recur-for-interval" [(ngModel)]="_recurForInterval">
+                <option *ngFor="let i of _recurrenceIntervals" [value]="i.value">{{i.displayName}}</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>
