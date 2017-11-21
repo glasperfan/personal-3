@@ -1,4 +1,13 @@
-import { IGetUserParams, ILoginArguments, ISignupArguments, IUser, IUserWithPasscode, WhimAPI, WhimError } from '../models';
+import {
+    IGetUserParams,
+    ILoginArguments,
+    ISignupArguments,
+    IUser,
+    IUserSettings,
+    IUserWithPasscode,
+    WhimAPI,
+    WhimError,
+} from '../models';
 import { DatabaseManager } from '../managers';
 import * as MongoDB from 'mongodb';
 import { v4 } from 'uuid';
@@ -14,6 +23,7 @@ export class UserManager {
 
   public createUser(args: ISignupArguments): Promise<IUser> {
     const newUser: IUserWithPasscode = {
+      _id: v4(),
       name: {
         first: args.first,
         last: args.last,
@@ -22,7 +32,7 @@ export class UserManager {
       email: args.email,
       location: { city: args.city },
       passcode: args.passcode,
-      _id: v4()
+      settings: this._defaultUserSettings
     };
 
     // Validate
@@ -88,15 +98,28 @@ export class UserManager {
     });
   }
 
-  private getCollectionToken(): string {
+  public updateUserSettings(userId: string, settings: IUserSettings): Promise<void> {
+    return this.getUsersCollection().updateOne(
+      { _id: userId },
+      { $set: { settings: settings } }
+    ).then(result => {
+      if (result.modifiedCount === 1 && result.result.ok) {
+        return Promise.resolve();
+      } else {
+        throw new WhimError(`Failed to update user settings (id: ${userId}).`);
+      }
+    }).catch(err => Promise.reject(err));
+  }
+
+  public getCollectionToken(): string {
     return this.collectionToken;
   }
 
-  private getUsersCollection(): MongoDB.Collection<IUserWithPasscode> {
+  public getUsersCollection(): MongoDB.Collection<IUserWithPasscode> {
     return this.dbMgr.getOrCreateCollection<IUserWithPasscode>(this.getCollectionToken());
   }
 
-  private removePasscode(user: IUserWithPasscode): IUser {
+  public removePasscode(user: IUserWithPasscode): IUser {
     delete user.passcode;
     return user as IUser;
   }
@@ -127,5 +150,13 @@ export class UserManager {
     if (passcode.length !== 4) {
       throw new WhimError('Passcode must be 4 digits.');
     }
+  }
+
+  private get _defaultUserSettings(): IUserSettings {
+    return {
+      email: {
+        weeklyOptIn: false
+      }
+    };
   }
 }

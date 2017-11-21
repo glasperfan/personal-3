@@ -1,7 +1,7 @@
 import { ICalendarManager } from '../managers/contracts/ICalendarManager';
 import { IFriendManager } from '../managers/contracts/IFriendManager';
 import { ICommandParser } from '../parsers/commands/contracts/ICommandParser';
-import { IDeleteEventsArguments, IDeleteFriendsArguments } from '../models/api';
+import { IDeleteEventsArguments, IDeleteFriendsArguments, IUpdateSettingsArguments } from '../models/api';
 import { IDateParser } from '../parsers/dates/contracts/IDateParser';
 import {
     IAddEventsArguments,
@@ -29,7 +29,8 @@ import {
   FriendManager,
   HistoryManager,
   MethodManager,
-  UserManager
+  UserManager,
+  EmailManager
 } from '../managers';
 import { IdeaGenerator } from '../generators';
 import { CommandParser, DateParser } from '../parsers';
@@ -54,6 +55,7 @@ interface IApp {
   IdeaGenerator: IdeaGenerator;
   CommandParser: ICommandParser;
   DateParser: IDateParser;
+  EmailManager: EmailManager;
 }
 
 function errorHandler(err: IError, res: express.Response): void {
@@ -75,11 +77,14 @@ class App implements IApp {
   private historyMgr: HistoryManager;
   private commandParser: ICommandParser;
   private dateParser: IDateParser;
+  private emailMgr: EmailManager;
 
   private readonly dbUrl: string;
+  private readonly dbPort: number;
 
-  constructor(dbUrl: string) {
+  constructor(dbUrl: string, dbPort: number) {
     this.dbUrl = dbUrl;
+    this.dbPort = dbPort;
     this.express = express();
     this.middleware();
     this.routes();
@@ -96,9 +101,15 @@ class App implements IApp {
   public get IdeaGenerator(): IdeaGenerator { return this.ideaGenerator; }
   public get CommandParser(): ICommandParser { return this.commandParser; }
   public get DateParser(): IDateParser { return this.dateParser; }
+  public get EmailManager(): EmailManager { return this.emailMgr; }
 
   public connectToMongo(): Promise<void> {
     return this.databaseMgr.connectToDb();
+  }
+
+  public boot(): void {
+    this.emailMgr.initiateEmailCronJobs();
+    console.log(`Connected to MongoDB on port ${this.dbPort}.`);
   }
 
   private middleware(): void {
@@ -225,6 +236,13 @@ class App implements IApp {
         .catch((error: IError) => errorHandler(error, res));
     });
 
+    router.post(WhimAPI.UpdateSettings, (req, res, next) => {
+      const args: IUpdateSettingsArguments = req.body;
+      this.userMgr.updateUserSettings(args.userId, args.settings)
+        .then(results => res.json())
+        .catch((error: IError) => errorHandler(error, res));
+    });
+
     this.express.use('/', router);
   }
 
@@ -238,6 +256,7 @@ class App implements IApp {
     this.calendarMgr = new CalendarManager(this.databaseMgr, this.dateParser);
     this.ideaGenerator = new IdeaGenerator(this.friendMgr, this.methodMgr, this.historyMgr);
     this.commandParser = new CommandParser(this.friendMgr, this.calendarMgr);
+    this.emailMgr = new EmailManager(this.userMgr, this.calendarMgr);
   }
 }
 
@@ -245,7 +264,7 @@ class App implements IApp {
 const dbPort = 27017;
 const dbUrl = `mongodb://localhost:${dbPort}/whim`;
 
-const whimApp: App = new App(dbUrl);
+const whimApp: App = new App(dbUrl, dbPort);
 const expressApp: express.Application = whimApp.Express;
 
 const port = Settings.LocalPort;
@@ -254,7 +273,7 @@ const server = http.createServer(expressApp);
 server.listen(port);
 
 whimApp.connectToMongo()
-  .then(() => console.log(`Connected to MongoDB on port ${dbPort}.`))
+  .then(() => whimApp.boot())
   .catch((err: IError) => {
     console.log(err.errorMessage);
     process.exit(1);

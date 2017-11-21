@@ -1,6 +1,5 @@
 // tslint:disable:no-empty-interface
-import { IParsedDate } from './date';
-import { IUser, WindowView, Guid } from './models';
+import { IUser, WindowView, Guid, IUserSettings, IParsedDate } from './';
 
 export enum WhimAPI {
   GetIdeasForDate = '/ideas',
@@ -16,7 +15,8 @@ export enum WhimAPI {
   AddEvents = '/events',
   UpdateEvents = '/events',
   DeleteEvents = '/events/delete',
-  ParseSearch = '/parse'
+  ParseSearch = '/parse',
+  UpdateSettings = '/settings'
 }
 
 export interface IResponse {
@@ -135,6 +135,11 @@ export interface IParseResult {
 
 export interface IParseSearchResults {
   results: IParseResult[];
+}
+
+export interface IUpdateSettingsArguments {
+  userId: string;
+  settings: IUserSettings;
 }
 
 

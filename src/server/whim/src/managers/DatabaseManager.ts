@@ -33,6 +33,12 @@ export class DatabaseManager {
   }
 
   public getOrCreateCollection<T>(collectionName: string): MongoDB.Collection<T> {
+    if (!this.isConnected) {
+      throw new WhimError(`
+        Empty database object when retrieving collection!
+        Are you sure the database is initialized?`
+      );
+    }
     return this.dbObject.collection(collectionName, (err, col) => {
       if (!err) {
         return col;
