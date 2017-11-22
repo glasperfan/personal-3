@@ -1,7 +1,12 @@
 import { ICalendarManager } from '../managers/contracts/ICalendarManager';
 import { IFriendManager } from '../managers/contracts/IFriendManager';
 import { ICommandParser } from '../parsers/commands/contracts/ICommandParser';
-import { IDeleteEventsArguments, IDeleteFriendsArguments, IUpdateSettingsArguments } from '../models/api';
+import {
+    IDeleteEventsArguments,
+    IDeleteFriendsArguments,
+    IGetSettingsArguments,
+    IUpdateSettingsArguments,
+} from '../models/api';
 import { IDateParser } from '../parsers/dates/contracts/IDateParser';
 import {
     IAddEventsArguments,
@@ -22,6 +27,7 @@ import {
     WhimError,
     IFriend,
     IEvent,
+    IUserSettings,
 } from '../models';
 import {
   CalendarManager,
@@ -30,7 +36,8 @@ import {
   HistoryManager,
   MethodManager,
   UserManager,
-  EmailManager
+  EmailManager,
+  SettingsManager
 } from '../managers';
 import { IdeaGenerator } from '../generators';
 import { CommandParser, DateParser } from '../parsers';
@@ -56,6 +63,7 @@ interface IApp {
   CommandParser: ICommandParser;
   DateParser: IDateParser;
   EmailManager: EmailManager;
+  SettingsManager: SettingsManager;
 }
 
 function errorHandler(err: IError, res: express.Response): void {
@@ -78,6 +86,7 @@ class App implements IApp {
   private commandParser: ICommandParser;
   private dateParser: IDateParser;
   private emailMgr: EmailManager;
+  private settingsMgr: SettingsManager;
 
   private readonly dbUrl: string;
   private readonly dbPort: number;
@@ -102,6 +111,7 @@ class App implements IApp {
   public get CommandParser(): ICommandParser { return this.commandParser; }
   public get DateParser(): IDateParser { return this.dateParser; }
   public get EmailManager(): EmailManager { return this.emailMgr; }
+  public get SettingsManager(): SettingsManager { return this.settingsMgr; }
 
   public connectToMongo(): Promise<void> {
     return this.databaseMgr.connectToDb();
@@ -236,9 +246,18 @@ class App implements IApp {
         .catch((error: IError) => errorHandler(error, res));
     });
 
-    router.post(WhimAPI.UpdateSettings, (req, res, next) => {
+    router.get(WhimAPI.GetSettings, (req, res, next) => {
+      const params: IGetSettingsArguments = req.query;
+      this.settingsMgr.getUserSettings(params.userId)
+        .then((settings: IUserSettings) => {
+          return res.json(settings);
+        })
+        .catch((error: IError) => errorHandler(error, res));
+    });
+
+    router.put(WhimAPI.UpdateSettings, (req, res, next) => {
       const args: IUpdateSettingsArguments = req.body;
-      this.userMgr.updateUserSettings(args.userId, args.settings)
+      this.settingsMgr.updateUserSettings(args.userId, args.settings)
         .then(results => res.json())
         .catch((error: IError) => errorHandler(error, res));
     });
@@ -257,6 +276,7 @@ class App implements IApp {
     this.ideaGenerator = new IdeaGenerator(this.friendMgr, this.methodMgr, this.historyMgr);
     this.commandParser = new CommandParser(this.friendMgr, this.calendarMgr);
     this.emailMgr = new EmailManager(this.userMgr, this.calendarMgr);
+    this.settingsMgr = new SettingsManager(this.userMgr);
   }
 }
 

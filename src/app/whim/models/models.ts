@@ -1,4 +1,4 @@
-import { IParsedDate } from './date';
+import { IParsedDate, ICronSchedule } from './';
 import * as moment from 'moment';
 
 export type Guid = string;
@@ -95,10 +95,20 @@ export interface IUser {
   name: IName;
   email: string;
   location: IAddress;
+  settings: IUserSettings;
 }
 
 export interface IUserWithPasscode extends IUser {
   passcode: string;
+}
+
+export interface IUserSettings {
+  email: IUserEmailSettings;
+}
+
+export interface IUserEmailSettings {
+  weeklyOptIn: boolean;
+  weeklySchedule?: ICronSchedule;
 }
 
 /***** ROUTING *****/
@@ -112,6 +122,7 @@ export enum WindowView {
   AddEvents = 'AddEvents',
   ShowFriends = 'ShowFriends',
   ShowEvents = 'ShowEvents',
+  Settings = 'Settings',
   Calendar = 'Calendar'
 }
 

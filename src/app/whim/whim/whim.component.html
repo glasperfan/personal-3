@@ -2,7 +2,7 @@
   <div class="header">Uh oh...</div>
   <div class="subtitle">We can't seem to connect to the server.</div>
 </div>
-<div class="frame" [ngSwitch]="windowManager.currentWindow$ | async">
+<div class="frame" *ngIf="windowManager.currentWindow$ | async as currentWindow">
   <div class="description">
     <p><b>whim</b> is about building stronger connections with the most important people in your life. In this age of technological distractions and productivity obsessions, I rarely take the time out of my day to reach out to even my closest friends. I built this as a reminder that</p>
 
@@ -14,7 +14,7 @@
 
   <div class="break"></div>
 
-  <div class="window-view-container">
+  <div class="window-view-container" [ngSwitch]="currentWindow">
     <div *ngSwitchCase="WindowView.None"></div>
     <p3-whim-login *ngSwitchCase="WindowView.Login"               [args]="viewArgs" (switchTo)="switchTo($event)"></p3-whim-login>
     <p3-whim-passcode *ngSwitchCase="WindowView.Passcode"         [args]="viewArgs" (switchTo)="switchTo($event)"></p3-whim-passcode>
@@ -23,6 +23,7 @@
     <p3-whim-add-events *ngSwitchCase="WindowView.AddEvents"      [args]="viewArgs" (switchTo)="switchTo($event)"></p3-whim-add-events>
     <p3-whim-show-friends *ngSwitchCase="WindowView.ShowFriends"  [args]="viewArgs" (switchTo)="switchTo($event)"></p3-whim-show-friends>
     <p3-whim-show-events *ngSwitchCase="WindowView.ShowEvents"    [args]="viewArgs" (switchTo)="switchTo($event)"></p3-whim-show-events>
+    <p3-whim-settings *ngSwitchCase="WindowView.Settings"         [args]="viewArgs" (switchTo)="switchTo($event)"></p3-whim-settings>
     <p3-whim-dashboard *ngSwitchDefault                           [args]="viewArgs" (switchTo)="switchTo($event)"></p3-whim-dashboard>
   </div>
 
@@ -30,6 +31,6 @@
 
   <div class="button-group centered">
     <div class="button" (click)="logout()">Logout</div>
-    <div class="button">Settings</div>
+    <div class="button" (click)="toSettings()" *ngIf="currentWindow !== WindowView.Settings">Settings</div>
   </div>
 </div>

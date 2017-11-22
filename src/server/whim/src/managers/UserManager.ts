@@ -98,19 +98,6 @@ export class UserManager {
     });
   }
 
-  public updateUserSettings(userId: string, settings: IUserSettings): Promise<void> {
-    return this.getUsersCollection().updateOne(
-      { _id: userId },
-      { $set: { settings: settings } }
-    ).then(result => {
-      if (result.modifiedCount === 1 && result.result.ok) {
-        return Promise.resolve();
-      } else {
-        throw new WhimError(`Failed to update user settings (id: ${userId}).`);
-      }
-    }).catch(err => Promise.reject(err));
-  }
-
   public getCollectionToken(): string {
     return this.collectionToken;
   }

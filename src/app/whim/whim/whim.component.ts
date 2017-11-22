@@ -50,6 +50,10 @@ export class WhimComponent implements OnInit {
 
   private logout(): void {
     this.accountService.logout();
-    this.windowManager.switchTo(new WindowViewWithArgs(WindowView.Login));
+    this.switchTo(new WindowViewWithArgs(WindowView.Login));
+  }
+
+  private toSettings(): void {
+    this.switchTo(new WindowViewWithArgs(WindowView.Settings));
   }
 }

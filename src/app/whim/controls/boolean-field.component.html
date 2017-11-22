@@ -1,0 +1,16 @@
+<div class="field boolean-field" *ngIf="shouldShow">
+  <div class="data">
+    <label class="label" [attr.for]="label">{{label}}</label>
+
+    <input [disabled]="!editMode"
+    class="form-control"
+    type="checkbox"
+    [(ngModel)]="data" />
+
+  </div>
+
+  <div class="actions" *ngIf="showControls">
+    <div class="action" *ngIf="editMode" (click)="finishEdit()">show</div>
+    <div class="action" *ngIf="!editMode" (click)="edit()">edit</div>
+  </div>
+</div>

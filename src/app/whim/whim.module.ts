@@ -18,8 +18,10 @@ import { AddCalendarEventsComponent } from './add/events/add-events.component';
 import { AddFriendsComponent } from './add/friends/add-friends.component';
 import { ShowFriendsComponent } from './show/friends/show-friends.component';
 import { ShowEventsComponent } from './show/events/show-events.component';
+import { SettingsComponent } from './settings/settings.component';
 import { FriendService } from './services/friend.service';
 import { CalendarService } from './services/calendar.service';
+import { SettingsService } from './services/settings.service';
 import { IdeaGeneratorService } from './services/idea-generator.service';
 import { StringFieldComponent } from './controls/string-field.component';
 import { MultilineFieldComponent } from './controls/multiline-field.component';
@@ -27,6 +29,8 @@ import { NotesFieldComponent } from './controls/notes-field.component';
 import { TagsFieldComponent } from './controls/tags-field.component';
 import { DateFieldComponent } from './controls/date-field.component';
 import { RecurringDateFieldComponent } from './controls/date-recurring-field.component';
+import { BooleanFieldComponent } from './controls/boolean-field.component';
+import { SelectFieldComponent } from './controls/select-field.component';
 import { DatetimeRelativeFormatPipe } from './controls/datetime-relative.pipe';
 import { DatetimeAbsoluteFormatPipe } from './controls/datetime-absolute.pipe';
 import { DateRelativeFormatPipe } from './controls/date-relative.pipe';
@@ -62,6 +66,7 @@ export const API_URL = new InjectionToken<string>('API_URL');
     AddCalendarEventsComponent,
     ShowFriendsComponent,
     ShowEventsComponent,
+    SettingsComponent,
     /* Controls */
     StringFieldComponent,
     MultilineFieldComponent,
@@ -69,6 +74,8 @@ export const API_URL = new InjectionToken<string>('API_URL');
     TagsFieldComponent,
     DateFieldComponent,
     RecurringDateFieldComponent,
+    BooleanFieldComponent,
+    SelectFieldComponent,
     DatetimeRelativeFormatPipe,
     DatetimeAbsoluteFormatPipe,
     DateRelativeFormatPipe,
@@ -85,6 +92,7 @@ export class WhimModule {
       providers: [
         FriendService,
         CalendarService,
+        SettingsService,
         IdeaGeneratorService,
         AccountService,
         HttpService,

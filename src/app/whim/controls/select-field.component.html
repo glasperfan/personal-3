@@ -1,0 +1,18 @@
+<div class="field select-field" *ngIf="shouldShow">
+  <div class="data">
+    <label class ="label" [attr.for]="label">{{label}}</label>
+
+    <div *ngIf="!editMode">
+      <div class="value" *ngIf="value">{{_valueName}}</div>
+    </div>
+
+    <select *ngIf="editMode" [name]="label" [compareWith]="isSameObject" [(ngModel)]="data">
+      <option *ngFor="let opt of options; let i = index" [ngValue]="opt">{{optionNames[i]}}</option>
+    </select>
+
+  </div>
+</div>
+<div class="actions" *ngIf="showControls">
+  <div class="action" *ngIf="editMode" (click)="finishEdit()">show</div>
+  <div class="action" *ngIf="!editMode" (click)="edit()">edit</div>
+</div>

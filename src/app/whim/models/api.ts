@@ -1,6 +1,5 @@
 // tslint:disable:no-empty-interface
-import { IParsedDate } from './date';
-import { IUser, WindowView, Guid } from './models';
+import { IUser, WindowView, Guid, IUserSettings, IParsedDate } from './';
 
 export enum WhimAPI {
   GetIdeasForDate = '/ideas',
@@ -16,7 +15,9 @@ export enum WhimAPI {
   AddEvents = '/events',
   UpdateEvents = '/events',
   DeleteEvents = '/events/delete',
-  ParseSearch = '/parse'
+  ParseSearch = '/parse',
+  GetSettings = '/settings',
+  UpdateSettings = '/settings'
 }
 
 export interface IResponse {
@@ -33,8 +34,11 @@ export interface IField {
   value: any;
 }
 
-export interface IGetIdeasForDateParams {
-  userId: string;
+export interface IByUser {
+  userId: Guid;
+}
+
+export interface IGetIdeasForDateParams extends IByUser {
   timestamp: number;
 }
 
@@ -76,31 +80,23 @@ export interface IAddFriendArguments {
   firstNote?: string;
 }
 
-export interface IAddFriendsArguments {
-  userId: string;
+export interface IAddFriendsArguments extends IByUser {
   friends: IAddFriendArguments[];
 }
 
-export interface IGetAllFriendsArguments {
-  userId: string;
-}
+export interface IGetAllFriendsArguments extends IByUser {}
 
-export interface IGetAvailableFriendsArguments {
-  userId: string;
-}
+export interface IGetAvailableFriendsArguments extends IByUser {}
 
-export interface IGetFriendArguments {
-  userId: string;
+export interface IGetFriendArguments extends IByUser {
   friendId: string;
 }
 
-export interface IDeleteFriendsArguments {
-  userId: string;
+export interface IDeleteFriendsArguments extends IByUser {
   friendIds: Guid[];
 }
 
-export interface IGetEventsParams {
-  userId: string;
+export interface IGetEventsParams extends IByUser {
   includeArchived: boolean;
 }
 
@@ -111,18 +107,15 @@ export interface IAddEventArguments {
   tags: string[];
 }
 
-export interface IAddEventsArguments {
-  userId: string;
+export interface IAddEventsArguments extends IByUser {
   events: IAddEventArguments[];
 }
 
-export interface IDeleteEventsArguments {
-  userId: string;
+export interface IDeleteEventsArguments extends IByUser {
   events: Guid[];
 }
 
-export interface IParseSearchArguments {
-  userId: string;
+export interface IParseSearchArguments extends IByUser {
   searchTerm: string;
 }
 
@@ -135,6 +128,12 @@ export interface IParseResult {
 
 export interface IParseSearchResults {
   results: IParseResult[];
+}
+
+export interface IGetSettingsArguments extends IByUser {}
+
+export interface IUpdateSettingsArguments extends IByUser {
+  settings: IUserSettings;
 }
 
 

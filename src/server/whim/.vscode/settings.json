@@ -1,0 +1,9 @@
+{
+  // Typescript
+	"files.exclude": {
+    "src/**/*.js": true,
+    "src/generators/**/*.js": true,
+    "src/parsers/**/*.js": true,
+    "src/**/*.map": true
+  }
+}

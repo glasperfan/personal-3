@@ -1,5 +1,5 @@
 import { ICalendarManager } from './contracts/ICalendarManager';
-import { IUser, ICronSchedule } from '../models';
+import { IUser, ICronSchedule, CRON_SCHEDULES } from '../models';
 import { UserManager } from './';
 import * as cron from 'cron';
 import * as nodemailer from 'nodemailer';
@@ -8,29 +8,6 @@ const Settings = settings.Settings;
 const CronJob = cron.CronJob;
 
 export class EmailManager {
-  public readonly SUN_EVENING_CRON_SCHEDULE: ICronSchedule = {
-    _id: 'SUN_EVENING',
-    name: 'Sunday night',
-    time: '00 17 * * SUN'
-  };
-
-  public readonly MON_MORNING_CRON_SCHEDULE: ICronSchedule = {
-    _id: 'MON_MORNING',
-    name: 'Monday morning',
-    time: '00 04 * * MON'
-  };
-
-  public readonly EVERY_MINUTE_CRON_SCHEDULE: ICronSchedule = {
-    _id: 'EVERY_MINUTE',
-    name: 'Every minute',
-    time: '* * * * *'
-  };
-
-  public readonly CRON_SCHEDULES: ICronSchedule[] = [
-    // this.SUN_EVENING_CRON_SCHEDULE,
-    // this.MON_MORNING_CRON_SCHEDULE,
-    this.EVERY_MINUTE_CRON_SCHEDULE
-  ];
 
   private readonly SmtpTransport: nodemailer.Transporter;
 
@@ -48,8 +25,8 @@ export class EmailManager {
   };
 
   public initiateEmailCronJobs() {
-    this.CRON_SCHEDULES.forEach(schedule =>
-      this.createWeeklyEmailCronJob(schedule, true, undefined, undefined, true)
+    CRON_SCHEDULES.forEach(schedule =>
+      this.createWeeklyEmailCronJob(schedule, true, undefined, undefined, false)
     );
     console.log('Email service initialized.');
   }
@@ -110,8 +87,9 @@ export class EmailManager {
             console.log(`Error sending emails: ${error}`);
           }
           console.log(`
-          Total accepted: ${info.accepted.length}
-          Total rejected: ${info.rejected.length}`);
+            Total accepted: ${info.accepted.length}
+            Total rejected: ${info.rejected.length}
+          `);
         }
       )
     )).then(_ => console.log('Emails sent...'))

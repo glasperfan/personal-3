@@ -5,3 +5,4 @@ export * from './HistoryManager';
 export * from './MethodManager';
 export * from './UserManager';
 export * from './EmailManager';
+export * from './SettingsManager';

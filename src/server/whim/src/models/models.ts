@@ -1,4 +1,4 @@
-import { IParsedDate, ICronSchedule } from './date';
+import { IParsedDate, ICronSchedule } from './';
 import * as moment from 'moment';
 
 export type Guid = string;
@@ -122,6 +122,7 @@ export enum WindowView {
   AddEvents = 'AddEvents',
   ShowFriends = 'ShowFriends',
   ShowEvents = 'ShowEvents',
+  Settings = 'Settings',
   Calendar = 'Calendar'
 }
 

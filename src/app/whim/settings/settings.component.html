@@ -1,0 +1,30 @@
+<div class="settings" *ngIf="args as settings">
+
+  <div class="setting" *ngIf="settings.email">
+    <div class="setting-header">Email</div>
+    <p3-whim-boolean-field
+    [editMode]="editMode"
+    [label]="'weekly email opt-in'"
+    [(data)]="_weeklyOptIn">
+    </p3-whim-boolean-field>
+
+    <p3-whim-select-field
+    [editMode]="editMode && _weeklyOptIn"
+    [label]="'weekly email schedule'"
+    [options]="settingsService.emailSchedules"
+    [optionNames]="settingsService.emailScheduleTitles"
+    [defaultIdx]="0"
+    [(data)]="_weeklySchedule">
+    </p3-whim-select-field>
+  </div>
+
+</div>
+
+<div class="button-group centered">
+  <div class="button" *ngIf="editMode" (click)="update()">Update</div>
+  <div class="button" *ngIf="editMode" (click)="cancel()">Cancel</div>
+  <div class="button" *ngIf="!editMode" (click)="toEditMode()">Edit</div>
+  <div class="button" *ngIf="!editMode" (click)="toDashboard()">Done</div>
+</div>
+
+<div class="process-message">{{processMessage}}</div>

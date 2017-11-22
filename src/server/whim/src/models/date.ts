@@ -36,11 +36,3 @@ export interface IRecurrenceUnit {
 
 export type RecurrenceInterval = 'day' | 'week' | 'month' | 'year';
 export type DateUnits = 'days' | 'day' | 'weeks' | 'week' | 'months' | 'month' | 'years' | 'year';
-
-// CHRON
-
-export interface ICronSchedule {
-  _id: string;
-  name: string;
-  time: string;
-}
