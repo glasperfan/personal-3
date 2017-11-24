@@ -21,6 +21,7 @@ export class RecurringDateFieldComponent extends FieldComponent<IParsedDate> imp
   ];
 
   private _recurrenceDescription: string;
+  private readonly oneTimeDescription = 'once';
 
   constructor(private relativeDateFormatter: DateRelativeFormatPipe) { super(); }
 
@@ -133,7 +134,7 @@ export class RecurringDateFieldComponent extends FieldComponent<IParsedDate> imp
 
   private updateRecurrenceDescription(): void {
     if (!this._isRecurrent) {
-      this._recurrenceDescription = 'once';
+      this._recurrenceDescription = this.oneTimeDescription;
     } else {
       let s = `every ${this._recurEveryAmount} ${this._recurEveryInterval}(s)`;
       if (!this._isForever) {

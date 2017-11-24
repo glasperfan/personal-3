@@ -8,7 +8,7 @@ import * as moment from 'moment';
   styleUrls: ['./date-field.component.less']
 })
 export class DateFieldComponent extends FieldComponent<number> implements OnInit {
-  @Input() dateFormat = 'MMMM D, YYYY';
+  @Input() dateFormat = 'MMM D, YYYY';
   private _lastDate: Date;
   private _dateChanged = false;
   private emptyProperty = 'no date chosen';

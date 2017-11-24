@@ -43,9 +43,15 @@ export class AccountService {
     return this.http.post<ILoginArguments, ILoginResponse>(WhimAPI.Login, { email: email, passcode: passcode })
       .then((response: ILoginResponse) => {
         const authenticatedUser: IUser = response as IUser;
-        this._currentUser$.next(authenticatedUser);
+        this.afterLogin(authenticatedUser);
         return Promise.resolve(authenticatedUser);
       });
+  }
+
+  public afterLogin(authenticatedUser: IUser): void {
+    this._currentUser$.next(authenticatedUser);
+    this.storeEmailCookie(authenticatedUser.email);
+    this.storeAuthCookie(authenticatedUser._id);
   }
 
   public logout(): void {
@@ -57,7 +63,7 @@ export class AccountService {
     return this.http.post<ISignupArguments, ISignupResponse>(WhimAPI.Signup, args)
       .then((response: ISignupResponse) => {
         const authenticatedUser: IUser = response as IUser;
-        this._currentUser$.next(authenticatedUser);
+        this.afterLogin(authenticatedUser);
         return Promise.resolve(response as IUser);
       });
   }
@@ -65,6 +71,11 @@ export class AccountService {
   public getUser(userId: string): Promise<IUser> {
     return this.http.get<IGetUserResponse>(WhimAPI.GetUser, { _id: userId })
       .then((response: IGetUserResponse) => Promise.resolve(response as IUser));
+  }
+
+  public getLastLoggedInUser(): Promise<IUser> {
+    const emailCookie = this.getEmailCookie();
+    return this.getUserByEmail(emailCookie.email);
   }
 
   public getUserByEmail(email: string): Promise<IUser> {
@@ -101,19 +112,22 @@ export class AccountService {
     return cookie ? JSON.parse(cookie) as IAuthCookie : undefined;
   }
 
-  public storeEmailCookie(email: string): void {
-    Cookies.set(this.WhimEmailCookieKey, JSON.stringify({ email: email }), { expires: this.emailCookieExpiration });
-  }
-
-  public storeAuthCookie(userId: string): void {
-    Cookies.set(this.WhimAuthCookieKey, JSON.stringify({ userId: userId }), { expires: this.authCookieExpiration });
-  }
-
-  public removeEmailCookie(): void {
+  private removeEmailCookie(): void {
     Cookies.remove(this.WhimEmailCookieKey);
   }
 
-  public removeAuthCookie(): void {
+  private removeAuthCookie(): void {
     Cookies.remove(this.WhimAuthCookieKey);
+  }
+
+  private storeEmailCookie(email: string): void {
+    Cookies.set(
+      this.WhimEmailCookieKey,
+      JSON.stringify({ email: email }),
+      { expires: this.emailCookieExpiration });
+  }
+
+  private storeAuthCookie(userId: string): void {
+    Cookies.set(this.WhimAuthCookieKey, JSON.stringify({ userId: userId }), { expires: this.authCookieExpiration });
   }
 }

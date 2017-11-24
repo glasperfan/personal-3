@@ -9,11 +9,18 @@
   .data {
     display: flex;
 
-    .label {
-      width: 140px;
-      text-align: right;
-      margin-right: 25px;
-      color: #AAA;
+    &.centered {
+      align-items: center;
+    }
+
+    .label, .icon-label {
+      min-width: 65px;
+      color: #BBB;
+      text-transform: capitalize;
+
+      &.long-label {
+        min-width: 150px;
+      }
 
       &.sub-label {
         font-size: 0.8em;

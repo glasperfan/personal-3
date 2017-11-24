@@ -38,31 +38,31 @@ abstract class BaseMethodGenerator implements IMethodGenerator {
 
 
 export class EmailMethodGenerator extends BaseMethodGenerator {
-  constructor() { super(MethodCode.Email, 1, 'Send an email to {}.'); }
+  constructor() { super(MethodCode.Email, 1, 'Send an email to {} 📨'); }
 }
 
 export class CallMethodGenerator extends BaseMethodGenerator {
-  constructor() { super(MethodCode.Call, 1, 'Take a few minutes to call {}.'); }
+  constructor() { super(MethodCode.Call, 1, 'Take a few minutes to call {} 📱 😎'); }
 }
 
 export class TextMethodGenerator extends BaseMethodGenerator {
-  constructor() { super(MethodCode.Text, 1, 'Text {} to check in.'); }
+  constructor() { super(MethodCode.Text, 1, 'Text {} to check in 😄'); }
 }
 
 export class VideoChatMethodGenerator extends BaseMethodGenerator {
   constructor() {
-    super(MethodCode.VideoChat, 1, 'Use FaceTime, Skype, or Google Hangouts to connect with {}.');
+    super(MethodCode.VideoChat, 1, 'Use FaceTime, Skype, or Google Hangouts to connect with {} 🖥 ');
   }
 }
 
 export class LetterMethodGenerator extends BaseMethodGenerator {
-  constructor() { super(MethodCode.Letter, 1, 'Go old school and write a letter to {}.'); }
+  constructor() { super(MethodCode.Letter, 1, 'Go old school and write a letter to {} ✉️'); }
 }
 
 export class CarePackageMethodGenerator extends BaseMethodGenerator {
-  constructor() { super(MethodCode.CarePackage, 1, `Assemble a care package for {} - without Amazon's help.`); }
+  constructor() { super(MethodCode.CarePackage, 1, `Assemble a care package for {} 📦`); }
 }
 
 export class MealMethodGenerator extends BaseMethodGenerator {
-  constructor() { super(MethodCode.Meal, 1, 'Find time to meet {} for coffee, lunch, or dinner.'); }
+  constructor() { super(MethodCode.Meal, 1, 'Find time to meet {} for coffee ☕'); }
 }

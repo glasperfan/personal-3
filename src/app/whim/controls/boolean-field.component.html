@@ -1,6 +1,7 @@
 <div class="field boolean-field" *ngIf="shouldShow">
   <div class="data">
-    <label class="label" [attr.for]="label">{{label}}</label>
+    <i *ngIf="iconLabel" [ngClass]="'icon-label fa fa-' + iconLabel + ' ' + labelClass" aria-hidden="true"></i>
+    <label *ngIf="!iconLabel" [ngClass]="'label ' + labelClass" [attr.for]="label">{{label}}</label>
 
     <input [disabled]="!editMode"
     class="form-control"

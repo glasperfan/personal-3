@@ -1,15 +1,30 @@
 <div class="field string-field" *ngIf="shouldShow">
-  <div class="data">
-    <label class ="label"[attr.for]="label">{{label}}</label>
+  <div class="data centered">
+    <i *ngIf="iconLabel" [ngClass]="'icon-label fa fa-' + iconLabel + ' ' + labelClass" aria-hidden="true"></i>
+    <label *ngIf="!iconLabel" [ngClass]="'label ' + labelClass" [attr.for]="label">{{label}}</label>
+
     <div *ngIf="!editMode">
       <div class="value" *ngIf="value && value.length">{{value}}</div>
       <div class="value empty" *ngIf="!value || !value.length">{{emptyProperty}}</div>
     </div>
-    <input *ngIf="editMode"
-    class="value editable form-control"
-    type="text"
-    [name]="field"
-    [(ngModel)]="data"/>
+
+    <div *ngIf="editMode">
+      <input *ngIf="isPasscode"
+      class="form-control"
+      type="password"
+      [placeholder]="placeholder"
+      [(ngModel)]="data"
+      maxlength="passcodeLength"
+      size="passcodeLength"/>
+
+      <input *ngIf="!isPasscode"
+      class="value editable form-control"
+      type="text"
+      [placeholder]="placeholder"
+      [(ngModel)]="data"/>
+
+    </div>
+
   </div>
   <div class="actions" *ngIf="showControls">
     <div class="action" *ngIf="editMode" (click)="finishEdit()">show</div>

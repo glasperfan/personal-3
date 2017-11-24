@@ -1,13 +1,15 @@
 <div class="field notes-field" *ngIf="shouldShow">
   <div class="data">
-    <label class ="label" [attr.for]="label">{{label}}</label>
+    <i *ngIf="iconLabel" [ngClass]="'icon-label fa fa-' + iconLabel + ' ' + labelClass" aria-hidden="true"></i>
+    <label *ngIf="!iconLabel" [ngClass]="'label ' + labelClass" [attr.for]="label">{{label}}</label>
+
     <div class="notes">
 
       <div class="new-note" *ngIf="editMode">
         <div class="border">
           <textarea autosize
           class="form-control"
-          [placeholder]="placeholderText"
+          [placeholder]="placeholder"
           (keydown)="listenForSubmit($event)"
           [(ngModel)]="newNoteText">
           </textarea>
@@ -15,7 +17,7 @@
         <div class="description">Type Shift + Enter to submit.</div>
       </div>
 
-      <div class="note" *ngFor="let note of value; let i = index">
+      <div class="note" *ngFor="let note of data; let i = index">
         <div class="border">
           <div class="note-content">
             <div class="header">

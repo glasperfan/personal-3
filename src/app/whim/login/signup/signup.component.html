@@ -1,44 +1,58 @@
-<div class="form-container">
-  <div class="form-title">Sign Up</div>
-  <form (ngSubmit)="signup()">
-    <div class="form-group">
-      <label for="first">First name</label>
-      <input type="text" name="first" class="form-control" [(ngModel)]="args.first" required>
+<div class="whim-frame">
+    <div class="whim-title">Sign Up</div>
+    <div class="whim-form">
+
+        <p3-whim-string-field
+        [label]="'F'"
+        [placeholder]="'First name'"
+        [editMode]="editMode"
+        [(data)]="args.first">
+        </p3-whim-string-field>
+
+      <p3-whim-string-field
+      [label]="'L'"
+      [placeholder]="'Last name'"
+      [editMode]="editMode"
+      [(data)]="args.last">
+      </p3-whim-string-field>
+
+      <p3-whim-string-field
+      [iconLabel]="'envelope-o'"
+      [placeholder]="'Email'"
+      [editMode]="editMode"
+      [(data)]="args.email">
+      </p3-whim-string-field>
+
+      <p3-whim-string-field
+      [iconLabel]="'map-marker'"
+      [placeholder]="'City'"
+      [editMode]="editMode"
+      [(data)]="args.city">
+      </p3-whim-string-field>
+
+      <p3-whim-string-field
+      [iconLabel]="'lock'"
+      [placeholder]="'Passcode'"
+      [editMode]="editMode"
+      [isPasscode]="true"
+      [(data)]="args.passcode">
+      </p3-whim-string-field>
+
+      <p3-whim-string-field
+      [iconLabel]="args.passcode === confirmationPasscode ? 'check' : ''"
+      [placeholder]="'Re-type passcode'"
+      [isPasscode]="true"
+      [(data)]="confirmationPasscode">
+      </p3-whim-string-field>
+
+      <div class="form-control-desc">Choose a 4-digit passcode as your password.</div>
+
+      <div class="button-group">
+        <div class="button" (click)="signup()">Sign up</div>
+        <div class="button" (click)="toLogin()">Log in</div>
+      </div>
+
     </div>
 
-    <div class="form-group">
-      <label for="last">Last name</label>
-      <input type="text" name="last" class="form-control" [(ngModel)]="args.last" required>
-    </div>
-
-    <div class="form-group">
-      <label for="email">Email</label>
-      <input type="text" name="email" class="form-control" [(ngModel)]="args.email" required>
-    </div>
-
-    <div class="form-group">
-      <label for="city">City</label>
-      <input type="text" name="city" class="form-control" [(ngModel)]="args.city" required>
-    </div>
-
-    <div class="form-group">
-      <label for="passcode">Passcode</label>
-      <input type="password" name="passcode" class="form-control" [(ngModel)]="args.passcode" required maxlength="4" size="4">
-    </div>
-
-    <div class="form-group">
-      <label for="confirm">Retype passcode</label>
-      <input type="password" name="confirm" class="form-control" [(ngModel)]="confirmationPasscode" required maxlength="4" size="4">
-    </div>
-
-    <div class="form-control-desc">Choose a 4-digit passcode as your password.</div>
-
-    <div class="button-group">
-      <button type="submit">Sign Up</button>
-      <div class="button nav-away-button" (click)="toLogin()">Log In</div>
-    </div>
-
-  </form>
-
-  <div class="process-message">{{processMessage}}</div>
-</div>
+    <div class="process-message">{{processMessage}}</div>
+  </div>

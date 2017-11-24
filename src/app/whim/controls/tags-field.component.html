@@ -1,6 +1,8 @@
 <div class="field tags-field" *ngIf="shouldShow">
   <div class="data">
-    <label class ="label"[attr.for]="label">{{label}}</label>
+    <i *ngIf="iconLabel" [ngClass]="'icon-label fa fa-' + iconLabel + ' ' + labelClass" aria-hidden="true"></i>
+    <label *ngIf="!iconLabel" [ngClass]="'label ' + labelClass" [attr.for]="label">{{label}}</label>
+
     <div *ngIf="!editMode">
       <div class="value" *ngIf="value && value.length">
         <div class="tags">
@@ -9,7 +11,13 @@
       </div>
       <div class="value empty" *ngIf="!value || !value.length">{{emptyProperty}}</div>
     </div>
-    <input *ngIf="editMode" class="value editable form-control" type="text" [name]="field" [(ngModel)]="tags" />
+
+    <input *ngIf="editMode"
+    class="value editable form-control"
+    type="text"
+    [name]="field"
+    [placeholder]="placeholder"
+    [(ngModel)]="tags" />
   </div>
   <div class="actions" *ngIf="showControls">
     <div class="action" *ngIf="editMode" (click)="finishEdit()">show</div>

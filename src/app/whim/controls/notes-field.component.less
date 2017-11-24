@@ -10,6 +10,7 @@
 
     .new-note {
       margin-bottom: 25px;
+      width: 310px; // compensates for padding string fields?
 
       textarea.form-control {
         margin-left: 0;
@@ -22,11 +23,13 @@
     padding: 2px;
     position: relative;
     overflow: hidden;
+    background-color: #f5f5f5;
+    border-radius: 2px;
   }
 
   textarea {
     border: none;
-    padding: 2px 5px;
+    padding: 2px;
     outline: none;
     cursor: text;
     min-height: 80px;

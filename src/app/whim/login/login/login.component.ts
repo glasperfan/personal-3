@@ -1,4 +1,5 @@
-import { IError, ILoginResponse, WindowView, WindowViewWithArgs } from '../../models';
+import { AuthComponent } from '../auth.component';
+import { IError, ILoginArguments, ILoginResponse, WindowView, WindowViewWithArgs } from '../../models';
 import { AccountService } from '../../services/account.service';
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 
@@ -7,24 +8,17 @@ import { Component, Input, Output, EventEmitter } from '@angular/core';
   templateUrl: './login.component.html',
   styleUrls: ['./../login.less']
 })
-export class LoginComponent {
-  @Input() public args;
-  @Output() public switchTo = new EventEmitter<WindowViewWithArgs>();
-  public emailInput: string;
-  public passcodeInput: string;
-  private processMessage: string;
+export class LoginComponent extends AuthComponent<void> {
+  private emailInput: string;
+  private passcodeInput: string;
 
-
-  constructor(private accountService: AccountService) {
-  }
+  constructor(private accountService: AccountService) { super(); }
 
   private login(): void {
     this.processMessage = 'logging in...';
     const emailInput = this.emailInput;
-    this.accountService.login(this.emailInput, this.passcodeInput)
+    this.accountService.login(emailInput, this.passcodeInput)
       .then((response: ILoginResponse) => {
-        this.accountService.storeEmailCookie(emailInput);
-        this.accountService.storeAuthCookie(response._id);
         this.switchTo.emit(new WindowViewWithArgs(WindowView.Dashboard));
         this.processMessage = undefined;
       })

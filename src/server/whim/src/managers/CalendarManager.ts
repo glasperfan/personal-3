@@ -23,7 +23,7 @@ export class CalendarManager {
     const operation = this.getUserEventCollection(userId)
       .then(collection => collection.find({
         userId: userId,
-        'date.endDate': { $gt: Constants.StartOfToday().valueOf() }
+        'date.endDate': { $gte: Constants.StartOfToday().valueOf() }
       }).toArray());
     return operation.then(events => {
       if (!events || !events.length) {

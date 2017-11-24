@@ -1,31 +1,35 @@
-<div class="whim-header">
+<div class="whim-frame">
   <div class="whim-title">{{args.title}}</div>
+
+  <div class="whim-form">
+    <p3-whim-string-field
+    [iconLabel]="'file-text'"
+    [(data)]="_title"
+    [showOn]="editMode"
+    [editMode]="editMode">
+    </p3-whim-string-field>
+
+    <p3-whim-date-recurring-field
+    [iconLabel]="'refresh'"
+    [(data)]="_date"
+    [editMode]="editMode">
+    </p3-whim-date-recurring-field>
+
+    <p3-whim-multiline-field
+    [iconLabel]="'align-left'"
+    [placeholder]="'Add a description'"
+    [(data)]="_description"
+    [editMode]="editMode">
+    </p3-whim-multiline-field>
+
+    <div class="button-group">
+      <button type="submit" *ngIf="editMode" (click)="update()">Update</button>
+      <div class="button" *ngIf="editMode" (click)="cancel()">Cancel</div>
+      <div class="button" *ngIf="!editMode" (click)="toEditMode()">Edit</div>
+      <div class="button" *ngIf="!editMode" (click)="delete()">Delete</div>
+      <div class="button" *ngIf="!editMode" (click)="toDashboard()">Back to dashboard</div>
+    </div>
+
+    <div class="process-message">{{processMessage}}</div>
+  </div>
 </div>
-
-<p3-whim-string-field
-[label]="'title'"
-[(data)]="_title"
-[editMode]="editMode">
-</p3-whim-string-field>
-
-<p3-whim-date-recurring-field
-[label]="'date'"
-[(data)]="_date"
-[editMode]="editMode">
-</p3-whim-date-recurring-field>
-
-<p3-whim-multiline-field
-[label]="'description'"
-[(data)]="_description"
-[editMode]="editMode">
-</p3-whim-multiline-field>
-
-<div class="button-group">
-  <button type="submit" *ngIf="editMode" (click)="update()">Update</button>
-  <div class="button" *ngIf="editMode" (click)="cancel()">Cancel</div>
-  <div class="button" *ngIf="!editMode" (click)="toEditMode()">Edit</div>
-  <div class="button" *ngIf="!editMode" (click)="delete()">Delete</div>
-  <div class="button nav-away-button" *ngIf="!editMode" (click)="toDashboard()">Back to dashboard</div>
-</div>
-
-<div class="process-message">{{processMessage}}</div>

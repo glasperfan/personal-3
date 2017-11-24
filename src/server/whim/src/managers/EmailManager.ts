@@ -2,26 +2,29 @@ import { ICalendarManager } from './contracts/ICalendarManager';
 import { IUser, ICronSchedule, CRON_SCHEDULES } from '../models';
 import { UserManager } from './';
 import * as cron from 'cron';
-import * as nodemailer from 'nodemailer';
+const sgMail = require('@sendgrid/mail');
 import * as settings from './../app/settings';
 const Settings = settings.Settings;
 const CronJob = cron.CronJob;
 
 export class EmailManager {
 
-  private readonly SmtpTransport: nodemailer.Transporter;
+  private readonly SmtpTransport: boolean;
 
   constructor(private userMgr: UserManager, private calendarMgr: ICalendarManager) {
-    this.SmtpTransport = nodemailer.createTransport({
-      service: 'gmail',
-      auth: {
-        user: Settings.Email.usr,
-        pass: Settings.Email.pwd
-      }
-    }, {
-        from: `whim.io <${Settings.Email.usr}>`,
-        sender: 'whim.io'
-    });
+    // text generator
+    // html generator
+    // IGenerator (given the data to display, return the text or html display string)
+    // data => string
+    // sgMail.setApiKey('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');
+    // const msg = {
+    //   to: 'test@example.com',
+    //   from: 'test@example.com',
+    //   subject: 'Sending with SendGrid is Fun',
+    //   text: 'and easy to do anywhere, even with Node.js',
+    //   html: '<strong>and easy to do anywhere, even with Node.js</strong>',
+    // };
+    // sgMail.send(msg);
   };
 
   public initiateEmailCronJobs() {
@@ -72,27 +75,27 @@ export class EmailManager {
   }
 
   private sendWeeklyEmailTo(subscribers: IUser[]): void {
-    Promise.all(subscribers.map(subscriber =>
-      this.SmtpTransport.sendMail(
-        // options
-        {
-          to: `${subscriber.name.displayName} <${subscriber.email}>`,
-          subject: 'Hello ✔', // Subject line
-          text: 'Hello world ✔', // plaintext body
-          html: '<b>Hello world ✔</b>' // html body
-        },
-        // response handling
-        (error: Error, info: nodemailer.SentMessageInfo) => {
-          if (error) {
-            console.log(`Error sending emails: ${error}`);
-          }
-          console.log(`
-            Total accepted: ${info.accepted.length}
-            Total rejected: ${info.rejected.length}
-          `);
-        }
-      )
-    )).then(_ => console.log('Emails sent...'))
-      .catch(err => console.log('Uncaught error in email sending', err));
+    // Promise.all(subscribers.map(subscriber =>
+    //   this.SmtpTransport.sendMail(
+    //     // options
+    //     {
+    //       to: `${subscriber.name.displayName} <${subscriber.email}>`,
+    //       subject: 'Hello ✔', // Subject line
+    //       text: 'Hello world ✔', // plaintext body
+    //       html: '<b>Hello world ✔</b>' // html body
+    //     },
+    //     // response handling
+    //     (error: Error, info: nodemailer.SentMessageInfo) => {
+    //       if (error) {
+    //         console.log(`Error sending emails: ${error}`);
+    //       }
+    //       console.log(`
+    //         Total accepted: ${info.accepted.length}
+    //         Total rejected: ${info.rejected.length}
+    //       `);
+    //     }
+    //   )
+    // )).then(_ => console.log('Emails sent...'))
+    //   .catch(err => console.log('Uncaught error in email sending', err));
   }
 }

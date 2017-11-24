@@ -36,7 +36,7 @@ export class ShowFriendsComponent extends ShowComponent<IFriend> implements OnIn
   protected delete(): void {
     this.friendService.deleteFriends([this.args])
       .then(_ => {
-        this.toShowMode();
+        this.toDashboard();
       })
       .catch((e: IError) => {
         console.log(e);

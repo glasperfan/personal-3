@@ -60,6 +60,14 @@ export class AddFriendsComponent extends AddComponent<IAddFriendArguments> {
     set(this.args, 'email', email);
   }
 
+  private get _phone(): string {
+    return get(this.args, 'phone');
+  }
+
+  private set _phone(s: string) {
+    set(this.args, 'phone', s);
+  }
+
   private get _birthday(): number {
     return get(this.args, 'birthday');
   }

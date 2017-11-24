@@ -1,17 +1,22 @@
-<div class="header">goals for {{todayDateFormatted}}:</div>
-<div *ngIf="ideas | async as ideas$; else cannotLoad">
+<div class="header header-green">daily goals</div>
+<div class="content" *ngIf="ideas | async as ideas$; else cannotLoad">
 
-  <div class="display-ideas" *ngIf="ideas$.length >= requiredFriendCount">
-    <div class="ideas" *ngFor="let i of ideas$">
-      <div class="idea">{{i.idea.method.message}}</div>
+  <div class="display-ideas" *ngIf="ideas$.length >= requiredFriendCount; else insufficientFriends">
+    <div class="row-container" *ngFor="let i of ideas$">
+      <div class="row">
+        <div class="inner-row">
+            {{i.idea.method.message}}
+        </div>
+      </div>
     </div>
   </div>
 
-  <div class="no-ideas" *ngIf="insufficientFriendsReason">
-    You'll need to <span class="internal-link" (click)="addFriends()">add</span> some friends and family to get started.
-  </div>
 
 </div>
+
+<ng-template #insufficientFriends>
+  You'll need to <span class="internal-link" (click)="addFriends()">add</span> some friends and family to get started.
+</ng-template>
 
 <ng-template #cannotLoad>
   <div class="no-ideas">Something went wrong :/ contact Hugh</div>

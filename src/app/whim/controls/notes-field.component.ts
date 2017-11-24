@@ -9,7 +9,6 @@ import { IField, INote, Note } from 'app/whim/models';
 })
 export class NotesFieldComponent extends FieldComponent<INote[]> implements OnInit {
   private newNoteText: string;
-  private readonly placeholderText = 'Add a note...';
 
   ngOnInit() {
     this.label = this.label || 'Notes';
@@ -33,7 +32,11 @@ export class NotesFieldComponent extends FieldComponent<INote[]> implements OnIn
   }
 
   addNote(): void {
-    this.data = [new Note(this.newNoteText)].concat(this.value); // append to front and emit
+    if (this.data) {
+      this.data = [new Note(this.newNoteText)].concat(this.value); // append to front and emit
+    } else {
+      this.data = [new Note(this.newNoteText)];
+    }
     this.newNoteText = undefined;
   }
 

@@ -1,16 +1,13 @@
-<p3-whim-date-field [label]="'Date'" [editMode]="editMode" [(data)]="_startDate"></p3-whim-date-field>
+<p3-whim-date-field [iconLabel]="'calendar'" [editMode]="editMode" [(data)]="_startDate"></p3-whim-date-field>
 
-<div class="field checkbox-field">
+<div class="field checkbox-field" *ngIf="editMode || _recurrenceDescription !== oneTimeDescription">
   <div class="data">
-    <label class="label" [attr.for]="label">Recurs?</label>
+    <i *ngIf="iconLabel" [ngClass]="'icon-label fa fa-' + iconLabel + ' ' + labelClass" aria-hidden="true"></i>
+    <label *ngIf="!iconLabel" [ngClass]="'label ' + labelClass" [attr.for]="label">{{label}}</label>
 
     <div class="data-container">
       <div class="main-input">
-        <input *ngIf="editMode"
-        type="checkbox"
-        name="isRecurrent"
-        class="form-control"
-        [(ngModel)]="_isRecurrent"/>
+        <input *ngIf="editMode" type="checkbox" name="isRecurrent" class="form-control" [(ngModel)]="_isRecurrent" />
 
         <div *ngIf="!editMode">
           <div class="value" *ngIf="value">{{_recurrenceDescription}}</div>

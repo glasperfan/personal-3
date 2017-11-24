@@ -1,91 +1,102 @@
-<div class="whim-header">
+<div class="whim-frame">
   <div class="whim-title">{{title}}</div>
+
+  <div class="whim-form">
+    <p3-whim-string-field
+    [label]="'f'"
+    [(data)]="_first"
+    [placeholder]="'First name'"
+    [editMode]="editMode">
+    </p3-whim-string-field>
+
+    <p3-whim-string-field
+    [label]="'l'"
+    [(data)]="_last"
+    [placeholder]="'Last name'"
+    [editMode]="editMode">
+    </p3-whim-string-field>
+
+    <p3-whim-string-field
+    [iconLabel]="'envelope-o'"
+    [(data)]="_email"
+    [placeholder]="'Add an email'"
+    [editMode]="editMode">
+    </p3-whim-string-field>
+
+    <p3-whim-string-field
+    [iconLabel]="'phone'"
+    [(data)]="_phone"
+    [placeholder]="'Add a phone number'"
+    [editMode]="editMode">
+    </p3-whim-string-field>
+
+    <p3-whim-date-field
+    [iconLabel]="'birthday-cake'"
+    [(data)]="_birthday"
+    [editMode]="editMode">
+    </p3-whim-date-field>
+
+    <p3-whim-string-field
+    [iconLabel]="'map-marker'"
+    [placeholder]="'Address'"
+    [(data)]="_address1"
+    [editMode]="editMode">
+    </p3-whim-string-field>
+
+    <p3-whim-string-field
+    [label]="''"
+    [placeholder]="'Address 2'"
+    [(data)]="_address2"
+    [editMode]="editMode">
+    </p3-whim-string-field>
+
+    <p3-whim-string-field
+    [placeholder]="'City'"
+    [(data)]="_city"
+    [editMode]="editMode">
+    </p3-whim-string-field>
+
+    <p3-whim-string-field
+    [placeholder]="'State'"
+    [(data)]="_state"
+    [editMode]="editMode">
+    </p3-whim-string-field>
+
+    <p3-whim-string-field
+    [placeholder]="'Country'"
+    [(data)]="_country"
+    [editMode]="editMode">
+    </p3-whim-string-field>
+
+    <p3-whim-string-field
+    [iconLabel]="'sitemap'"
+    [placeholder]="'Organization'"
+    [(data)]="_organization"
+    [editMode]="editMode">
+    </p3-whim-string-field>
+
+    <p3-whim-tags-field
+    [iconLabel]="'tags'"
+    [placeholder]="'Add any tags'"
+    [(data)]="_tags"
+    [editMode]="editMode">
+    </p3-whim-tags-field>
+
+    <p3-whim-notes-field
+    [iconLabel]="'align-left'"
+    [placeholder]="'Add a description. How did you meet?'"
+    [(data)]="_notes"
+    [editMode]="editMode">
+    </p3-whim-notes-field>
+
+    <div class="button-group">
+      <button type="submit" *ngIf="editMode" (click)="update()">Update</button>
+      <div class="button" *ngIf="editMode" (click)="cancel()">Cancel</div>
+      <div class="button" *ngIf="!editMode" (click)="toEditMode()">Edit</div>
+      <div class="button" *ngIf="!editMode" (click)="delete()">Delete</div>
+      <div class="button" *ngIf="!editMode" (click)="toDashboard()">Back to dashboard</div>
+    </div>
+
+    <div class="process-message">{{processMessage}}</div>
+  </div>
 </div>
-
-<p3-whim-string-field
-[label]="'first'"
-[(data)]="_first"
-[editMode]="editMode">
-</p3-whim-string-field>
-
-<p3-whim-string-field
-[label]="'last'"
-[(data)]="_last"
-[editMode]="editMode">
-</p3-whim-string-field>
-
-<p3-whim-string-field
-[label]="'email'"
-[(data)]="_email"
-[editMode]="editMode">
-</p3-whim-string-field>
-
-<p3-whim-string-field
-[label]="'phone'"
-[(data)]="_phone"
-[editMode]="editMode">
-</p3-whim-string-field>
-
-<p3-whim-date-field
-[label]="'birthday'"
-[(data)]="_birthday"
-[editMode]="editMode">
-</p3-whim-date-field>
-
-<p3-whim-string-field
-[label]="'address'"
-[(data)]="_address1"
-[editMode]="editMode">
-</p3-whim-string-field>
-
-<p3-whim-string-field
-[label]="'address (line 2)'"
-[(data)]="_address2"
-[editMode]="editMode">
-</p3-whim-string-field>
-
-<p3-whim-string-field
-[label]="'city'"
-[(data)]="_city"
-[editMode]="editMode">
-</p3-whim-string-field>
-
-<p3-whim-string-field
-[label]="'state'"
-[(data)]="_state"
-[editMode]="editMode">
-</p3-whim-string-field>
-
-<p3-whim-string-field
-[label]="'country'"
-[(data)]="_country"
-[editMode]="editMode">
-</p3-whim-string-field>
-
-<p3-whim-string-field
-[label]="'organization'"
-[(data)]="_organization"
-[editMode]="editMode">
-</p3-whim-string-field>
-
-<p3-whim-tags-field
-[label]="'tags'"
-[(data)]="_tags"
-[editMode]="editMode">
-</p3-whim-tags-field>
-
-<p3-whim-notes-field
-[label]="'notes'"
-[(data)]="_notes"
-[editMode]="editMode">
-</p3-whim-notes-field>
-
-<div class="button-group">
-  <button type="submit" *ngIf="editMode" (click)="update()">Update</button>
-  <div class="button" *ngIf="editMode" (click)="cancel()">Cancel</div>
-  <div class="button" *ngIf="!editMode" (click)="toEditMode()">Edit</div>
-  <div class="button" *ngIf="!editMode" (click)="delete()">Delete</div>
-  <div class="button nav-away-button" *ngIf="!editMode" (click)="toDashboard()">Back to dashboard</div>
-</div>
-
-<div class="process-message">{{processMessage}}</div>

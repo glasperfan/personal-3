@@ -1,30 +1,32 @@
-<div class="whim-header">
-  <div class="whim-title">{{title}}</div>
-</div>
-<form (ngSubmit)="add()">
+<div class="whim-frame">
+    <div class="whim-title">{{args.title}}</div>
 
-  <p3-whim-string-field
-  [label]="'Title'"
-  [(data)]="_title"
-  [editMode]="true">
-  </p3-whim-string-field>
+    <div class="whim-form">
+      <p3-whim-string-field
+      [iconLabel]="'file-text'"
+      [(data)]="_title"
+      [showOn]="editMode"
+      [editMode]="editMode">
+      </p3-whim-string-field>
 
-  <p3-whim-date-recurring-field
-  [label]="'Date'"
-  [(data)]="_date"
-  [editMode]="true">
-  </p3-whim-date-recurring-field>
+      <p3-whim-date-recurring-field
+      [iconLabel]="'refresh'"
+      [(data)]="_date"
+      [editMode]="editMode">
+      </p3-whim-date-recurring-field>
 
-  <p3-whim-multiline-field
-  [label]="'Description'"
-  [(data)]="_description"
-  [editMode]="true">
-  </p3-whim-multiline-field>
+      <p3-whim-multiline-field
+      [iconLabel]="'align-left'"
+      [placeholder]="'Add a description'"
+      [(data)]="_description"
+      [editMode]="editMode">
+      </p3-whim-multiline-field>
 
-  <div class="button-group">
-      <button type="submit">Add {{_title}}</button>
-      <div class="button nav-away-button" (click)="toDashboard()">Back to dashboard</div>
+      <div class="button-group">
+        <div class="button" (click)="add()">Add</div>
+        <div class="button" (click)="toDashboard()">Cancel</div>
+      </div>
+
+      <div class="process-message">{{processMessage}}</div>
+    </div>
   </div>
-
-  <div class="process-message">{{processMessage}}</div>
-</form>

@@ -7,6 +7,7 @@ export abstract class AddComponent<T> implements OnInit {
   @Output() switchTo = new EventEmitter<WindowViewWithArgs>();
   protected title: string;
   protected processMessage: string;
+  protected editMode = true;
 
   ngOnInit() {
     this.args = this.args || <T>{};

@@ -1,16 +1,20 @@
-<div class="form-container">
-  <div class="form-title">Sign In</div>
-  <form (ngSubmit)="login()">
+<div class="whim-frame">
+  <div class="whim-title">Sign In</div>
+  <form class="whim-form" (ngSubmit)="login()">
 
-    <div class="form-group">
-      <label for="passcode">Passcode</label>
-      <input type="password" name="passcode" class="form-control" [(ngModel)]="passcodeInput" required maxlength="4" size="4">
-    </div>
+    <p3-whim-string-field
+    [iconLabel]="'lock'"
+    [placeholder]="'Passcode'"
+    [editMode]="editMode"
+    [isPasscode]="true"
+    [(data)]="passcodeInput">
+    </p3-whim-string-field>
 
     <div class="button-group">
-      <button type="submit">Log In</button>
-      <div class="button nav-away-button" (click)="toLogin()">Different email?</div>
+      <button type="submit" class="button">Log in</button>
+      <div class="button" (click)="toLogin()">Different email?</div>
     </div>
+
   </form>
 
   <div class="process-message">{{processMessage}}</div>

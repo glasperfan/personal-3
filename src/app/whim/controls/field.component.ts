@@ -5,7 +5,11 @@ import { get, set } from 'lodash';
 export class FieldComponent<T> {
   value: T;
   @Input() label: string;
+  @Input() iconLabel: string;
+  @Input() placeholder: string;
+  @Input() labelClass: string;
   @Input() editMode: boolean;
+  @Input() showOn = true;
   @Input() showControls = false;
   @Input() showIfEmpty = false;
 
@@ -27,7 +31,7 @@ export class FieldComponent<T> {
 
   // Override for non-primitive (for value existence check)
   get shouldShow(): boolean {
-    return this.showIfEmpty || this.editMode || !!this.value;
+    return this.showOn && (this.showIfEmpty || this.editMode || !!this.value);
   }
 
   edit(): void {

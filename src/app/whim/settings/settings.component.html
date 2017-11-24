@@ -1,30 +1,39 @@
-<div class="settings" *ngIf="args as settings">
+<div class="whim-frame">
+  <div class="whim-title">Settings</div>
 
-  <div class="setting" *ngIf="settings.email">
-    <div class="setting-header">Email</div>
-    <p3-whim-boolean-field
-    [editMode]="editMode"
-    [label]="'weekly email opt-in'"
-    [(data)]="_weeklyOptIn">
-    </p3-whim-boolean-field>
+  <div class="whim-form">
+    <div class="settings" *ngIf="args as settings">
 
-    <p3-whim-select-field
-    [editMode]="editMode && _weeklyOptIn"
-    [label]="'weekly email schedule'"
-    [options]="settingsService.emailSchedules"
-    [optionNames]="settingsService.emailScheduleTitles"
-    [defaultIdx]="0"
-    [(data)]="_weeklySchedule">
-    </p3-whim-select-field>
+      <div class="setting" *ngIf="settings.email">
+        <div class="setting-header">Email</div>
+        <p3-whim-boolean-field
+        [editMode]="editMode"
+        [label]="'weekly email opt-in'"
+        [labelClass]="'long-label'"
+        [(data)]="_weeklyOptIn">
+        </p3-whim-boolean-field>
+
+        <p3-whim-select-field
+        [editMode]="editMode && _weeklyOptIn"
+        [label]="'weekly email schedule'"
+        [options]="settingsService.emailSchedules"
+        [optionNames]="settingsService.emailScheduleTitles"
+        [defaultIdx]="0"
+        [labelClass]="'long-label'"
+        [(data)]="_weeklySchedule">
+        </p3-whim-select-field>
+      </div>
+
+    </div>
+
+    <div class="button-group centered">
+      <div class="button" *ngIf="editMode" (click)="update()">Update</div>
+      <div class="button" *ngIf="editMode" (click)="cancel()">Cancel</div>
+      <div class="button" *ngIf="!editMode" (click)="toEditMode()">Edit</div>
+      <div class="button" *ngIf="!editMode" (click)="toDashboard()">Done</div>
+    </div>
+
+    <div class="process-message">{{processMessage}}</div>
   </div>
-
 </div>
 
-<div class="button-group centered">
-  <div class="button" *ngIf="editMode" (click)="update()">Update</div>
-  <div class="button" *ngIf="editMode" (click)="cancel()">Cancel</div>
-  <div class="button" *ngIf="!editMode" (click)="toEditMode()">Edit</div>
-  <div class="button" *ngIf="!editMode" (click)="toDashboard()">Done</div>
-</div>
-
-<div class="process-message">{{processMessage}}</div>
