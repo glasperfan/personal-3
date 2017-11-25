@@ -159,7 +159,7 @@ export class FriendManager implements IFriendManager {
       methods: [],
       organization: friendArg.organization,
       skills: [],
-      notes: friendArg.firstNote ? [new Note(friendArg.firstNote)] : [],
+      notes: friendArg.notes || [],
       userId: userId,
       wasRemoved: false,
       whenAdded: Date.now(),

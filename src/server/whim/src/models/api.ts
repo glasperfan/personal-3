@@ -1,5 +1,5 @@
 // tslint:disable:no-empty-interface
-import { IUser, WindowView, Guid, IUserSettings, IParsedDate } from './';
+import { IUser, WindowView, Guid, IUserSettings, IParsedDate, INote } from './';
 
 export enum WhimAPI {
   GetIdeasForDate = '/ideas',
@@ -77,7 +77,7 @@ export interface IAddFriendArguments {
   country?: string;
   organization?: string;
   tags?: string[];
-  firstNote?: string;
+  notes?: INote[];
 }
 
 export interface IAddFriendsArguments extends IByUser {

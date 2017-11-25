@@ -1,12 +1,15 @@
 <div class="input-container">
   <input #cmdInput class="cmd-input"
   placeholder="Type here..."
+  (keydown.enter)="selectResult()"
+  (keydown.ArrowDown)="onSelectionDown($event)"
+  (keydown.ArrowUp)="onSelectionUp($event)"
   [ngModel]="searchInput"
   (ngModelChange)="onInput($event)"/>
 </div>
 <div class="results-container" *ngIf="(cmdInput.value || '').length">
   <ul class="results" *ngIf="results.length">
-    <li class="result" *ngFor="let result of results" (click)="onSelect(result)">
+    <li class="result" *ngFor="let result of results; let i = index" [class.selected]="i === resultIndex" (click)="onSelect(result)">
       <div class="result-header" [innerHTML]="result.header"></div>
       <div class="result-description">
         <p *ngFor="let d of (result.description.split('%%'))" [innerHTML]="d | markdown"></p>

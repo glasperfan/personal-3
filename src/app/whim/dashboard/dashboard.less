@@ -1,7 +1,10 @@
 @section-padding: 16px;
+@selection-background: #f7f7f7; //#e9f5f9;
+@border-color: #ddd;
+@box-shadow-color: #ddd;
 
 .section {
-  box-shadow: 0 0.5px 4px 1px #ddd;
+  box-shadow: 0 0.5px 4px 1px @box-shadow-color;
   margin: 30px 0;
 }
 
@@ -39,11 +42,11 @@
     transition: all ease-out 0.2s;
 
     &:hover {
-      background-color: #e9f5f9;
+      background-color: @selection-background;
     }
 
     &.bordered {
-      border-bottom: 1px solid #ddd;
+      border-bottom: 1px solid @border-color;
     }
 
     .row {

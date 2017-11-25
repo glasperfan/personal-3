@@ -1,6 +1,6 @@
 import { AddComponent } from '../add.component';
 import { FriendService } from '../../services/friend.service';
-import { IAddFriendArguments, IError, IFriend, IName, WindowView, WindowViewWithArgs } from '../../models';
+import { IAddFriendArguments, IError, IFriend, IName, WindowView, WindowViewWithArgs, INote } from '../../models';
 import { Component, Input, EventEmitter, Output } from '@angular/core';
 import * as moment from 'moment';
 import { get, set } from 'lodash';
@@ -124,12 +124,12 @@ export class AddFriendsComponent extends AddComponent<IAddFriendArguments> {
     set(this.args, 'organization', organization);
   }
 
-  private get _firstNote(): string {
-    return get(this.args, 'firstNote');
+  private get _notes(): INote[] {
+    return get(this.args, 'notes');
   }
 
-  private set _firstNote(firstNote: string) {
-    set(this.args, 'firstNote', firstNote);
+  private set _notes(ns: INote[]) {
+    set(this.args, 'notes', ns);
   }
 
   private get _tags(): string[] {
