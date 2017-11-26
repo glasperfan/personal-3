@@ -87,7 +87,12 @@ select.form-control {
 
 .process-message {
   text-align: center;
-  margin: 45px 0;
+  margin: 45px 5% 20px;
+  font-size: 13px;
+  border: 1px solid @error-color;
+  border-top: 6px solid @error-color;
+  padding: 3px 10px;
+  font-style: italic;
 }
 
 .section {
@@ -132,6 +137,10 @@ select.form-control {
   cursor: pointer;
 }
 
+.stronger {
+  font-weight: 600;
+}
+
 span.emoji {
   width: 20px;
   text-align: center;
@@ -145,10 +154,6 @@ span.emoji {
 
   &.outside-content {
     font-size: @content-font-size;
-  }
-
-  &.warning-box {
-
   }
 
   &.error-box {

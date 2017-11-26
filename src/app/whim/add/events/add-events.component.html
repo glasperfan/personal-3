@@ -27,6 +27,6 @@
         <div class="button" (click)="toDashboard()">Cancel</div>
       </div>
 
-      <div class="process-message">{{processMessage}}</div>
+      <div class="process-message" *ngIf="processMessage">{{processMessage}}</div>
     </div>
   </div>

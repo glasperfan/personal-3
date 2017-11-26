@@ -97,6 +97,6 @@
       <div class="button" *ngIf="!editMode" (click)="toDashboard()">Back to dashboard</div>
     </div>
 
-    <div class="process-message">{{processMessage}}</div>
+    <div class="process-message" *ngIf="processMessage">{{processMessage}}</div>
   </div>
 </div>
