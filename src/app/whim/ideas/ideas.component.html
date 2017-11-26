@@ -1,4 +1,4 @@
-<div class="header header-green">daily goals</div>
+<div class="header header-1">daily goals</div>
 <div class="content" *ngIf="ideas | async as ideas$; else cannotLoad">
 
   <div class="display-ideas" *ngIf="ideas$.length >= requiredFriendCount; else insufficientFriends">
@@ -15,9 +15,19 @@
 </div>
 
 <ng-template #insufficientFriends>
-  You'll need to <span class="internal-link" (click)="addFriends()">add</span> some friends and family to get started.
+  <div class="info-box warning-box">
+    <div class="message">
+      <span class="emoji">😎</span>
+      <span class="message-text">We need to add some friends and family to get started.</span>
+    </div>
+    <div class="button-group left centered-margin">
+      <div class="button" (click)="addFriends()">Sure, how?</div>
+    </div>
+  </div>
 </ng-template>
 
 <ng-template #cannotLoad>
-  <div class="no-ideas">Something went wrong :/ contact Hugh</div>
+  <div class="info-box error-box">
+    <div class="message">Something went wrong :/ contact Hugh</div>
+  </div>
 </ng-template>

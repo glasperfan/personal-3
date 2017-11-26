@@ -40,6 +40,12 @@ export class NotesFieldComponent extends FieldComponent<INote[]> implements OnIn
     this.newNoteText = undefined;
   }
 
+  updateNote(note: INote, noteIdx: number, newText: string) {
+    this.value[noteIdx].text = newText;
+    this.value[noteIdx].dateModified = Date.now();
+    this.dataChange.emit(this.value);
+  }
+
   private get hasContent(): boolean {
     return !!this.newNoteText.trim().length;
   }

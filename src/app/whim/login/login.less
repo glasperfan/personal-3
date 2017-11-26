@@ -1,68 +1,22 @@
 @import (css) '../assets/fa-4.7.0/css/fa.min.css';
+@import '../controls/common';
 
 // Font Awesome
 .fa {
-  color: #BBB;
-}
+  color: @icon-color;
 
-.form-container {
-  text-align: center;
-  margin-top: 50px;
-}
-
-.form-title {
-  font-weight: bold;
-  line-height: 45px;
-}
-
-.form-group {
-  display: flex;
-  align-items: baseline;
-  justify-content: flex-start;
-  margin: 25px 0;
-
-  &.multi-line {
-    align-items: left;
-  }
-
-  label {
-    width: 220px;
-    text-align: right;
-  }
-
-  .form-subgroups {
-    width: 300px;
-    display: flex;
-    flex-direction: column;
-
-    .form-subgroup {
-      display: flex;
-      padding: 5px 0;
-      align-items: center;
-      justify-content: flex-start;
-
-      > input {
-        width: 50px;
-      }
-
-      > label {
-        font-size: 0.8em;
-        text-align: left;
-
-        &.before-input {
-          margin-left: 16px;
-          width: initial;
-        }
-      }
-    }
+  &.fa-x {
+    font-size: 1.3em;
   }
 }
+
+// Forms
 
 select, option {
   outline: none;
   font: 0.8em 'Open Sans', sans-serif;
-  background-color: #fff;
-  border: 1px solid #ddd;
+  background-color: @background-color;
+  border: 1px solid @shading-color;
 }
 
 .form-control {
@@ -71,7 +25,7 @@ select, option {
   border: none;
   font: 1em 'Open Sans', 'sans-serif';
   margin-left: 16px;
-  background-color: #f5f5f5;
+  background-color: @selection-background;
   border-radius: 2px;
   padding: 5px 5px;
 }
@@ -86,6 +40,10 @@ select.form-control {
   height: 30px;
 }
 
+
+
+// Buttons
+
 .button-group {
   margin-top: 45px;
   display: flex;
@@ -93,24 +51,37 @@ select.form-control {
   align-items: center;
   position: relative;
 
+  &.centered-margin {
+    margin-top: 15px;
+    margin-bottom: 15px;
+  }
+
   &.centered {
     justify-content: center;
   }
 
+  &.left {
+    justify-content: flex-start;
+
+    button, .button {
+      margin: 0 20px 0 0;
+    }
+  }
+
   button, .button {
-    background-color: white;
-    font: 0.85em 'Open Sans', 'sans-serif';
+    background-color: @background-color;
+    font: @content-font-size 'Open Sans', 'sans-serif';
     padding: 2px 8px;
     margin: 0 20px;
     text-transform: uppercase;
     cursor: pointer;
-    box-shadow: 0.5px 1.5px 2px 1px #DDD;
+    box-shadow: 0.5px 1.5px 2px 1px @shading-color;
     transition: all ease-out 0.2s;
   }
 
   button:hover, .button:hover {
-    background-color: #149ae8;
-    color: #fff;
+    background-color: @main-contrast-color;
+    color: @background-color;
   }
 }
 
@@ -118,4 +89,71 @@ select.form-control {
   text-align: center;
   margin: 45px 0;
 }
+
+.section {
+  box-shadow: 0 0.5px 4px 1px @shading-color;
+  margin: 30px 0;
+}
+
+.header {
+  padding: @section-padding;
+  text-transform: capitalize;
+  border-bottom: 1px solid @shading-color;
+  font-weight: 100;
+  background-color: @main-contrast-color;
+  color: white;
+
+  &.header-1 {
+    background-color: @header-color-1;
+  }
+
+  &.header-2 {
+    background-color: @header-color-2;
+  }
+
+  &.header-3 {
+    background-color: @header-color-3;
+  }
+
+  &.header-4 {
+    background-color: @header-color-4;
+  }
+}
+
+// Controls
+
+.text-overflow {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.clickable {
+  cursor: pointer;
+}
+
+span.emoji {
+  width: 20px;
+  text-align: center;
+  display: inline-block;
+}
+
+// Warning and error messages
+
+.info-box {
+  padding: 24px @section-padding;
+
+  &.outside-content {
+    font-size: @content-font-size;
+  }
+
+  &.warning-box {
+
+  }
+
+  &.error-box {
+    font-style: italic;
+  }
+}
+
 

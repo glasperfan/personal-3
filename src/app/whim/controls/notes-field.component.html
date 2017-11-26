@@ -20,7 +20,7 @@
       <div class="note" *ngFor="let note of data; let i = index">
         <div class="border">
           <div class="note-content">
-            <div class="header">
+            <div class="note-header">
               <div class="header-prop" *ngIf="note.dateCreated === note.dateModified">
                 {{note.dateCreated | datetimeRel}}
               </div>
@@ -29,12 +29,21 @@
               </div>
             </div>
             <div class="wrapper">
-              <div class="text" [innerHTML]="note.text | markdown"></div>
+              <textarea autosize
+              class="form-control"
+              *ngIf="editMode"
+              [ngModel]="note.text | markdown"
+              (ngModelChange)="updateNote(note, i, $event)">
+            </textarea>
+              <div class="text" *ngIf="!editMode" [innerHTML]="note.text | markdown"></div>
             </div>
-            <div class="actions">
-              <div class="action" *ngIf="!editMode">{{note.text.length}} characters</div>
-              <div class="action" (click)="deleteNote(i)" *ngIf="editMode">delete</div>
+
+            <div class="actions" *ngIf="editMode">
+              <div class="note-prop" (click)="deleteNote(i)">
+                <i class="fa fa-x fa-trash" aria-hidden="true"></i>
+              </div>
             </div>
+
           </div>
         </div>
       </div>

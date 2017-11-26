@@ -6,28 +6,28 @@
         [label]="'F'"
         [placeholder]="'First name'"
         [editMode]="editMode"
-        [(data)]="args.first">
+        [(data)]="_first">
         </p3-whim-string-field>
 
       <p3-whim-string-field
       [label]="'L'"
       [placeholder]="'Last name'"
       [editMode]="editMode"
-      [(data)]="args.last">
+      [(data)]="_last">
       </p3-whim-string-field>
 
       <p3-whim-string-field
       [iconLabel]="'envelope-o'"
       [placeholder]="'Email'"
       [editMode]="editMode"
-      [(data)]="args.email">
+      [(data)]="_email">
       </p3-whim-string-field>
 
       <p3-whim-string-field
       [iconLabel]="'map-marker'"
       [placeholder]="'City'"
       [editMode]="editMode"
-      [(data)]="args.city">
+      [(data)]="_city">
       </p3-whim-string-field>
 
       <p3-whim-string-field
@@ -35,12 +35,13 @@
       [placeholder]="'Passcode'"
       [editMode]="editMode"
       [isPasscode]="true"
-      [(data)]="args.passcode">
+      [(data)]="_passcode">
       </p3-whim-string-field>
 
       <p3-whim-string-field
-      [iconLabel]="args.passcode === confirmationPasscode ? 'check' : ''"
+      [iconLabel]="_passcodesMatch ? 'check' : ''"
       [placeholder]="'Re-type passcode'"
+      [editMode]="editMode"
       [isPasscode]="true"
       [(data)]="confirmationPasscode">
       </p3-whim-string-field>

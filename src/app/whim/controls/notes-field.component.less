@@ -1,4 +1,6 @@
 @import 'field';
+@field-width: 310px; // compensates for padding string fields?
+@field-margin-left: 16px;
 
 .field.notes-field {
   display: block;
@@ -6,30 +8,31 @@
 
   .notes {
     flex: 1;
-    margin-left: 16px;
+    margin-left: @field-margin-left;
 
     .new-note {
       margin-bottom: 25px;
-      width: 310px; // compensates for padding string fields?
+      width: @field-width;
 
-      textarea.form-control {
-        margin-left: 0;
+      .border {
+        background-color: @selection-background;
       }
     }
   }
 
   .border {
-    border: 1px solid #ccc;
+    border: 1px solid @shading-color;
+    background-color: @background-color;
     padding: 2px;
     position: relative;
     overflow: hidden;
-    background-color: #f5f5f5;
     border-radius: 2px;
   }
 
-  textarea {
+  textarea.form-control {
     border: none;
     padding: 2px;
+    margin-left: 0;
     outline: none;
     cursor: text;
     min-height: 80px;
@@ -40,26 +43,22 @@
 
   .description {
     font-size: 12px;
-    color: #aaa;
+    color: @light-text;
   }
 
   .note {
     margin-bottom: 20px;
-    padding: 1px 0 7px 0;
-    width: 100%;
-
-    .border {
-      border: none;
-    }
+    width: @field-width;
 
     .note-content {
-      .header {
-        margin-bottom: 3px;
-        padding: 0 3px;
-        font-size: 12px;
-        color: #aaa;
+      padding: 4px;
+
+      .note-header {
+        padding: 5px 0;
+        font-size: @content-font-size;
+        color: @light-text;
         display: flex;
-        border-bottom: 1px solid #ccc;
+        border-bottom: 1px solid @shading-color;
       }
 
       .wrapper {
@@ -68,14 +67,23 @@
 
         .text {
           word-break: break-word;
+          padding: 9px 0;
+        }
+
+        textarea.form-control { /* existing note */
+          background-color: @background-color;
         }
       }
 
       .actions {
-        font-size: 12px;
-        color: #aaa;
+        font-size: @content-font-size;
+        color: @light-text;
         display: flex;
         justify-content: flex-end;
+
+        .note-prop {
+          .clickable;
+        }
       }
     }
   }
