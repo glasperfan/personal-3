@@ -1,6 +1,6 @@
-<div id="dialog" *ngIf="httpService.connRefused$ | async">
-  <div class="header">Uh oh...</div>
-  <div class="subtitle">We can't seem to connect to the server.</div>
+<div class="dialog error-dialog" *ngIf="httpService.connRefused$ | async">
+  <div class="dialog-title">Uh oh...</div>
+  <div class="dialog-msg">We can't seem to connect to the server.</div>
 </div>
 <div class="frame" *ngIf="windowManager.currentWindow$ | async as currentWindow">
   <div class="description">

@@ -93,6 +93,7 @@ export class HttpService {
     if (response && response.error) {
       throw new WhimError(response.error.errorMessage, response.error.httpCode);
     }
+    this._connRefused$.next(false);
   }
 
   private proccessHttpError(err: HttpErrorResponse | WhimError): any {

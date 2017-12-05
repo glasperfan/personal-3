@@ -40,6 +40,10 @@ select.form-control {
   height: 30px;
 }
 
+.form-control-desc {
+  font-size: 85%;
+  margin-left: 85px;
+}
 
 
 // Buttons
@@ -161,4 +165,30 @@ span.emoji {
   }
 }
 
+.dialog {
+  padding: 25px 15px;
+  margin: 6px;
+  max-width: 300px;
+  box-shadow: 0.3px 0 4px 1px @shading-color;
+  z-index: 9999;
+  position: fixed;
+  background-color: @background-color;
+  top: 0;
+  right: 0;
 
+  .error-dialog {
+    .dialog-title {
+      background-color: @error-color;
+    }
+  }
+
+  .dialog-title {
+    background-color: @main-contrast-color;
+    color: @background-color;
+    padding: 8px;
+  }
+
+  .dialog-msg {
+    font-size: @content-font-size;
+  }
+}
