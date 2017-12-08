@@ -144,8 +144,7 @@ export class FriendManager implements IFriendManager {
             amount: 1,
             interval: 'year'
           },
-          inputText: undefined,
-          isAlternating: false
+          inputText: undefined
         }, {
             pattern: undefined,
             inputText: undefined,

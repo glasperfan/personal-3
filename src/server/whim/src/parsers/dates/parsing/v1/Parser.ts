@@ -235,11 +235,10 @@ class FragmentParser {
       if (this._isAlternating) {
         withoutPrefix = withoutPrefix.replace('other ', '');
       }
-      const pattern = this.extractRecurrenceUnit(withoutPrefix);
+      const pattern = this.extractRecurrenceUnit(withoutPrefix, this._isAlternating);
       if (pattern) { // every 2 days
         return {
           pattern: pattern,
-          isAlternating: this._isAlternating,
           inputText: this.normalizeForDisplay(text)
         };
       }
@@ -248,7 +247,6 @@ class FragmentParser {
         if (startingDate) {
           this._startDate = startingDate;
           const recurrence = this.inferRecurrenceFromDate(withoutPrefix);
-          recurrence.isAlternating = this._isAlternating;
           recurrence.inputText = this.normalizeForDisplay(text);
           return recurrence;
         }
@@ -305,7 +303,11 @@ class FragmentParser {
    * like 'every Wednesday'. We must infer that it should repeat weekly.
    */
   private inferRecurrenceFromDate(everyDate: string): IRecurEvery {
-    return Constants.Weekday.includes(everyDate) ? Constants.WeeklyRecurrence : Constants.YearlyRecurrence;
+    const r = Constants.Weekday.includes(everyDate) ?
+      Constants.WeeklyRecurrence :
+      Constants.YearlyRecurrence;
+    r.pattern.amount = (this._isAlternating ? 2 : 1) * r.pattern.amount;
+    return r;
   }
 
   private parseDate(s: string): moment.Moment {
@@ -369,7 +371,7 @@ class FragmentParser {
     return undefined;
   }
 
-  private extractRecurrenceUnit(s: string): IRecurrenceUnit {
+  private extractRecurrenceUnit(s: string, isAlternating: boolean = false): IRecurrenceUnit {
     const components = s.split(' ').filter(x => !!x.length);
     let amount: number;
     let interval: RecurrenceInterval;
@@ -391,7 +393,7 @@ class FragmentParser {
       return undefined;
     }
     return {
-      amount: amount || 1,
+      amount: (amount || 1) * (isAlternating ? 2 : 1),
       interval: interval
     };
   }

@@ -18,7 +18,6 @@ export interface IRecurrence {
 
 export interface IRecurEvery {
   pattern: IRecurrenceUnit;
-  isAlternating: boolean;
   inputText: string;
 }
 

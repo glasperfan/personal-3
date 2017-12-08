@@ -62,8 +62,12 @@ export class RecurringDateFieldComponent extends FieldComponent<IParsedDate> imp
   }
 
   private set _recurEveryAmount(n: number) {
+    if (typeof n === 'string') {
+      n = parseInt(n, 10);
+    }
     n = n < 1 ? 1 : n; // minimum: 1
     this.set('recurrence.recurEvery.pattern.amount', n);
+    this.updateEndDate();
   }
 
   private get _recurEveryInterval(): moment.unitOfTime.Base {
@@ -74,14 +78,6 @@ export class RecurringDateFieldComponent extends FieldComponent<IParsedDate> imp
     this.set('recurrence.recurEvery.pattern.interval', s);
   }
 
-  private get _isAlternating(): boolean {
-    return get(this.value, 'recurrence.recurEvery.isAlternating', false);
-  }
-
-  private set _isAlternating(b: boolean) {
-    this.set('recurrence.recurEvery.isAlternating', b);
-  }
-
   private get _recurForAmount(): number {
     return get(this.value, 'recurrence.recurFor.pattern.amount', 1);
   }
@@ -89,7 +85,7 @@ export class RecurringDateFieldComponent extends FieldComponent<IParsedDate> imp
   private set _recurForAmount(n: number) {
     n = n < 1 ? 1 : n; // minimum: 1
     this.set('recurrence.recurFor.pattern.amount', n);
-    this.updateEndDate();
+    this.updateRecurrenceDescription();
   }
 
   private get _recurForInterval(): moment.unitOfTime.Base {

@@ -2,7 +2,7 @@ import { IUser } from '../models';
 import { IAddEventArguments } from '../models/api';
 import { IFriendManager } from './contracts/IFriendManager';
 import { ICalendarManager } from './contracts/ICalendarManager';
-import { UserManager } from 'src/managers';
+import { UserManager } from './';
 
 export class UpdateManager {
 

@@ -22,4 +22,8 @@ export class FakeCalendarManager implements ICalendarManager {
   public updateEvents(args: IEvent[]): Promise<void> {
       throw new Error('Not implemented yet.');
   }
+
+  public getBirthday(userId: string, friendId: string): Promise<IEvent> {
+    throw new Error('Not implemented yet.');
+  }
 }

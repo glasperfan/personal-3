@@ -20,14 +20,10 @@
           <label class="label sub-label" [attr.for]="recur-every">How often?</label>
           <div class="sub-field-options">
             <div class="sub-field-option">
-              <input #everyAmount type="number" name="amount" min="1" class="form-control" [(ngModel)]="_recurEveryAmount" />
+              <input #everyAmount type="number" name="amount" min="1" class="form-control" autocomplete="off" [(ngModel)]="_recurEveryAmount" (blur)="_recurEveryAmount = everyAmount.value"/>
               <select name="recur-every-interval" [(ngModel)]="_recurEveryInterval">
                 <option *ngFor="let i of _recurrenceIntervals" [value]="i.value">{{i.displayName}}</option>
               </select>
-            </div>
-            <div class="sub-field-option">
-              <input type="checkbox" name="alternating" class="form-control" [(ngModel)]="_isAlternating" />
-              <label class="label sub-label" [attr.for]="alternating">Alternating?</label>
             </div>
           </div>
         </div>

@@ -192,8 +192,7 @@ export class DateParsingConstants {
         amount: 1,
         interval: 'year'
       },
-      inputText: undefined,
-      isAlternating: false
+      inputText: undefined
     };
   }
 
@@ -203,8 +202,7 @@ export class DateParsingConstants {
         amount: 1,
         interval: 'week'
       },
-      inputText: undefined,
-      isAlternating: false
+      inputText: undefined
     };
   }
 
@@ -214,15 +212,13 @@ export class DateParsingConstants {
         amount: 1,
         interval: 'day'
       },
-      inputText: undefined,
-      isAlternating: false
+      inputText: undefined
     };
   }
 
   public static get NoRecurrence(): IRecurEvery {
     return {
       pattern: undefined,
-      isAlternating: false,
       inputText: undefined
     };
   }

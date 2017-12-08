@@ -116,7 +116,7 @@ describe('Date parsers', () => {
         result,
         Constants.StartOfToday(),
         undefined,
-        { inputText: 'everyday', pattern: { amount: 1, interval: 'day'}, isAlternating: false },
+        { inputText: 'everyday', pattern: { amount: 1, interval: 'day'} },
         Constants.DefaultDuration
       );
     });
@@ -127,7 +127,7 @@ describe('Date parsers', () => {
         result,
         Constants.StartOfToday(),
         undefined,
-        { inputText: 'Every day', pattern: { amount: 1, interval: 'day'}, isAlternating: false },
+        { inputText: 'Every day', pattern: { amount: 1, interval: 'day'} },
         Constants.DefaultDuration
       );
     });
@@ -138,7 +138,7 @@ describe('Date parsers', () => {
         result,
         Constants.NearestWeekday('wednesday'),
         undefined,
-        { inputText: 'every Wednesday', pattern: { amount: 1, interval: 'week'}, isAlternating: false },
+        { inputText: 'every Wednesday', pattern: { amount: 1, interval: 'week'} },
         Constants.DefaultDuration
       );
     });
@@ -149,7 +149,7 @@ describe('Date parsers', () => {
         result,
         Constants.NearestWeekday('thursday'),
         undefined,
-        { inputText: 'every other Thursday', pattern: { amount: 1, interval: 'week' }, isAlternating: true },
+        { inputText: 'every other Thursday', pattern: { amount: 2, interval: 'week' } },
         Constants.DefaultDuration
       );
     });
@@ -169,7 +169,7 @@ describe('Date parsers', () => {
         result,
         Constants.NearestWeekday('Tuesday'),
         'starting Tuesday',
-        { inputText: 'every week', pattern: { amount: 1, interval: 'week' }, isAlternating: false },
+        { inputText: 'every week', pattern: { amount: 1, interval: 'week' } },
         Constants.DefaultDuration
       );
     });
@@ -180,7 +180,7 @@ describe('Date parsers', () => {
         result,
         Constants.NearestWeekday('Wednesday'),
         'starting Wednesday',
-        { inputText: 'every other week', pattern: { amount: 1, interval: 'week' }, isAlternating: true },
+        { inputText: 'every other week', pattern: { amount: 2, interval: 'week' } },
         { inputText: 'for 2 weeks', pattern: { amount: 2, interval: 'week' }, isForever: false },
         Constants.DaysUntil(Constants.NearestWeekday('Wednesday').add(2, 'weeks'))
       );
@@ -192,7 +192,7 @@ describe('Date parsers', () => {
         result,
         Constants.NearestWeekday('Thursday'),
         'starting Thursday',
-        { inputText: 'every day', pattern: { amount: 1, interval: 'day' }, isAlternating: false },
+        { inputText: 'every day', pattern: { amount: 1, interval: 'day' } },
         { inputText: 'for 2 months', pattern: { amount: 2, interval: 'month' }, isForever: false },
         Constants.DaysUntil(Constants.NearestWeekday('Thursday').add(2, 'months'))
       );
@@ -204,7 +204,7 @@ describe('Date parsers', () => {
         result,
         Constants.NearestWeekday('Friday'),
         undefined,
-        { inputText: 'every Friday', pattern: { amount: 1, interval: 'week' }, isAlternating: false },
+        { inputText: 'every Friday', pattern: { amount: 1, interval: 'week' } },
         { inputText: 'for 2 days', pattern: { amount: 2, interval: 'day' }, isForever: false },
         Constants.DaysUntil(Constants.NearestWeekday('Friday')) + 2
       );
@@ -228,7 +228,7 @@ describe('Date parsers', () => {
         result,
         Constants.NearestWeekday('Sunday'),
         'starting Sunday',
-        { inputText: 'every other day', pattern: { amount: 1, interval: 'day' }, isAlternating: true },
+        { inputText: 'every other day', pattern: { amount: 2, interval: 'day' } },
         { inputText: 'until next year', pattern: { amount: Constants.DaysUntil(Constants.StartOfYear().add(1, 'year')), interval: 'day' }, isForever: false },
         Constants.DaysUntil(Constants.StartOfYear().add(1, 'year'))
       );
@@ -240,7 +240,7 @@ describe('Date parsers', () => {
         result,
         Constants.StartOfToday(),
         'starting today',
-        { inputText: 'Every 2 days', pattern: { amount: 2, interval: 'day' }, isAlternating: false },
+        { inputText: 'Every 2 days', pattern: { amount: 2, interval: 'day' } },
         { inputText: 'for 5 months', pattern: { amount: 5, interval: 'month' }, isForever: false },
         Constants.DaysUntil(Constants.StartOfToday().add(5, 'months'))
       );
@@ -252,7 +252,7 @@ describe('Date parsers', () => {
         result,
         Constants.StartOfToday(),
         undefined,
-        { inputText: 'every day', pattern: { amount: 1, interval: 'day' }, isAlternating: false },
+        { inputText: 'every day', pattern: { amount: 1, interval: 'day' } },
         { inputText: 'until tomorrow', pattern: { amount: 2, interval: 'day' }, isForever: false },
         2
       );
@@ -298,7 +298,6 @@ class Utils {
 
     expect(result.recurrence.recurEvery.inputText).to.equal(recurEvery.inputText);
     expect(result.recurrence.recurFor.inputText).to.equal(recurFor.inputText);
-    expect(result.recurrence.recurEvery.isAlternating).to.equal(recurEvery.isAlternating);
     expect(result.recurrence.recurFor.isForever).to.equal(recurFor.isForever);
     expect(result.recurrence.recurEvery.pattern).to.deep.equal(recurEvery.pattern);
     expect(result.recurrence.recurFor.pattern).to.deep.equal(recurFor.pattern);

@@ -1,8 +1,6 @@
 import { IEventMetadata } from '../../models';
 import { DateParsingConstants } from './parsing/DateParsingConstants';
-import { IRecurEvery, IRecurFor, IRecurrence } from '../../models/date';
-import { OneTimeDate } from './';
-import { IParsedDate } from 'src/models';
+import { IRecurEvery, IRecurFor, IRecurrence, IParsedDate } from '../../models/date';
 import * as moment from 'moment';
 
 export class RecurrentDate implements IParsedDate {

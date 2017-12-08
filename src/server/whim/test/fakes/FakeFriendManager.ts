@@ -29,4 +29,8 @@ export class FakeFriendManager implements IFriendManager {
   public deleteFriends(args: IDeleteFriendsArguments): Promise<void> {
       throw new Error('Not implemented yet.');
   }
+
+  public createBirthdays(userId: string, newFriends: IFriend[]): Promise<void> {
+    throw new Error('Not implemented yet.');
+  }
 }

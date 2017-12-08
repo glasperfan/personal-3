@@ -48,10 +48,9 @@ export class CalendarComponent implements OnInit {
     }
     const startOfToday = moment().startOf('day');
     const current = moment(d.startDate, 'x', true);
-    const alternatingFactor = d.recurrence.recurEvery.isAlternating ? 2 : 1;
     while (current < startOfToday) {
       current.add(
-        d.recurrence.recurEvery.pattern.amount * alternatingFactor,
+        d.recurrence.recurEvery.pattern.amount,
         d.recurrence.recurEvery.pattern.interval
       );
     }
