@@ -98,6 +98,10 @@ export class UserManager {
     });
   }
 
+  public getAllUsers(): Promise<IUser[]> {
+    return this.getUsersCollection().find().toArray();
+  }
+
   public getCollectionToken(): string {
     return this.collectionToken;
   }

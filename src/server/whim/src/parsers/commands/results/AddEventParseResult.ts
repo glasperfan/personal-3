@@ -3,7 +3,7 @@ import { IAddEventArguments } from '../../../models/api';
 import { DateParser } from '../../dates';
 import { splice } from '../splice';
 import { ParseResultWithValidator } from './ParseResult';
-import { IParsedDate, WindowView } from '../../../models';
+import { EventCategory, IParsedDate, WindowView } from '../../../models';
 import { Validator } from '../../validator';
 import * as moment from 'moment';
 import { keyBy } from 'lodash';
@@ -73,6 +73,7 @@ export class AddEventParseResult extends ParseResultWithValidator {
       title: this._title,
       description: undefined,
       date: this._date,
+      type: EventCategory.Standard,
       tags: this._tags
     };
   };

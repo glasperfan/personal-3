@@ -1,16 +1,20 @@
-import { IDeleteFriendsArguments } from '../models/api';
+import { RecurrentDate } from '../parsers/dates';
+import { ICalendarManager } from './contracts/ICalendarManager';
+import { IAddEventArguments, IAddEventsArguments, IDeleteFriendsArguments } from '../models/api';
 import { IFriendManager } from './contracts/IFriendManager';
 import { IDateParser } from '../parsers/dates/contracts/IDateParser';
 import { DateParser, Validator } from '../parsers';
 import {
-  IAddFriendArguments,
-  IAddFriendsArguments,
-  IGetFriendArguments,
-  IFriend,
-  IParsedDate,
-  IUser,
-  Note,
-  WhimError,
+    EventCategory,
+    Guid,
+    IAddFriendArguments,
+    IAddFriendsArguments,
+    IFriend,
+    IGetFriendArguments,
+    IParsedDate,
+    IUser,
+    Note,
+    WhimError,
 } from '../models';
 import { DatabaseManager } from '../managers';
 import * as MongoDB from 'mongodb';
@@ -36,8 +40,10 @@ export class FriendManager implements IFriendManager {
   public static readonly TagIndex = 'tags';
 
   private readonly collectionTokenPrefix = 'friends';
-  constructor(private dbMgr: DatabaseManager, private dateParser: IDateParser) { };
-
+  constructor(
+    private dbMgr: DatabaseManager,
+    private calendarManager: ICalendarManager,
+    private dateParser: IDateParser) { };
 
   getAllFriends(userId: string): Promise<IFriend[]> {
     return this.getUserFriendCollection(userId).then(collection =>
@@ -64,7 +70,9 @@ export class FriendManager implements IFriendManager {
 
     return operation.then(write => {
       if (!!write.result.ok) {
-        return newFriends;
+        return this.createBirthdays(args.userId, newFriends)
+          .then(_ => newFriends)
+          .catch(err => { throw new WhimError(`Failed to create birthday events for new friends. Error: ${err}`); });
       }
       throw new WhimError(`FriendManager: could not create new friends.`);
     });
@@ -77,6 +85,7 @@ export class FriendManager implements IFriendManager {
       return this.updateFriend(f);
     });
     for (const friend of updated) {
+      // Update friend
       ops.push(this.getUserFriendCollection(friend.userId).then(collection => {
         return collection.replaceOne({ _id: friend._id }, friend)
           .then(result => {
@@ -88,7 +97,7 @@ export class FriendManager implements IFriendManager {
           .catch(err => Promise.reject(err));
       }));
     }
-    return Promise.all(ops).then(_ => updated).catch(err => { throw new WhimError(err); });
+    return this.updateFriendsBirthdays(updated).then(_ => Promise.all(ops)).then(_ => updated).catch(err => { throw new WhimError(err); });
   }
 
   deleteFriends(args: IDeleteFriendsArguments): Promise<void> {
@@ -104,7 +113,7 @@ export class FriendManager implements IFriendManager {
           Deleted: ${deleted.deletedCount}`
         );
       }
-      return undefined;
+      return this.deleteFriendsBirthdays(args);
     }).catch(err => {
       throw new WhimError(
         `FriendManager: uncaught exception deleting friends.
@@ -123,6 +132,43 @@ export class FriendManager implements IFriendManager {
       console.log(e);
       return [];
     });
+  }
+
+  createBirthdays(userId: string, friends: IFriend[]): Promise<void> {
+    const events: IAddEventArguments[] = friends.filter(f => !!f.birthday).map(f => {
+      return <IAddEventArguments>{
+        title: `${f.name.displayName}'s birthday`,
+        description: undefined,
+        date: new RecurrentDate(f.birthday, undefined, {
+          pattern: {
+            amount: 1,
+            interval: 'year'
+          },
+          inputText: undefined,
+          isAlternating: false
+        }, {
+            pattern: undefined,
+            inputText: undefined,
+            isForever: true
+          }),
+        metadata: {
+            type: EventCategory.Birthday,
+            birthdayFriend: f._id
+          }
+      };
+    });
+    const args: IAddEventsArguments = {
+      userId: userId,
+      events: events
+    };
+    return Promise.all(friends.map(friend => this.calendarManager.getBirthday(userId, friend._id)))
+      .then(birthdays => birthdays.filter(b => !!b))
+      .then(birthdays => {
+        return this.calendarManager.createEvents({
+          userId: userId,
+          events: events.filter(e => !birthdays.map(b => b.metadata.birthdayFriend).includes(e.metadata.birthdayFriend))
+        });
+      }).then(_ => undefined); // error propagates
   }
 
   private getUserFriendCollection(userId: string): Promise<MongoDB.Collection<IFriend>> {
@@ -165,6 +211,31 @@ export class FriendManager implements IFriendManager {
       whenAdded: Date.now(),
       whenLastModified: Date.now()
     };
+  }
+
+  private updateFriendsBirthdays(friends: IFriend[]): Promise<void> {
+    return Promise.all(friends.filter(f => !!f.birthday).map((friend: IFriend) =>
+      this.calendarManager.getBirthday(friend.userId, friend._id)
+        .then(birthday => {
+          // End date is fine since birthdays never end :) in a sense
+          birthday.date.startDate = friend.birthday;
+          return this.calendarManager.updateEvents([birthday]);
+        })
+    )).then(_ => undefined);
+  }
+
+  private deleteFriendsBirthdays(args: IDeleteFriendsArguments): Promise<void> {
+    if (!args.friendIds.length) {
+      return Promise.resolve();
+    }
+    return Promise.all(args.friendIds.map((friendId: Guid) =>
+      this.calendarManager.getBirthday(args.userId, friendId)
+        .then(birthday => !!birthday ? birthday._id : undefined)))
+        .then(results => results.filter(b => !!b))
+        .then(birthdaysToDelete => this.calendarManager.deleteEvents({
+          userId: args.userId,
+          events: birthdaysToDelete
+        }));
   }
 
   private validateArguments(args: IAddFriendArguments): void {

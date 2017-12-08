@@ -7,4 +7,5 @@ export interface IFriendManager {
   updateFriends(args: IFriend[]): Promise<IFriend[]>;
   deleteFriends(args: IDeleteFriendsArguments): Promise<void>;
   searchByText(userId: string, searchComponents: string[]): Promise<IFriend[]>;
+  createBirthdays(userId: string, newFriends: IFriend[]): Promise<void>;
 }

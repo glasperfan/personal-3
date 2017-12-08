@@ -1,5 +1,5 @@
-import { Component } from '@angular/core';
-import { IError, IEvent, IParsedDate } from '../../models';
+import { Component, OnInit } from '@angular/core';
+import { EventCategory, IError, IEvent, IParsedDate } from '../../models';
 import { CalendarService } from '../../services/calendar.service';
 import { ShowComponent } from '../show.component';
 import { get, set } from 'lodash';
@@ -9,8 +9,15 @@ import { get, set } from 'lodash';
   templateUrl: './show-events.component.html',
   styleUrls: ['./show-events.component.less']
 })
-export class ShowEventsComponent extends ShowComponent<IEvent> {
+export class ShowEventsComponent extends ShowComponent<IEvent> implements OnInit {
   constructor(private calendarService: CalendarService) { super(); }
+
+  ngOnInit() {
+    // Check for birthday
+    if (this.args.metadata.type && this.args.metadata.type === EventCategory.Birthday) {
+      this.canEdit = false;
+    }
+  }
 
   protected update(): void {
     this.calendarService.updateEvents([this.args])
@@ -52,5 +59,13 @@ export class ShowEventsComponent extends ShowComponent<IEvent> {
 
   private set _description(s: string) {
     set(this.args, 'description', s);
+  }
+
+  private get _tags(): string[] {
+    return get(this.args, 'tags');
+  }
+
+  private set _tags(sarr: string[]) {
+    set(this.args, 'tags', sarr);
   }
 }

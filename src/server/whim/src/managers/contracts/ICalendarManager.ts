@@ -5,4 +5,5 @@ export interface ICalendarManager {
   updateEvents(args: IEvent[]): Promise<void>;
   deleteEvents(args: IDeleteEventsArguments): Promise<void>;
   searchByText(userId: string, searchComponents: string[]): Promise<IEvent[]>;
+  getBirthday(userId: string, friendId: string): Promise<IEvent>;
 }

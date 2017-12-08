@@ -26,6 +26,17 @@ export interface IEvent {
   tags: string[];
   whenAdded: number;
   whenLastModified: number;
+  metadata: IEventMetadata;
+}
+
+export interface IEventMetadata {
+  type?: EventCategory;
+  birthdayFriend?: Guid;
+}
+
+export enum EventCategory {
+  Standard,
+  Birthday
 }
 
 export interface IName {

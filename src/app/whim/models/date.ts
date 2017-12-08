@@ -8,7 +8,6 @@ export interface IParsedDate {
   endDate: number;
   startInputText: string;
   recurrence: IRecurrence;
-  reminder: number;
 }
 
 export interface IRecurrence {

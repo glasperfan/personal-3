@@ -1,3 +1,4 @@
+import { UpdateManager } from '../managers/UpdateManager';
 import { ICalendarManager } from '../managers/contracts/ICalendarManager';
 import { IFriendManager } from '../managers/contracts/IFriendManager';
 import { ICommandParser } from '../parsers/commands/contracts/ICommandParser';
@@ -120,6 +121,11 @@ class App implements IApp {
   public boot(): void {
     this.emailMgr.initiateEmailCronJobs();
     console.log(`Connected to MongoDB on port ${this.dbPort}.`);
+  }
+
+  public update(): Promise<void> {
+    const updateMgr = new UpdateManager(this.userMgr, this.calendarMgr, this.friendMgr);
+    return updateMgr.performAllUpdates();
   }
 
   private middleware(): void {
@@ -271,8 +277,8 @@ class App implements IApp {
     this.methodMgr = new MethodManager();
     this.historyMgr = new HistoryManager();
     this.userMgr = new UserManager(this.databaseMgr);
-    this.friendMgr = new FriendManager(this.databaseMgr, this.dateParser);
     this.calendarMgr = new CalendarManager(this.databaseMgr, this.dateParser);
+    this.friendMgr = new FriendManager(this.databaseMgr, this.calendarMgr, this.dateParser);
     this.ideaGenerator = new IdeaGenerator(this.friendMgr, this.methodMgr, this.historyMgr);
     this.commandParser = new CommandParser(this.friendMgr, this.calendarMgr);
     this.emailMgr = new EmailManager(this.userMgr, this.calendarMgr);
@@ -294,6 +300,7 @@ server.listen(port);
 
 whimApp.connectToMongo()
   .then(() => whimApp.boot())
+  .then(() => whimApp.update())
   .catch((err: IError) => {
     console.log(err.errorMessage);
     process.exit(1);

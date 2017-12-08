@@ -1,14 +1,15 @@
 import { IParsedDate, IRecurrence } from '../../models';
 export class OneTimeDate implements IParsedDate {
   public readonly endDate: number;
-  public readonly recurrence: IRecurrence = {
+  public recurrence: IRecurrence = {
     recurEvery: undefined,
     recurFor: undefined,
     isRecurrent: false
   };
 
   constructor(
-    public startDate: number,
-    public startInputText: string = undefined,
-    public reminder: number = undefined) {}
+    public readonly startDate: number,
+    public readonly startInputText: string = undefined) {
+    this.endDate = this.startDate;
+  }
 }

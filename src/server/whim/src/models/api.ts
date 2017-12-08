@@ -1,5 +1,5 @@
 // tslint:disable:no-empty-interface
-import { IUser, WindowView, Guid, IUserSettings, IParsedDate, INote } from './';
+import { EventCategory, Guid, INote, IParsedDate, IUser, IUserSettings, WindowView } from './';
 
 export enum WhimAPI {
   GetIdeasForDate = '/ideas',
@@ -104,7 +104,12 @@ export interface IAddEventArguments {
   title: string;
   description: string;
   date: IParsedDate;
+  type: EventCategory;
   tags: string[];
+  metadata?: {
+    type?: EventCategory;
+    birthdayFriend?: Guid;
+  };
 }
 
 export interface IAddEventsArguments extends IByUser {

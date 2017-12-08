@@ -1,6 +1,6 @@
 <div class="field multiline-field" *ngIf="shouldShow">
   <div class="data">
-    <i *ngIf="iconLabel" [ngClass]="'icon-label fa fa-' + iconLabel + ' ' + labelClass" aria-hidden="true"></i>
+    <i *ngIf="iconLabel" [ngClass]="'icon-label align-label fa fa-' + iconLabel + ' ' + labelClass" aria-hidden="true"></i>
     <label *ngIf="!iconLabel" [ngClass]="'label ' + labelClass" [attr.for]="label">{{label}}</label>
 
     <div *ngIf="!editMode">

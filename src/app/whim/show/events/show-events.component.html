@@ -22,11 +22,18 @@
     [editMode]="editMode">
     </p3-whim-multiline-field>
 
+    <p3-whim-tags-field
+    [iconLabel]="'tags'"
+    [placeholder]="'Add any tags'"
+    [(data)]="_tags"
+    [editMode]="editMode">
+    </p3-whim-tags-field>
+
     <div class="button-group">
       <button type="submit" *ngIf="editMode" (click)="update()">Update</button>
       <div class="button" *ngIf="editMode" (click)="cancel()">Cancel</div>
-      <div class="button" *ngIf="!editMode" (click)="toEditMode()">Edit</div>
-      <div class="button" *ngIf="!editMode" (click)="delete()">Delete</div>
+      <div class="button" *ngIf="!editMode && canEdit" (click)="toEditMode()">Edit</div>
+      <div class="button" *ngIf="!editMode && canEdit" (click)="delete()">Delete</div>
       <div class="button" *ngIf="!editMode" (click)="toDashboard()">Back to dashboard</div>
     </div>
 

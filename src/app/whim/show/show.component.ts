@@ -4,6 +4,7 @@ import { set } from 'lodash';
 
 export abstract class ShowComponent<T> {
   @Input() args: T;
+  @Input() canEdit = true;
   @Output() switchTo = new EventEmitter<WindowViewWithArgs>();
   protected title: string;
   protected editMode = false;

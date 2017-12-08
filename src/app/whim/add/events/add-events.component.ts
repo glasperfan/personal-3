@@ -75,5 +75,11 @@ export class AddCalendarEventsComponent extends AddComponent<IAddEventArguments>
     set(this.args, 'date', d);
   }
 
-  // TODO: tags
+  private get _tags(): string[] {
+    return get(this.args, 'tags', []);
+  }
+
+  private set _tags(tags: string[]) {
+    set(this.args, 'tags', tags);
+  }
 }

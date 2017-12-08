@@ -168,6 +168,20 @@ export class DateParsingConstants {
     return !isNaN(new Date(timestamp).getTime());
   }
 
+  public static CalculateEndDate(startDate: moment.Moment, isRecurrent, recurFor: IRecurFor): number {
+    if (!isRecurrent) {
+      return startDate.valueOf();
+    }
+    if (recurFor.isForever) {
+      return Number.MAX_SAFE_INTEGER;
+    }
+    // start date + duration
+    return startDate
+      .clone()
+      .add(recurFor.pattern.amount, recurFor.pattern.interval)
+      .valueOf();
+  }
+
   public static get DefaultStartDate(): moment.Moment {
     return this.StartOfToday();
   }

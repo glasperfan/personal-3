@@ -1,14 +1,14 @@
+import { ICalendarManager } from './contracts/ICalendarManager';
 import { IDeleteEventsArguments } from '../models/api';
 import { DateParsingConstants as Constants } from '../parsers/dates/parsing/DateParsingConstants';
-import { IParsedDate } from '../models/date';
 import { IDateParser } from '../parsers/dates/contracts/IDateParser';
 import { OneTimeDate, RecurrentDate } from '../parsers/dates';
-import { IAddEventArguments, IAddEventsArguments, IEvent, WhimError, WhimErrorCode } from '../models';
+import { EventCategory, IAddEventArguments, IAddEventsArguments, IEvent, WhimError, WhimErrorCode } from '../models';
 import { DatabaseManager } from '../managers';
 import * as MongoDB from 'mongodb';
 import { v4 } from 'uuid';
 
-export class CalendarManager {
+export class CalendarManager implements ICalendarManager {
 
   private static readonly QueryIndexes: { [field: string]: string | number } = {
     title: 'text',
@@ -29,11 +29,20 @@ export class CalendarManager {
       if (!events || !events.length) {
         throw new WhimError(WhimErrorCode.NoEvents);
       }
+      // Add type and tags if missing (later remove since duplicated in CreateEvent)
+      events = events.map(e => {
+        e.metadata = e.metadata || {};
+        e.tags = e.tags || [];
+        return e;
+      });
       return Promise.resolve(events);
     });
   }
 
   createEvents(args: IAddEventsArguments): Promise<IEvent[]> {
+    if (args.events && args.events.length === 0) {
+      return Promise.resolve([]);
+    }
     const newEvents: IEvent[] = args.events.map(e => this.createEvent(e, args.userId));
     const operation = this.getUserEventCollection(args.userId)
       .then(collection => collection.insertMany(newEvents));
@@ -104,6 +113,12 @@ export class CalendarManager {
     });
   }
 
+  getBirthday(userId: string, friendId: string): Promise<IEvent> {
+    return this.getUserEventCollection(userId).then(collection =>
+      collection.findOne({ 'metadata.birthdayFriend': friendId })
+    );
+  }
+
   private getUserEventCollection(userId: string): Promise<MongoDB.Collection<IEvent>> {
     return this.getEventCollection<IEvent>(userId);
   }
@@ -116,7 +131,9 @@ export class CalendarManager {
       date: args.date,
       description: args.description,
       whenAdded: Date.now(),
-      whenLastModified: Date.now()
+      whenLastModified: Date.now(),
+      tags: args.tags || [],
+      metadata: args.metadata || {}
     };
   }
 

@@ -195,8 +195,7 @@ class FragmentParser {
         recurEvery: this._recurEvery,
         recurFor: this._recurFor,
         isRecurrent: this._isRecurrent
-      },
-      reminder: undefined
+      }
     };
     return this._result;
   }
@@ -401,17 +400,7 @@ class FragmentParser {
     if (this._endDate) {
       return this._endDate.valueOf();
     }
-    if (!this._isRecurrent) {
-      return this._startDate.valueOf();
-    }
-    if (this._recurFor.isForever) {
-      return Number.MAX_SAFE_INTEGER;
-    }
-    // start date + duration
-    return this._startDate
-      .clone()
-      .add(this._recurFor.pattern.amount, this._recurFor.pattern.interval)
-      .valueOf();
+    return Constants.CalculateEndDate(this._startDate, this._isRecurrent, this._recurFor);
   }
 
   private normalizeFragment(fragment: string): string {
