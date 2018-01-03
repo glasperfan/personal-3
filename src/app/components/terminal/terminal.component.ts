@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChildren, AfterViewInit } from '@angular/core';
-import { TerminalService } from 'app/services/terminal.service';
-import { ILog } from 'app/interfaces/ILog';
-import { IResponse } from 'app/interfaces/IProgram';
+import { TerminalService } from '../../services/terminal.service';
+import { ILog } from '../../interfaces/ILog';
+import { IResponse } from '../../interfaces/IProgram';
 
 /**
  * Email commands:

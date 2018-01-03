@@ -6,8 +6,6 @@
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build && gulp",
-    "whim": "gulp && node src/server/whim/js/app.js",
-    "whim-debug": "gulp && node debug src/server/whim/js/app.js",
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e"

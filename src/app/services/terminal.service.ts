@@ -1,10 +1,10 @@
 import { Observable, BehaviorSubject } from 'rxjs/Rx';
 import { Injectable } from '@angular/core';
 import { Http } from '@angular/http';
-import { IProgram, IResponse } from 'app/interfaces/IProgram';
-import { ICommand } from 'app/interfaces/ICommand';
-import { ILog } from 'app/interfaces/ILog';
-import { EmailProgram } from "app/models/EmailProgram";
+import { IProgram, IResponse } from '../interfaces/IProgram';
+import { ICommand } from '../interfaces/ICommand';
+import { ILog } from '../interfaces/ILog';
+import { EmailProgram } from '../models/EmailProgram';
 
 @Injectable()
 export class TerminalService {
@@ -56,7 +56,7 @@ export class TerminalService {
         }
         this.prevResponse = response.isFinal ? undefined : response;
         return Promise.resolve(response);
-      })
+      });
   }
 
   private getProgram(input: string): IProgram {
@@ -80,7 +80,7 @@ export class TerminalService {
     } else if (response.message) {
       message = response.message(lastInput);
     }
-    let prompt: string = prevResponse ? prevResponse.prompt : response.prompt;
+    const prompt: string = prevResponse ? prevResponse.prompt : response.prompt;
     this.logs.push({
       text: this.promptPrefix + prompt + (response.requiresTextarea ? '[text]' : lastInput),
       message: message

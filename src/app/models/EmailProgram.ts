@@ -1,7 +1,7 @@
 import { Http, Response } from '@angular/http';
 import { Observable } from 'rxjs/Rx';
-import { IProgram, IResponse } from 'app/interfaces/IProgram';
-import { ICommand } from 'app/interfaces/ICommand';
+import { IProgram, IResponse } from '../interfaces/IProgram';
+import { ICommand } from '../interfaces/ICommand';
 
 export class EmailProgram implements IProgram {
   private senderName: string;

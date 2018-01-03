@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Locals } from 'app/services/Localization';
+import { Locals } from '../../services/Localization';
 
 @Component({
   selector: 'p3-footer',

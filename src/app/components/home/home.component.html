@@ -9,8 +9,8 @@
       <div class="header" [id]="home.elementId">{{home.header}}</div>
       <p *ngFor="let paragraph of home.content; let i = index" [class.top]="i === 0" [innerHTML]="paragraph"></p>
 
-      <img class="profile_pic" src="assets/profile_2.jpg" />
-      <div class="caption">Troms&#248;, Norway. 2016.</div>
+      <img class="profile_pic" src="assets/profile.jpg" />
+      <div class="caption">c. 2017</div>
 
       <div class="divider"></div>
 
@@ -19,7 +19,7 @@
 
       <div class="divider"></div>
 
-      <div class="header" [id]="work.header">{{work.header}}</div>
+      <div class="header" [id]="work.elementId">{{work.header}}</div>
       <p *ngFor="let paragraph of work.content; let i = index" [class.top]="i === 0" [innerHTML]="paragraph"></p>
       <div class="item" *ngFor="let role of roles">
         <div class="line">
@@ -31,15 +31,15 @@
           <div class="location right">{{role.location}}</div>
         </div>
       </div>
+      <div class="links">
+        <a href="https://github.com/glasperfan"><img src="assets/github.png" /></a>
+        <a href="https://www.strava.com/athletes/zabriskie"><img src="assets/strava.png" /></a>
+        <a href="https://soundcloud.com/hughza"><img src="assets/soundcloud.png" /></a>
+      </div>
 
       <div class="divider"></div>
 
-      <div class="header" [id]="content.header">{{content.header}}</div>
-      <p *ngFor="let paragraph of content.content; let i = index" [class.top]="i === 0" [innerHTML]="paragraph"></p>
-
-      <div class="divider"></div>
-
-      <div class="header" [id]="contact.header">{{contact.header}}</div>
+      <div class="header" [id]="contact.elementId">{{contact.header}}</div>
       <p *ngFor="let paragraph of contact.content; let i = index" [class.top]="i === 0" [innerHTML]="paragraph"></p>
       <p3-terminal></p3-terminal>
 

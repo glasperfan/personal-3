@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
-import { Locals } from 'app/services/Localization';
-import { ILink, IRole, ISection } from 'app/interfaces/Locals';
+import { Locals } from '../../services/Localization';
+import { ILink, IRole, ISection } from '../../interfaces/Locals';
 
 @Component({
   selector: 'p3-home',
@@ -16,7 +16,6 @@ export class HomeComponent {
   public home: ISection;
   public about: ISection;
   public work: ISection;
-  public content: ISection;
   public contact: ISection;
 
   constructor() {
@@ -26,7 +25,6 @@ export class HomeComponent {
     this.links = [
       Locals.Links.About,
       Locals.Links.Work,
-      Locals.Links.Content,
       Locals.Links.Contact
     ];
 
@@ -39,7 +37,6 @@ export class HomeComponent {
     this.home = Locals.Sections.Home;
     this.about = Locals.Sections.About;
     this.work = Locals.Sections.Work;
-    this.content = Locals.Sections.Content;
     this.contact = Locals.Sections.Contact;
   }
 }
