@@ -74,8 +74,8 @@ export const Locals: ILocals = {
       header: 'Home',
       elementId: 'home',
       content: [
-        `I'm a musician and software engineer, enthralled by everything in the union, and specifically the intersection, of these two fields. By day, I work as a software engineer in Seattle. I'm a full-stack developer at <a href="https://azure.microsoft.com/en-us/" target="_blank">Microsoft</a>, working on Azure's machine learning platform. By night, I transcribe tunes from Kind of Blue and train for triathlons.`,
-        `I graduated from Harvard with a joint concentration in Computer Science and Music.`,
+        `I'm a musician and software engineer, enthralled by everything in the union, and specifically the intersection, of these two fields. By day, I work as a software engineer in Seattle. I'm a full-stack developer at <a href="https://azure.microsoft.com/en-us/services/machine-learning-services/" target="_blank">Microsoft</a>, working on an enterprise machine learning and data science platform. By night, I transcribe tunes from Kind of Blue and train for triathlons.`,
+        `I graduated from Harvard in 2016 with a joint concentration in Computer Science and Music.`,
         `If you would like to get in touch with me, please use the robot-proof message system below.`
       ]
     },
@@ -83,10 +83,10 @@ export const Locals: ILocals = {
       header: 'About',
       elementId: 'about',
       content: [
-        `I'm now living in the Northwest, and I keep busy with a million little projects. Statistically, there's a good chance one of them is a million-dollar project. You can see the results from some of them <a href="#content">below</a>.`,
-        `I'm participating in as many duathlons, triathlons, and long-distance cycling events as I can possibly fit in. The BMC Time Machine SLR02 is a natural extension of my being. You can check <a href="http://strava.com/athletes/zabriskie" target="_blank">Strava</a> to see how I'm doing.`,
+        `I recently moved to the Northwest, and I keep busy with a million little projects. Statistically, there's a good chance one of them is a million-dollar project. You can see the results from some of them <a href="#work">below</a> and on <a href="https://github.com/glasperfan" target="_blank">GitHub</a>.`,
+        `I'm participating in as many duathlons, triathlons, and long-distance cycling events as I can possibly fit in. My BMC Time Machine SLR02 is a natural extension of my being. You can check <a href="http://strava.com/athletes/zabriskie" target="_blank">Strava</a> to see what I'm up to.`,
         `I also spent 4 years at Harvard playing piano with the <a href="https://www.hastypudding.org/" target="_blank">Hasty Pudding Theatricals</a>, and I arranged and orchestrated starting as a sophmore. I continue to work as an orchestrator as an alumnus.`,
-        `I'm always interested in freelance work, both as a web developer and as pianist for almost any rehearsal or occasion. Please reach out if you'd like to hire me!`
+        `I'm always interested in freelance work, both as a versatile developer and as a pianist for almost any setting or occasion.`
       ]
     },
     Work: {
