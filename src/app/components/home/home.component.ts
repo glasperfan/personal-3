@@ -16,6 +16,7 @@ export class HomeComponent {
   public home: ISection;
   public about: ISection;
   public work: ISection;
+  public content: ISection;
   public contact: ISection;
 
   constructor() {
@@ -25,6 +26,7 @@ export class HomeComponent {
     this.links = [
       Locals.Links.About,
       Locals.Links.Work,
+      Locals.Links.Content,
       Locals.Links.Contact
     ];
 
@@ -37,6 +39,7 @@ export class HomeComponent {
     this.home = Locals.Sections.Home;
     this.about = Locals.Sections.About;
     this.work = Locals.Sections.Work;
+    this.content = Locals.Sections.Content;
     this.contact = Locals.Sections.Contact;
   }
 }

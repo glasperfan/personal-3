@@ -110,7 +110,7 @@ export const Locals: ILocals = {
       header: 'Content',
       elementId: 'content',
       content: [
-        `Coming soon!`
+        `<a href="/mela">Mela</a> - a better Pomodoro`
       ],
     },
     Contact: {

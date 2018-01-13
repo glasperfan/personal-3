@@ -39,6 +39,11 @@
 
       <div class="divider"></div>
 
+      <div class="header" [id]="content.elementId">{{content.header}}</div>
+      <p *ngFor="let paragraph of content.content; let i = index" [class.top]="i === 0" [innerHTML]="paragraph"></p>
+
+      <div class="divider"></div>
+
       <div class="header" [id]="contact.elementId">{{contact.header}}</div>
       <p *ngFor="let paragraph of contact.content; let i = index" [class.top]="i === 0" [innerHTML]="paragraph"></p>
       <p3-terminal></p3-terminal>
