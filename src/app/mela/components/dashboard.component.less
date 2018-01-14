@@ -1,0 +1,58 @@
+@import 'shared';
+
+:host {
+  background-color: #777;
+  position: absolute;
+  width: @dashboard-width;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  z-index: 1;
+  box-shadow: 1px 1px 4px 1px #ccc;
+}
+
+.dashboard-block {
+  height: @block-height;
+  background: #777;
+  border-bottom: 1px solid #222;
+  transition: all 0.2s ease-out;
+
+  &:hover {
+    background: #666;
+  }
+
+  .block-frame {
+    padding-top: 8px;
+    padding-left: 8px;
+  }
+
+  .session-type {
+    color: #bbb;
+    text-transform: capitalize;
+    font-size: 1.3em;
+    padding-top: 10px;
+  }
+
+  &.add-session-block {
+    background: #222;
+    transition: all 0.2s ease-out;
+    .link;
+
+    &:hover {
+      background: #111;
+    }
+  }
+
+  .add-session-icon {
+    font-size: 2.7em;
+    color: #BBB;
+    text-align: right;
+    margin-right: 31px;
+    line-height: 0.7em;
+  }
+
+  .block-title {
+    .small-text;
+    padding: 6px 3px 0 0;
+  }
+}

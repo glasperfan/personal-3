@@ -1,7 +1,7 @@
 import { NgModule, ModuleWithProviders } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MELA_ROUTES } from './mela.routes';
-import { MainComponent } from './components';
+import { MainComponent, DashboardComponent, DisplayComponent } from './components';
 
 @NgModule({
   imports: [
@@ -9,7 +9,9 @@ import { MainComponent } from './components';
     MELA_ROUTES
   ],
   declarations: [
-    MainComponent
+    MainComponent,
+    DashboardComponent,
+    DisplayComponent
   ]
 })
 export class MelaModule {

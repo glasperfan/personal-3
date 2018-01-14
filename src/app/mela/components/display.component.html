@@ -1,0 +1,27 @@
+<div class="overlay">
+  <div class="main-display">
+    <div class="banner">
+      <div id="timer">
+        <div class="description">time remaining</div>
+        <div class="info">{{currentTimer?.minutesLeftString || '00'}}:{{currentTimer?.secondsLeftString || '00'}}</div>
+      </div>
+      <div id="sound">
+          <div class="description">mood</div>
+          <div class="info">Rage</div>
+      </div>
+    </div>
+    <div id="clock">
+      <div id="session-timer"></div>
+      <div id="brake-timer"></div>
+    </div>
+
+    <div (click)="playVideo()">Play</div>
+
+    <div id="video"></div>
+
+    <div id="credits">
+      <img class="mela-icon" src="assets/mela/red-apple.png" />
+      <div class="by-us">mela</div>
+    </div>
+  </div>
+</div>

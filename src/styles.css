@@ -63,3 +63,14 @@ a:active  {
 .flex.top {
   align-items: baseline;
 }
+
+.path--background {
+  fill: none;
+  stroke: #000;
+  stroke-width: 2px;
+}
+
+.label {
+  font: 24px sans-serif;
+  text-anchor: middle;
+}
