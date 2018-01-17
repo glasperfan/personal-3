@@ -1,7 +1,18 @@
 @import 'shared';
+@keyframes pulse {
+  0% {
+    background: #777;
+  }
+  50% {
+    background: #222;
+  }
+  100% {
+    background: #777;
+  }
+}
 
 :host {
-  background-color: #777;
+  background-color: #888;
   position: absolute;
   width: @dashboard-width;
   top: 0;
@@ -26,6 +37,20 @@
     padding-left: 8px;
   }
 
+  .input-frame {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    .add-session-icon {
+      font-size: 2.7em;
+      color: #BBB;
+      text-align: right;
+      margin-right: 31px;
+      line-height: 0.7em;
+    }
+  }
+
   .session-type {
     color: #bbb;
     text-transform: capitalize;
@@ -43,12 +68,9 @@
     }
   }
 
-  .add-session-icon {
-    font-size: 2.7em;
-    color: #BBB;
-    text-align: right;
-    margin-right: 31px;
-    line-height: 0.7em;
+  &.now-session-block {
+    // -webkit-animation: pulse 10s ease-in-out infinite alternate;
+    // animation: pulse 10s ease-in-out infinite alternate;
   }
 
   .block-title {

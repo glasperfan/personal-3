@@ -1,4 +1,8 @@
 import { Component, OnInit } from '@angular/core';
+import { Observable } from 'rxjs/Rx';
+import { Timer } from './timer';
+import { PlaylistService } from '../services';
+import { ISession } from '../models';
 declare var d3: any;
 
 @Component({
@@ -8,12 +12,19 @@ declare var d3: any;
 })
 export class DisplayComponent implements OnInit {
 
-  private timeLeft = 13;
   private value = (new Date()).getSeconds();
-  private currentTimer: Timer;
+  public currentTimer: Timer;
+  public currentSession$: Observable<ISession>;
+  private readonly sessionTimerElementId = 'session-timer';
+
+  constructor(public playlistSvc: PlaylistService) {
+    this.currentSession$ = this.playlistSvc.currentSession$;
+  }
 
   ngOnInit() {
-    this.createChart('session-timer', 25);
+    this.currentSession$.subscribe(s => {
+      this.createChart(this.sessionTimerElementId, s.totalDuration);
+    });
     // this.hideChart();
   }
 
@@ -57,6 +68,7 @@ export class DisplayComponent implements OnInit {
     const path = field.append('path')
       .attr('class', 'path path--foreground');
 
+    // Update
     (function update() {
       const now = new Date();
 
@@ -80,65 +92,4 @@ export class DisplayComponent implements OnInit {
       };
     }
   }
-}
-
-class Timer {
-  private secondsCounter = 0;
-  private started = false;
-  private endTime: number; // timestamp
-  private timeStarted: number; // timestamp
-  constructor(public totalMinutes: number) { }
-
-  start() {
-    this.timeStarted = this.currentTimeInSeconds; // in seconds
-    this.endTime = this.timeStarted + (60 * this.totalMinutes);
-    this.started = true;
-  }
-
-  get minutesLeftString() {
-    const ml = Math.floor(this.minutesLeft);
-    return ml < 10 ? '0' + ml.toPrecision(1) : ml.toPrecision(2);
-  }
-
-  get secondsLeftString() {
-    const sl = Math.floor(this.secondsLeft);
-    return sl < 10 ? '0' + sl.toPrecision(1) : sl.toPrecision(2);
-  }
-
-  get minutesPassed() {
-    if (!this.started) {
-      return 0;
-    }
-    const mins = (this.currentTimeInSeconds - this.timeStarted) / 60;
-    console.log('mins', mins);
-    return mins;
-  }
-
-  get secondsPassed() {
-    if (!this.started) {
-      return 0;
-    }
-    const seconds = (this.currentTimeInSeconds - this.timeStarted) % 60;
-    console.log('seconds', seconds);
-    return seconds;
-  }
-
-  get minutesLeft() {
-    if (!this.started) {
-      return 0;
-    }
-    const mins = (this.endTime - this.currentTimeInSeconds) / 60;
-    console.log('mins', mins);
-    return mins;
-  }
-  get secondsLeft() {
-    if (!this.started) {
-      return 0;
-    }
-    const seconds = (this.endTime - this.currentTimeInSeconds) % 60;
-    console.log('seconds', seconds);
-    return seconds;
-  }
-
-  get currentTimeInSeconds() { return new Date().getTime() / 1000; }
 }

@@ -7,7 +7,9 @@
       </div>
       <div id="sound">
           <div class="description">mood</div>
-          <div class="info">Rage</div>
+          <div class="info" *ngIf="playlistSvc.currentSession$ | async; let session">
+            {{session.mood.displayName}}
+          </div>
       </div>
     </div>
     <div id="clock">
