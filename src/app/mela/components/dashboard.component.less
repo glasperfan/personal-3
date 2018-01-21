@@ -12,14 +12,12 @@
 }
 
 :host {
-  background-color: #888;
-  position: absolute;
+  background-color: #444;
+  float: left;
+  height: 100%;
   width: @dashboard-width;
-  top: 0;
-  left: 0;
-  bottom: 0;
-  z-index: 1;
   box-shadow: 1px 1px 4px 1px #ccc;
+  transition: 0.5s all ease-out;
 }
 
 .dashboard-block {
@@ -52,14 +50,24 @@
   }
 
   .session-type {
-    color: #bbb;
-    text-transform: capitalize;
-    font-size: 1.3em;
     padding-top: 10px;
+
+    .session-type-text {
+      color: #bbb;
+      text-transform: capitalize;
+      font-size: 1.3em;
+      font-weight: bold;
+    }
+
+    .dropdown {
+      .icon {
+        padding-right: 15px;
+      }
+    }
   }
 
   &.add-session-block {
-    background: #222;
+    background: #444;
     transition: all 0.2s ease-out;
     .link;
 

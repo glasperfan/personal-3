@@ -24,7 +24,11 @@ export interface IMood {
   key: string;
 }
 
-export class Session {
+export class Session implements ISession {
+  private static readonly pOfSpecialApple = 0.2;
+  public readonly icon: string;
+  public readonly totalDuration: number;
+
   static getDurationByType(type: SessionType) {
     switch (type) {
       case SessionType.Mela:
@@ -36,5 +40,14 @@ export class Session {
       default:
         throw new Error('Unsupported session type');
     }
+  }
+
+  constructor(public mood: IMood, public type = SessionType.Mela) {
+    this.icon = this.selectIcon();
+    this.totalDuration = Session.getDurationByType(type);
+  }
+
+  private selectIcon(): string {
+    return Math.random() < Session.pOfSpecialApple ? 'green-apple' : 'red-apple';
   }
 }

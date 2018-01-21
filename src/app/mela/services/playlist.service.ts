@@ -5,25 +5,30 @@ import { IPlaylist, ISession, IMood, SessionType, Session } from '../models';
 @Injectable()
 export class PlaylistService {
 
+  public static readonly InputMoodPlaceholder = 'Mood';
   public currentSession$: Observable<ISession>;
   public currentPlaylist$: Observable<IPlaylist>;
   private _currentPlaylist$: BehaviorSubject<IPlaylist>;
   public availableMoods$: Observable<IMood[]>;
   private _availableMoods$: BehaviorSubject<IMood[]>;
-
+  public selectedInputMood$: Observable<IMood>;
+  private _selectedInputMood$: BehaviorSubject<IMood>;
+  public toggleDashboard = true;
   constructor() {
     this._currentPlaylist$ = new BehaviorSubject<IPlaylist>(this.templatePlaylist);
     this.currentPlaylist$ = this._currentPlaylist$.asObservable();
     this.currentSession$ = this.currentPlaylist$.map(p => p.sessions && p.sessions.length ? p.sessions[0] : undefined);
     this._availableMoods$ = new BehaviorSubject<IMood[]>(this.templateMoods);
     this.availableMoods$ = this._availableMoods$.asObservable();
+    this._selectedInputMood$ = new BehaviorSubject<IMood>(undefined);
+    this.selectedInputMood$ = this._selectedInputMood$.asObservable();
   }
 
-  get emptyPlaylist(): IPlaylist {
+  private get emptyPlaylist(): IPlaylist {
     return { sessions: [] };
   }
 
-  get templatePlaylist(): IPlaylist {
+  private get templatePlaylist(): IPlaylist {
     return {
       sessions: [
         {
@@ -48,7 +53,7 @@ export class PlaylistService {
     };
   }
 
-  get templateMoods(): IMood[] {
+  private get templateMoods(): IMood[] {
     return [
       { displayName: 'monk', key: 'monk' },
       { displayName: 'rage', key: 'rage' },
@@ -56,6 +61,23 @@ export class PlaylistService {
       { displayName: 'spy', key: 'spy' },
       { displayName: 'yogi', key: 'yogi' }
     ];
+  }
+
+  public selectMood(m: IMood): void {
+    console.log(m);
+    if (!this._selectedInputMood$.value || m.key !== this._selectedInputMood$.value.key) {
+      this._selectedInputMood$.next(m);
+    }
+  }
+
+  public addSessionFromDashboard(): void {
+    this.addSession(this._selectedInputMood$.value);
+  }
+
+  public addSession(m: IMood): void {
+    const currentPlaylist = this._currentPlaylist$.value;
+    currentPlaylist.sessions.push(new Session(m));
+    this._currentPlaylist$.next(currentPlaylist);
   }
 
 }

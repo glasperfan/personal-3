@@ -22,7 +22,7 @@ export class DisplayComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.currentSession$.subscribe(s => {
+    this.currentSession$.distinct().subscribe(s => {
       this.createChart(this.sessionTimerElementId, s.totalDuration);
     });
     // this.hideChart();

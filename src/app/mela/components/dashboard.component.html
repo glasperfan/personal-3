@@ -2,8 +2,21 @@
   <div class="block-frame">
     <div class="block-title">new</div>
     <div class="input-frame">
-      <div class="session-type">Mood</div>
-      <div class="add-session-icon">+</div>
+      <div class="session-type" (click)="toggleMoodDropdown = !toggleMoodDropdown">
+        <span class="session-type-text" *ngIf="playlistSvc.selectedInputMood$ | async; let mood; else placeholdMood">{{mood.displayName}}</span>
+        <ng-template #placeholdMood>
+            <span class="session-type-text">Mood</span>
+        </ng-template>
+        <ul class="dropdown mood-dropdown" *ngIf="toggleMoodDropdown">
+          <li class="dropdown-opt" *ngFor="let mood of playlistSvc.availableMoods$ | async"
+          (click)="playlistSvc.selectMood(mood)">
+            <span class="mood-name">{{mood.displayName}}</span>
+            <img class="icon mood-emoji" [src]="'assets/mela/' + mood.key + '.png'" />
+          </li>
+        </ul>
+      </div>
+      <div class="add-session-icon" *ngIf="playlistSvc.selectedInputMood$ | async"
+      (click)="playlistSvc.addSessionFromDashboard()">+</div>
     </div>
   </div>
 </div>
@@ -14,7 +27,9 @@
     <div class="block-title" *ngIf="i === 1">next</div>
     <div class="block-title" *ngIf="i === 2">later</div>
     <div class="block-title" *ngIf="i > 2">later</div>
-    <div class="session-type">{{session.mood.displayName | capitalize}}</div>
+    <div class="session-type">
+      <span class="session-type-text">{{session.mood.displayName | capitalize}}</span>
+    </div>
   </div>
 </div>
 
