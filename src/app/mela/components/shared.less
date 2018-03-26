@@ -2,12 +2,18 @@
 
 * {
   font-family: 'Roboto Condensed', sans-serif;
+  font-size: 1em;
 }
 
 @dashboard-width: 160px;
 @block-height: 90px; // 9:16 ratio to dashboard width
 @clock-width: 300px;
 @pause-btn-width: 200px;
+@icon-width: 25px;
+
+span {
+  white-space: pre;
+}
 
 .center {
   display: flex;
@@ -21,12 +27,17 @@
   text-transform: uppercase;
 }
 
+.button {
+  cursor: pointer;
+}
+
 .link {
   cursor: pointer;
 }
 
 .icon {
-  width: 25px;
+  width: @icon-width;
+  height: @icon-width;
 }
 
 ul.dropdown {

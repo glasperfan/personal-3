@@ -1,64 +1,191 @@
 @import 'shared';
+@section-width: 650px;
+@session-icon-width: 40px;
+@streak-item-width: 50px;
 :host {
-  float: right;
-  margin-top: 50px;
+  margin-top: 75px;
   transition: 0.5s all ease-out;
 
-  .overlay {
-    width: 100%;
-    height: 100%;
-  }
-
   .main-display {
-    max-width: 650px;
-    min-width: 350px;
-    min-height: 100%;
+    max-width: @section-width;
+    min-width: @section-width;
     margin: 0 auto;
-
-
-    .banner {
-      display: flex;
-      height: 125px;
-      justify-content: space-between;
-      align-items: center;
-      text-align: center;
-
-      .description {
-        .small-text;
+    padding-bottom: 8em;
+    
+    .section {
+      min-width: @section-width;
+      position: relative;
+      box-shadow: 0.3px 0.3px 1px 1.2px #DDD;
+      
+      &.current {
+        min-height: 25em;
+        display: flex;
+        flex-direction: column;
       }
-
-      .info {
-        padding-top: 35px;
-        font-size: 4em;
-        font-weight: bold;
+      
+      .subsection {
+        .header {
+          .small-text;
+          text-align: right;
+          padding-top: 1.5em;
+          padding-right: 1.5em;
+        }
       }
+    }
 
-      #timer {
-        margin-left: 50px;
-      }
-
-      #sound {
-        margin-right: 50px;
-      }
+    hr {
+      display: block;
+      height: 1px;
+      border: 0;
+      border-top: 1px solid #ccc;
+      margin: 1em 0;
+      padding: 0;
     }
 
     #clock {
-      .center;
+      position: absolute;
+      padding: 1em 0 0 1em;
     }
 
-    #credits {
-      position: absolute;
-      right: 10px;
-      bottom: 10px;
-      .small-text;
-      text-transform: initial;
+    #timer {
+      display: flex;
+      flex-direction: column;
+      flex-grow: 1;
 
-      .mela-icon {
-        width: 25px;
+      .center-container {
+        .center;
+        flex-grow: 1;
+        flex-direction: column;
+        
+        .info {
+          text-align: center;
+          font-size: 6em;
+        }
+      }
+    }
+
+    #streaks {
+      display: flex;
+      flex-direction: column;
+      min-height: 7em;
+
+      .streaks {
+        list-style: none;
+        display: flex;
+        align-items: center;
+        justify-content: space-evenly;
+        flex-grow: 1;
+        
+        >li {
+          display: flex;
+          justify-content: space-between;
+          align-items: flex-end;
+          width: @streak-item-width;
+
+          >.icon {
+            width: (@streak-item-width / 2);
+            height: (@streak-item-width / 2);
+          }
+        }
+      }
+    }
+
+    .session-item {
+      height: 4em;
+      display: flex;
+      align-items: center;
+      border-bottom: 1px solid #ccc;
+      padding: 0.5em 1em;
+      transition: all ease-out 0.2s;
+
+      .session-type {
+        flex-grow: 0;
+        min-width: 3em;
+        background-color: white;
+        border-radius: 10px;
+        padding: 2px 1em 5px 0;
+        .center;
+
+        >.icon {
+          width: @session-icon-width;
+          height: @session-icon-width;
+        }
       }
 
-      .by-us {
-        font-size: 0.85em;
+      .session-name {
+        flex-grow: 1;
+        text-align: center;
+
+        .current-time-left {
+          .small-text;
+        }
+      }
+
+      .session-delete {
+        width: @icon-width;
+        height: @icon-width;
+        opacity: 0;
+        .button;
+        transition: all ease-out 0.2s;
+        border-radius: 100%;
+        .center;
+
+        &:hover {
+          background-color: #DDD;
+        }
+
+        .delete-icon {
+          width: 15px;
+          height: 15px;
+        }
+      }
+
+      &:hover .session-delete {
+        opacity: 1;
+      }
+
+      &.add-session-item {
+        input {
+          outline: none;
+          border-bottom: 1px solid #ccc;
+          padding-bottom: 8px;
+          transition: 0.3s ease-out all;
+        }
+        
+        input:hover, input:focus {
+          border-bottom: 1px solid #ea3e3e;
+        }
+      }
+
+      &.no-session-item {
+        .small-text;
+        .button;
+        .center;
+      }
+    }
+
+    .button.add-session {
+      position: fixed;
+      width: 60px;
+      height: 60px;
+      display: flex;
+      justify-content: center;
+      bottom: 1.5em;
+      right: 1.5em;
+      background-color: #ea3e3e;
+      color: white;
+      font-size: 2em;
+      align-items: center;
+      border-radius: 100%;
+      padding-top: -10px;
+      box-shadow: 0.3px 0.3px 1px 1.2px #DDD;
+      outline: none;
+      user-select: none;
+
+      .add-text {
+        padding-bottom: 5px;
+        outline: none;
+        user-select: none;
       }
     }
   }

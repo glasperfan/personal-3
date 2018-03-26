@@ -1,20 +1,35 @@
+import { Observable, BehaviorSubject } from 'rxjs/Rx';
+
 export class Timer {
-  private secondsCounter = 0;
+  public readonly MinutesPerHour = 60;
+  
+  private _timerEnded$: BehaviorSubject<void> = new BehaviorSubject<void>(undefined);
+  public timerEnded$: Observable<void>;
+
   private started = false;
+  private ended = false;
   private endTime: number; // timestamp
   private timeStarted: number; // timestamp
-  constructor(public totalMinutes: number) { }
+  
+  constructor(public totalMinutes: number) {
+    this.timerEnded$ = this._timerEnded$.skip(1);
+  }
 
   start() {
     this.timeStarted = this.currentTimeInSeconds; // in seconds
-    this.endTime = this.timeStarted + (60 * this.totalMinutes);
+    this.endTime = this.timeStarted + (this.MinutesPerHour * this.totalMinutes);
     this.started = true;
   }
 
+  end() {
+    this.ended = true;
+    this._timerEnded$.next(undefined);
+  }
+
   get minutesLeftString() {
+    this.checkForEnd(); // assumption: this is being called per second
     const ml = Math.floor(this.minutesLeft);
-    const sl = Math.floor(this.secondsLeft);
-    if (sl === 0) {
+    if (ml === 0 || ml < 0) {
       return '00';
     }
     return ml < 10 ? '0' + ml.toPrecision(1) : ml.toPrecision(2);
@@ -29,22 +44,25 @@ export class Timer {
   }
 
   get minutesPassed() {
+    if (this.ended) {
+      return this.totalMinutes;
+    }
     if (!this.started) {
       return 0;
     }
-    const mins = (this.currentTimeInSeconds - this.timeStarted) / 60;
+    const mins = (this.currentTimeInSeconds - this.timeStarted) / this.MinutesPerHour;
     // console.log('mins', mins);
-    // if (mins < 1) {
-    //   return 0;
-    // }
     return mins;
   }
 
   get secondsPassed() {
+    if (this.ended) {
+      return (this.totalMinutes * this.MinutesPerHour) % this.MinutesPerHour;
+    }
     if (!this.started) {
       return 0;
     }
-    const seconds = (this.currentTimeInSeconds - this.timeStarted) % 60;
+    const seconds = (this.currentTimeInSeconds - this.timeStarted) % this.MinutesPerHour;
     // console.log('seconds', seconds);
     if (seconds < 1) {
       return 0;
@@ -53,18 +71,24 @@ export class Timer {
   }
 
   get minutesLeft() {
-    if (!this.started) {
+    if (this.ended) {
       return 0;
     }
-    const mins = (this.endTime - this.currentTimeInSeconds) / 60;
+    if (!this.started) {
+      return this.totalMinutes;
+    }
+    const mins = (this.endTime - this.currentTimeInSeconds) / this.MinutesPerHour;
     // console.log('mins', mins);
     return mins;
   }
   get secondsLeft() {
-    if (!this.started) {
+    if (this.ended) {
       return 0;
     }
-    const seconds = (this.endTime - this.currentTimeInSeconds) % 60;
+    if (!this.started) {
+      return (this.totalMinutes * this.MinutesPerHour) % this.MinutesPerHour;
+    }
+    const seconds = (this.endTime - this.currentTimeInSeconds) % this.MinutesPerHour;
     // console.log('seconds', seconds);
     if (seconds < 1) {
       return 0;
@@ -73,4 +97,10 @@ export class Timer {
   }
 
   get currentTimeInSeconds() { return new Date().getTime() / 1000; }
+
+  private checkForEnd(): void {
+    if (this.started && !this.ended && this.minutesLeft < 1 && this.secondsLeft < 1) {
+      this.end();
+    }
+  }
 }

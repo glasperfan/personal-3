@@ -2,10 +2,23 @@ export const MELA_SESSION_LENGTH = 25; // minutes
 export const MELA_BREAK_LENGTH = 5;
 export const MELA_LONG_BREAK_LENGTH = 15;
 
+export const P_UNCOMMON = 0.2;
+export const P_RARE = 0.15;
+export const P_SUPERRARE = 0.1;
+export const P_MYTHICAL = 0.05;
+
 export enum SessionType {
-  Mela,
-  Break,
-  LongBreak
+  Mela = 'mela',
+  Break = 'break',
+  LongBreak = 'long-break'
+}
+
+export enum MelaType {
+  Common = 'red-apple',
+  Uncommon = 'green-apple',
+  Rare = 'rare-apple',
+  SuperRare = 'super-rare-apple',
+  Mythical = 'mythic-apple'
 }
 
 export interface IPlaylist {
@@ -14,19 +27,13 @@ export interface IPlaylist {
 
 export interface ISession {
   type: SessionType;
-  mood: IMood;
-  icon: string;
+  mela: MelaType;
+  name: string;
   totalDuration: number; // in minutes
 }
 
-export interface IMood {
-  displayName: string;
-  key: string;
-}
-
 export class Session implements ISession {
-  private static readonly pOfSpecialApple = 0.2;
-  public readonly icon: string;
+  public readonly mela: MelaType;
   public readonly totalDuration: number;
 
   static getDurationByType(type: SessionType) {
@@ -42,12 +49,17 @@ export class Session implements ISession {
     }
   }
 
-  constructor(public mood: IMood, public type = SessionType.Mela) {
-    this.icon = this.selectIcon();
+  constructor(public name: string, public type = SessionType.Mela) {
+    this.mela = this.selectMela();
     this.totalDuration = Session.getDurationByType(type);
   }
 
-  private selectIcon(): string {
-    return Math.random() < Session.pOfSpecialApple ? 'green-apple' : 'red-apple';
+  private selectMela(): MelaType {
+    const p = Math.random();
+    if (p < P_MYTHICAL) return MelaType.Mythical;
+    if (p < P_SUPERRARE) return MelaType.SuperRare;
+    if (p < P_RARE) return MelaType.Rare;
+    if (p < P_UNCOMMON) return MelaType.Uncommon;
+    return MelaType.Common;
   }
 }

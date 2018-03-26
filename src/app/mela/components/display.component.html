@@ -1,29 +1,79 @@
-<div class="overlay">
-  <div class="main-display">
-    <div class="banner">
-      <div id="timer">
-        <div class="description">time remaining</div>
-        <div class="info">{{currentTimer?.minutesLeftString || '00'}}:{{currentTimer?.secondsLeftString || '00'}}</div>
-      </div>
-      <div id="sound">
-          <div class="description">mood</div>
-          <div class="info" *ngIf="playlistSvc.currentSession$ | async; let session">
-            {{session.mood.displayName}}
-          </div>
-      </div>
-    </div>
+<div class="main-display">
+
+  <!-- timer + streaks -->
+  <div class="section current">
     <div id="clock">
       <div id="session-timer"></div>
       <div id="brake-timer"></div>
     </div>
-
-    <div (click)="playVideo()">Play</div>
-
-    <div id="video"></div>
-
-    <div id="credits">
-      <img class="mela-icon" src="assets/mela/red-apple.png" />
-      <div class="by-us">mela</div>
+    
+    <div class="subsection" id="timer">
+      <div class="header">time remaining</div>
+      <div class="center-container">
+        <div class="info">{{currentTimer?.minutesLeftString || '00'}}:{{currentTimer?.secondsLeftString || '00'}}</div>
+        <div class="small-text" *ngIf="timerNotStarted" (click)="onTimerStart()">start</div>
+        <div class="small-text" *ngIf="timerCompleted" (click)="onTimerComplete()">complete</div>
+      </div>
+    </div>
+    
+    <div class="subsection" id="streaks">
+      <div class="header">rewards</div>
+      <ul class="streaks">
+        <li *ngFor="let melaKey of melaKeys">
+            <img class="icon mela-icon" [src]="'assets/mela/' + melaKey + '.png'" />
+            <div class="type-count">{{melaCounts[melaKey]}}</div>
+        </li>
+      </ul>
     </div>
   </div>
+  
+  <hr/>
+
+  <!-- upcoming sessions -->
+  <div class="section upcoming">
+    <!-- no sessions -->
+    <div class="session-item no-session-item"
+        *ngIf="!(queuedSessions$ | async).length; else sessions"
+        (click)="onAddFirstSessionPrompt()">
+      Ready to get started? Make a mela.
+    </div>
+    
+    <!-- existing sessions -->
+    <ng-template #sessions>
+      <div class="session-item" [ngClass]="{'current': i === 0}" *ngFor="let session of queuedSessions$ | async; let i = index">
+        <div class="session-type">
+            <img class="icon mela-icon" [src]="'assets/mela/' + session.mela + '.png'" />
+        </div>
+        <div class="session-name">
+          {{session.name}}
+          <span class="current-time-left" *ngIf="i === 0">{{formatTimeLeft}}</span>
+        </div>
+        <div class="session-delete" (click)="onDeleteSession(i)">
+          <img class="icon delete-icon" src="/assets/mela/delete.png" />
+        </div>
+      </div>
+    </ng-template>
+  
+    <!-- add session -->
+    <div class="session-item add-session-item" *ngIf="showAddSession">
+        <div class="session-type">
+            <img class="icon mela-icon" src="assets/mela/red-apple.png" />
+        </div>
+        <input #sessionInput 
+              class="session-name add-session-input"
+              type="text"
+              (keyup)="onAddSessionInput(sessionInput.value)"
+              (keyup.enter)="onSubmitSessionInput()"
+              (keyup.esc)="onCancelSessionInput()">
+        <div class="session-delete" (click)="onCancelSessionInput()">
+          <img class="icon delete-icon" src="/assets/mela/delete.png" />
+        </div>
+    </div>
+  </div>
+
+  <!-- add session button -->
+  <div class="add-session button" (click)="onAddSessionRequested()">
+    <div class="add-text">+</div>
+  </div>
+
 </div>

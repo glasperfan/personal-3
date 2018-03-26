@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChildren, AfterViewInit } from '@angular/core';
+import { Component, ViewChildren, AfterViewInit } from '@angular/core';
 import { TerminalService } from '../../services/terminal.service';
 import { ILog } from '../../interfaces/ILog';
 import { IResponse } from '../../interfaces/IProgram';

@@ -1,88 +1,42 @@
 @import 'shared';
-@keyframes pulse {
-  0% {
-    background: #777;
-  }
-  50% {
-    background: #222;
-  }
-  100% {
-    background: #777;
-  }
-}
 
 :host {
   background-color: #444;
-  float: left;
-  height: 100%;
   width: @dashboard-width;
   box-shadow: 1px 1px 4px 1px #ccc;
   transition: 0.5s all ease-out;
 }
 
-.dashboard-block {
-  height: @block-height;
-  background: #777;
-  border-bottom: 1px solid #222;
-  transition: all 0.2s ease-out;
+#credits {
+  .center;
+  .small-text;
+  flex-direction: column;
+  height: 8em;
+  text-transform: initial;
 
-  &:hover {
-    background: #666;
+  .mela-icon {
+    width: 25px;
+    height: 25px;
   }
 
-  .block-frame {
-    padding-top: 8px;
-    padding-left: 8px;
+  .by-us {
+    margin-top: 3px;
+    font-size: 0.85em;
   }
+}
 
-  .input-frame {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+.toc {
+  color: white;
+  padding: 0 1em;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  margin-top: 3em;
+  height: 16em;
 
-    .add-session-icon {
-      font-size: 2.7em;
-      color: #BBB;
-      text-align: right;
-      margin-right: 31px;
-      line-height: 0.7em;
-    }
-  }
-
-  .session-type {
-    padding-top: 10px;
-
-    .session-type-text {
-      color: #bbb;
-      text-transform: capitalize;
-      font-size: 1.3em;
-      font-weight: bold;
-    }
-
-    .dropdown {
-      .icon {
-        padding-right: 15px;
-      }
-    }
-  }
-
-  &.add-session-block {
-    background: #444;
-    transition: all 0.2s ease-out;
+  >li {
+    text-transform: capitalize;
     .link;
-
-    &:hover {
-      background: #111;
-    }
-  }
-
-  &.now-session-block {
-    // -webkit-animation: pulse 10s ease-in-out infinite alternate;
-    // animation: pulse 10s ease-in-out infinite alternate;
-  }
-
-  .block-title {
-    .small-text;
-    padding: 6px 3px 0 0;
   }
 }

@@ -1,6 +1,3 @@
-import { Observable } from 'rxjs/Rx';
-import { ICommand } from '../interfaces/ICommand';
-
 export interface IResponse {
   isFinal: boolean;
   prompt?: string;

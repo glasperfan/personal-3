@@ -1,8 +1,6 @@
-import { Observable, BehaviorSubject } from 'rxjs/Rx';
 import { Injectable } from '@angular/core';
 import { Http } from '@angular/http';
 import { IProgram, IResponse } from '../interfaces/IProgram';
-import { ICommand } from '../interfaces/ICommand';
 import { ILog } from '../interfaces/ILog';
 import { EmailProgram } from '../models/EmailProgram';
 

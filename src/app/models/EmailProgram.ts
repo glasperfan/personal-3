@@ -1,7 +1,6 @@
-import { Http, Response } from '@angular/http';
+import { Http } from '@angular/http';
 import { Observable } from 'rxjs/Rx';
 import { IProgram, IResponse } from '../interfaces/IProgram';
-import { ICommand } from '../interfaces/ICommand';
 
 export class EmailProgram implements IProgram {
   private senderName: string;
@@ -75,11 +74,6 @@ export class EmailProgram implements IProgram {
 
   private allDataAcquired(): boolean {
     return !!this.senderName && !!this.senderEmail && !!this.senderMessage;
-  }
-
-  private confirm(input: string): boolean {
-    input = input.trim().toLowerCase();
-    return input === 'y' || input === 'yes';
   }
 
   private send(): Observable<IResponse> {
