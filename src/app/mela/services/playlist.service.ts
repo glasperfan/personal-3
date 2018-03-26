@@ -20,9 +20,9 @@ export class PlaylistService {
   private get templatePlaylist(): IPlaylist {
     return {
       sessions: [
-        new Session('This is the first thing to do.'),
-        new Session('Finish laundry'),
-        new Session('Work on machine learning (week 2)')
+        new Session('Respond to emails'),
+        new Session('Look into flights for trip in May'),
+        new Session('Write down notes before meeting at 11')
       ]
     };
   }

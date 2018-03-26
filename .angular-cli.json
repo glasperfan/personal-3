@@ -21,8 +21,7 @@
       "styles": [
         "styles.css"
       ],
-      "scripts": [
-      ],
+      "scripts": [],
       "environmentSource": "environments/environment.ts",
       "environments": {
         "dev": "environments/environment.ts",
@@ -44,5 +43,8 @@
     "styleExt": "less",
     "component": {
     }
+  },
+  "warnings": {
+    "typescriptMismatch": false
   }
 }

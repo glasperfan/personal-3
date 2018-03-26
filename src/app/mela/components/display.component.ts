@@ -2,7 +2,7 @@ import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { Observable } from 'rxjs/Rx';
 import { Timer } from './timer';
 import { PlaylistService } from '../services';
-import { ISession, MelaType } from '../models';
+import { ISession, MelaType, MELA_SESSION_LENGTH } from '../models';
 declare var d3: any;
 
 @Component({
@@ -38,7 +38,7 @@ export class DisplayComponent implements OnInit {
       this.createTimer();
       this.timerNotStarted = true;
     }
-    this.createChart(this.sessionTimerElementId, 0.1);
+    this.createChart(this.sessionTimerElementId, MELA_SESSION_LENGTH);
   }
 
   get melaKeys(): string[] {
@@ -112,7 +112,7 @@ export class DisplayComponent implements OnInit {
     this.timerNotStarted = false;
   }
 
-  createTimer(time: number = 0.1): void {
+  createTimer(time: number = MELA_SESSION_LENGTH): void {
     this.currentTimer = new Timer(time);
   }
 
