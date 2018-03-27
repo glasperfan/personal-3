@@ -11,8 +11,8 @@
       <div class="header">time remaining</div>
       <div class="center-container">
         <div class="info">{{currentTimer?.minutesLeftString || '00'}}:{{currentTimer?.secondsLeftString || '00'}}</div>
-        <div class="small-text" *ngIf="timerNotStarted" (click)="onTimerStart()">start</div>
-        <div class="small-text" *ngIf="timerCompleted" (click)="onTimerComplete()">complete</div>
+        <div class="button timer-button" *ngIf="timerNotStarted" (click)="onTimerStart()">start</div>
+        <div class="button timer-button" *ngIf="timerCompleted" (click)="onTimerComplete()">complete</div>
       </div>
     </div>
     
@@ -35,7 +35,7 @@
     <div class="session-item no-session-item"
         *ngIf="!(queuedSessions$ | async).length; else sessions"
         (click)="onAddFirstSessionPrompt()">
-      Ready to get started? Make a mela.
+      <div class="button add-first-mela-button">Ready to get started? Click here to make a mela.</div>
     </div>
     
     <!-- existing sessions -->
@@ -62,6 +62,7 @@
         <input #sessionInput 
               class="session-name add-session-input"
               type="text"
+              placeholder="Name your 25-minute session"
               (keyup)="onAddSessionInput(sessionInput.value)"
               (keyup.enter)="onSubmitSessionInput()"
               (keyup.esc)="onCancelSessionInput()">
@@ -72,8 +73,6 @@
   </div>
 
   <!-- add session button -->
-  <div class="add-session button" (click)="onAddSessionRequested()">
-    <div class="add-text">+</div>
-  </div>
+  <div class="button add-session" (click)="onAddSessionRequested()">+</div>
 
 </div>

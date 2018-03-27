@@ -15,7 +15,7 @@
     .section {
       min-width: @section-width;
       position: relative;
-      box-shadow: 0.3px 0.3px 1px 1.2px #DDD;
+      .shadowed;
       
       &.current {
         min-height: 25em;
@@ -125,7 +125,7 @@
         width: @icon-width;
         height: @icon-width;
         opacity: 0;
-        .button;
+        .link;
         transition: all ease-out 0.2s;
         border-radius: 100%;
         .center;
@@ -159,34 +159,22 @@
 
       &.no-session-item {
         .small-text;
-        .button;
+        .link;
         .center;
       }
     }
 
     .button.add-session {
       position: fixed;
-      width: 60px;
-      height: 60px;
-      display: flex;
-      justify-content: center;
-      bottom: 1.5em;
-      right: 1.5em;
-      background-color: #ea3e3e;
-      color: white;
+      bottom: 1em;
+      right: 1em;
       font-size: 2em;
-      align-items: center;
       border-radius: 100%;
-      padding-top: -10px;
-      box-shadow: 0.3px 0.3px 1px 1.2px #DDD;
-      outline: none;
-      user-select: none;
-
-      .add-text {
-        padding-bottom: 5px;
-        outline: none;
-        user-select: none;
-      }
+      padding: 0;
+      line-height: 2em;
+      height: 2em;
+      width: 2em;
+      text-align: center;
     }
   }
 }

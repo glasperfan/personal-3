@@ -1,5 +1,5 @@
-import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
-import { Observable } from 'rxjs/Rx';
+import { Component, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
+import { Observable, Subscription } from 'rxjs/Rx';
 import { Timer } from './timer';
 import { PlaylistService } from '../services';
 import { ISession, MelaType, MELA_SESSION_LENGTH } from '../models';
@@ -10,7 +10,7 @@ declare var d3: any;
   templateUrl: './display.component.html',
   styleUrls: ['./display.component.less']
 })
-export class DisplayComponent implements OnInit {
+export class DisplayComponent implements OnInit, OnDestroy {
 
   public currentTimer: Timer;
   public newSessionName = '';
@@ -21,6 +21,7 @@ export class DisplayComponent implements OnInit {
   public queuedSessions$: Observable<ISession[]>;
   public currentSession$: Observable<ISession>;
   private readonly sessionTimerElementId = 'session-timer';
+  private readonly _subscriptions: Subscription[] = [];
 
   @ViewChild('sessionInput') sessionInputEl: ElementRef;
 
@@ -39,6 +40,19 @@ export class DisplayComponent implements OnInit {
       this.timerNotStarted = true;
     }
     this.createChart(this.sessionTimerElementId, MELA_SESSION_LENGTH);
+    this._subscriptions.push(
+      // If the first session is added, initialize the timer.
+      this.playlistSvc.newSessionCreated$.subscribe(_ => {
+        if (this.playlistSvc.TotalQueuedSessions === 1) {
+          this.createTimer();
+          this.timerNotStarted = true;
+        }
+      })
+    );
+  }
+
+  ngOnDestroy() {
+    this._subscriptions.forEach(s => s.unsubscribe());
   }
 
   get melaKeys(): string[] {

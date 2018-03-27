@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { MELA_ROUTES } from './mela.routes';
 import { PlaylistService, CapitalizePipe } from './services';
 import { MainComponent, DashboardComponent, DisplayComponent } from './components';
+import { Title } from '@angular/platform-browser';
 
 @NgModule({
   imports: [
@@ -21,7 +22,8 @@ export class MelaModule {
     return {
       ngModule: MelaModule,
       providers: [
-        PlaylistService
+        PlaylistService,
+        Title
       ]
     };
   }

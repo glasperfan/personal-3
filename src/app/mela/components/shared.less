@@ -29,10 +29,26 @@ span {
 
 .button {
   cursor: pointer;
+  background-color: #eb3d3e;
+  color: white;
+  text-transform: uppercase;
+  .shadowed;
+  border-radius: 1em;
+  padding: 0.5em 3em;
+  user-select: none;
+  transition: background-color 0.15s ease-out;
+
+  &:hover {
+    background-color: #de2626;
+  }
 }
 
 .link {
   cursor: pointer;
+}
+
+.shadowed {
+  box-shadow: 0.3px 0.3px 4px 1.2px #DDD;
 }
 
 .icon {

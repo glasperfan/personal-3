@@ -6,35 +6,35 @@ import { IPlaylist, ISession, Session } from '../models';
 export class PlaylistService {
 
   public currentSession$: Observable<ISession>;
+  public newSessionCreated$: Observable<ISession>;
   public currentPlaylist$: Observable<IPlaylist>;
   public toggleDashboard = false;
   
+  private _newSessionCreated$: BehaviorSubject<ISession>;
   private _currentPlaylist$: BehaviorSubject<IPlaylist>;
   
   constructor() {
-    this._currentPlaylist$ = new BehaviorSubject<IPlaylist>(this.templatePlaylist);
+    this._newSessionCreated$ = new BehaviorSubject<ISession>(undefined);
+    this._currentPlaylist$ = new BehaviorSubject<IPlaylist>(this.emptyPlaylist);
+    this.newSessionCreated$ = this._newSessionCreated$.skip(1);
     this.currentPlaylist$ = this._currentPlaylist$.asObservable();
     this.currentSession$ = this.currentPlaylist$.map(p => p.sessions && p.sessions.length ? p.sessions[0] : undefined);
   }
 
-  private get templatePlaylist(): IPlaylist {
-    return {
-      sessions: [
-        new Session('Respond to emails'),
-        new Session('Look into flights for trip in May'),
-        new Session('Write down notes before meeting at 11')
-      ]
-    };
+  private get emptyPlaylist(): IPlaylist {
+    return { sessions: [] };
   }
 
   public get currentSession(): ISession {
     const pl = this._currentPlaylist$.value;
     return pl && pl.sessions && pl.sessions.length && pl.sessions[0];
   }
-
+  
   public addSession(sessionName: string): void {
     const currentPlaylist = this._currentPlaylist$.value;
-    currentPlaylist.sessions.push(new Session(sessionName || 'Untitled'));
+    const newSession = new Session(sessionName || 'Untitled');
+    currentPlaylist.sessions.push(newSession);
+    this._newSessionCreated$.next(newSession);
     this._currentPlaylist$.next(currentPlaylist);
   }
 
