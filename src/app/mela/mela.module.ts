@@ -1,7 +1,7 @@
 import { NgModule, ModuleWithProviders } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MELA_ROUTES } from './mela.routes';
-import { PlaylistService, CapitalizePipe } from './services';
+import { PlaylistService, RewardsService, CapitalizePipe } from './services';
 import { MainComponent, DashboardComponent, DisplayComponent } from './components';
 import { Title } from '@angular/platform-browser';
 
@@ -23,6 +23,7 @@ export class MelaModule {
       ngModule: MelaModule,
       providers: [
         PlaylistService,
+        RewardsService,
         Title
       ]
     };

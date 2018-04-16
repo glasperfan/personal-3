@@ -1,8 +1,8 @@
 import { Component, OnInit, OnDestroy, NgZone } from '@angular/core';
 import { Observable, Subscription } from 'rxjs/Rx';
 import { Timer } from './timer';
-import { PlaylistService } from '../services';
-import { ISession, MelaType, MELA_SESSION_LENGTH } from '../models';
+import { PlaylistService, RewardsService } from '../services';
+import { ISession, RewardsCounter, MELA_SESSION_LENGTH, MelaKeys } from '../models';
 declare var d3: any;
 declare var Mousetrap: any;
 
@@ -20,20 +20,18 @@ export class DisplayComponent implements OnInit, OnDestroy {
   public sessionIsRunning = false;
   public sessionIsPaused = false;
   public sessionIsReady = false;
-  public melaCounts: { [key: string]: number }
+  public melaCounts: RewardsCounter;
+  public melaKeys = MelaKeys;
   public queuedSessions$: Observable<ISession[]>;
   public currentSession$: Observable<ISession>;
   private readonly sessionTimerElementId = 'session-timer';
   private readonly _subscriptions: Subscription[] = [];
   private _timerSubscription: Subscription;
 
-  constructor(public playlistSvc: PlaylistService, private zone: NgZone) {
+  constructor(public playlistSvc: PlaylistService, public rewardsSvc: RewardsService, private zone: NgZone) {
     this.queuedSessions$ = this.playlistSvc.currentPlaylist$.map(plylst => plylst.sessions);
     this.currentSession$ = this.playlistSvc.currentSession$;
-    this.melaCounts = {};
-    for (const key of this.melaKeys) {
-      this.melaCounts[key] = 0;
-    }
+    this.melaCounts = this.rewardsSvc.UserRewards;
   }
 
   ngOnInit() {
@@ -61,10 +59,6 @@ export class DisplayComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this._subscriptions.forEach(s => s.unsubscribe());
-  }
-
-  get melaKeys(): string[] {
-    return Object.values(MelaType);
   }
 
   onAddSessionRequested(): void {
@@ -122,7 +116,7 @@ export class DisplayComponent implements OnInit, OnDestroy {
   
   onTimerComplete(): void {
     // update streak
-    this.melaCounts[this.playlistSvc.currentSession.mela] += 1;
+    this.rewardsSvc.recordRewards(this.playlistSvc.currentSession.mela);
     // delete current session and select the next one
     this.playlistSvc.deleteCurrentSession();
     // reset timer

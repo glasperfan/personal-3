@@ -20,6 +20,6 @@ export class MainComponent implements AfterViewInit {
   
   ngAfterViewInit(): void {
     // Update favicon
-    this.doc.getElementById('appFavicon').setAttribute('href', `/assets/mela/favicon-mela.ico?t=${new Date().getTime()}`);
+    this.doc.getElementById('appFavicon').setAttribute('href', `/assets/mela/favicon.ico?t=${new Date().getTime()}`);
   }
 }

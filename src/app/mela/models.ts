@@ -21,6 +21,8 @@ export enum MelaType {
   Mythical = 'mythic-apple'
 }
 
+export const MelaKeys: string[] = Object.values(MelaType);
+
 export interface IPlaylist {
   sessions: ISession[];
 }
@@ -63,3 +65,5 @@ export class Session implements ISession {
     return MelaType.Common;
   }
 }
+
+export type RewardsCounter = { [key: string]: number };
