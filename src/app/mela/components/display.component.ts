@@ -49,12 +49,26 @@ export class DisplayComponent implements OnInit, OnDestroy {
         }
       })
     );
-    this.activateAddSessionBinding();
+    this.activateHotkeyBindings();
   }
 
-  public activateAddSessionBinding(): void {
+  public activateHotkeyBindings(): void {
     const self = this;
-    Mousetrap.bind('q', function() { console.log('add session'); self.onAddSessionRequested(); });
+    // Q - Add a new session
+    Mousetrap.bind('q', function() { self.onAddSessionRequested(); });
+    // [Space] - pause/resume
+    Mousetrap.bind('space', function() { 
+      if (!self.sessionIsRunning && !self.sessionIsPaused) {
+        return;
+      }
+      self.sessionIsPaused ? self.onTimerResume() : self.onTimerPause(); 
+    });
+    // S - start current session
+    Mousetrap.bind('s', function() {
+      if (self.sessionIsReady) {
+        self.onTimerStart();
+      }
+    });
   }
 
   ngOnDestroy() {
@@ -62,12 +76,11 @@ export class DisplayComponent implements OnInit, OnDestroy {
   }
 
   onAddSessionRequested(): void {
-    const self = this;
-    if (self.showAddSession) {
-      self.onSubmitSessionInput(true);
-    }
-    self.showAddSession = true;
-    self.zone.run(() => {
+    this.zone.run(() => { // Mousetrap hotkey activation runs outside the Angular zone
+      if (this.showAddSession) {
+        this.onSubmitSessionInput(true);
+      }
+      this.showAddSession = true;
       setTimeout(() => {
         (<HTMLElement>document.getElementsByClassName('add-session-input')[0]).focus();
       }, 50);
@@ -130,22 +143,28 @@ export class DisplayComponent implements OnInit, OnDestroy {
   }
 
   onTimerStart(): void {
-    this.currentTimer.start();
-    this._timerSubscription = this.currentTimer.timerEnded$.subscribe(() => setTimeout(() => this.onTimerEnd(), 0));
-    this.sessionIsReady = false;
-    this.sessionIsRunning = true;
+    this.zone.run(() => { // Mousetrap hotkey activation runs outside the Angular zone
+      this.currentTimer.start();
+      this._timerSubscription = this.currentTimer.timerEnded$.subscribe(() => setTimeout(() => this.onTimerEnd(), 0));
+      this.sessionIsReady = false;
+      this.sessionIsRunning = true;
+    });
   }
 
   onTimerPause(): void {
-    this.sessionIsRunning = false;
-    this.sessionIsPaused = true;
-    this.currentTimer.pause();
+    this.zone.run(() => { // Mousetrap hotkey activation runs outside the Angular zone
+      this.sessionIsRunning = false;
+      this.sessionIsPaused = true;
+      this.currentTimer.pause();
+    });
   }
 
   onTimerResume(): void {
-    this.sessionIsRunning = true;
-    this.sessionIsPaused = false;
-    this.currentTimer.resume();
+    this.zone.run(() => { // Mousetrap hotkey activation runs outside the Angular zone
+      this.sessionIsRunning = true;
+      this.sessionIsPaused = false;
+      this.currentTimer.resume();
+    });
   }
 
   createTimer(time: number = MELA_SESSION_LENGTH): void {
