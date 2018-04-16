@@ -1,9 +1,10 @@
-import { Component, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, NgZone } from '@angular/core';
 import { Observable, Subscription } from 'rxjs/Rx';
 import { Timer } from './timer';
 import { PlaylistService } from '../services';
 import { ISession, MelaType, MELA_SESSION_LENGTH } from '../models';
 declare var d3: any;
+declare var Mousetrap: any;
 
 @Component({
   selector: 'p3-mela-display',
@@ -26,9 +27,7 @@ export class DisplayComponent implements OnInit, OnDestroy {
   private readonly _subscriptions: Subscription[] = [];
   private _timerSubscription: Subscription;
 
-  @ViewChild('sessionInput') sessionInputEl: ElementRef;
-
-  constructor(public playlistSvc: PlaylistService) {
+  constructor(public playlistSvc: PlaylistService, private zone: NgZone) {
     this.queuedSessions$ = this.playlistSvc.currentPlaylist$.map(plylst => plylst.sessions);
     this.currentSession$ = this.playlistSvc.currentSession$;
     this.melaCounts = {};
@@ -52,6 +51,12 @@ export class DisplayComponent implements OnInit, OnDestroy {
         }
       })
     );
+    this.activateAddSessionBinding();
+  }
+
+  public activateAddSessionBinding(): void {
+    const self = this;
+    Mousetrap.bind('q', function() { console.log('add session'); self.onAddSessionRequested(); });
   }
 
   ngOnDestroy() {
@@ -63,12 +68,17 @@ export class DisplayComponent implements OnInit, OnDestroy {
   }
 
   onAddSessionRequested(): void {
-    if (this.showAddSession) {
-      this.onSubmitSessionInput(true);
+    const self = this;
+    if (self.showAddSession) {
+      self.onSubmitSessionInput(true);
     }
-    this.showAddSession = true;
-    setTimeout(() => this.sessionInputEl.nativeElement.focus(), 50);
-    window.scrollTo(0, document.body.scrollHeight);
+    self.showAddSession = true;
+    self.zone.run(() => {
+      setTimeout(() => {
+        (<HTMLElement>document.getElementsByClassName('add-session-input')[0]).focus();
+      }, 50);
+      window.scrollTo(0, document.body.scrollHeight);
+    });
   }
 
   onAddFirstSessionPrompt(): void {
