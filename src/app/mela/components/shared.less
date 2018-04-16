@@ -1,15 +1,25 @@
 @import url('https://fonts.googleapis.com/css?family=Roboto:400,700');
 
-* {
-  font-family: 'Roboto Condensed', sans-serif;
-  font-size: 1em;
-}
-
 @dashboard-width: 160px;
 @block-height: 90px; // 9:16 ratio to dashboard width
 @clock-width: 300px;
 @pause-btn-width: 200px;
 @icon-width: 25px;
+
+@background-dark: #7f0000; // should match main.component.ts update
+@background-light: #f05545; // should match fill and stroke in timer wheel (display.component.ts)
+@background-primary: #b71c1c;
+@text-primary: #fff;
+@text-secondary: @background-light;
+
+* {
+  font-family: 'Roboto Condensed', sans-serif;
+  font-size: 1em;
+}
+
+html, body {
+  background-color: @background-dark;
+}
 
 span {
   white-space: pre;
@@ -23,7 +33,7 @@ span {
 
 .small-text {
   font-size: 0.85em;
-  color: #AAA;
+  color: @text-secondary;
   text-transform: uppercase;
 }
 
@@ -32,7 +42,6 @@ span {
   background-color: #eb3d3e;
   color: white;
   text-transform: uppercase;
-  .shadowed;
   border-radius: 1em;
   padding: 0.5em 3em;
   user-select: none;
@@ -47,18 +56,17 @@ span {
   cursor: pointer;
 }
 
-.shadowed {
-  box-shadow: 0.3px 0.3px 4px 1.2px #DDD;
-}
-
 .icon {
   width: @icon-width;
   height: @icon-width;
 }
 
+.rounded {
+  border-radius: 1.5em;
+}
+
 ul.dropdown {
   list-style: none;
-  box-shadow: 1px 1px 3px 0.5px #ddd;
   background: #ffffff;
   position: absolute;
   left: 0;
@@ -77,4 +85,15 @@ ul.dropdown {
     background: #666;
     color: #ddd;
   }
+}
+
+.page-text {
+  .small-text;
+  color: white;
+}
+
+.page-header {
+  .page-text;
+  line-height: 2em;
+  margin-bottom: 1em;
 }

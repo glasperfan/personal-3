@@ -8,22 +8,35 @@ export class Timer {
 
   private started = false;
   private ended = false;
-  private endTime: number; // timestamp
-  private timeStarted: number; // timestamp
+  private pauseTime: number; // timestamp (in seconds)
+  private endTime: number; // timestamp (in seconds)
+  private startTime: number; // timestamp (in seconds)
   
   constructor(public totalMinutes: number) {
     this.timerEnded$ = this._timerEnded$.skip(1);
   }
 
   start() {
-    this.timeStarted = this.currentTimeInSeconds; // in seconds
-    this.endTime = this.timeStarted + (this.MinutesPerHour * this.totalMinutes);
+    this.startTime = this.currentTimeInSeconds; // in seconds
+    this.endTime = this.startTime + (this.MinutesPerHour * this.totalMinutes);
     this.started = true;
   }
 
   end() {
     this.ended = true;
     this._timerEnded$.next(undefined);
+  }
+
+  pause() {
+    this.pauseTime = this.currentTimeInSeconds;
+  }
+
+  resume() {
+    const pauseTime = this.pauseTime;
+    this.pauseTime = undefined;
+    const pauseLength = this.currentTimeInSeconds - pauseTime;
+    this.startTime += pauseLength;
+    this.endTime += pauseLength;
   }
 
   get minutesLeftString() {
@@ -50,7 +63,7 @@ export class Timer {
     if (!this.started) {
       return 0;
     }
-    const mins = (this.currentTimeInSeconds - this.timeStarted) / this.MinutesPerHour;
+    const mins = (this.currentTimeInSeconds - this.startTime) / this.MinutesPerHour;
     // console.log('mins', mins);
     return mins;
   }
@@ -62,7 +75,7 @@ export class Timer {
     if (!this.started) {
       return 0;
     }
-    const seconds = (this.currentTimeInSeconds - this.timeStarted) % this.MinutesPerHour;
+    const seconds = (this.currentTimeInSeconds - this.startTime) % this.MinutesPerHour;
     // console.log('seconds', seconds);
     if (seconds < 1) {
       return 0;
@@ -96,7 +109,7 @@ export class Timer {
     return seconds;
   }
 
-  get currentTimeInSeconds() { return new Date().getTime() / 1000; }
+  get currentTimeInSeconds() { return this.pauseTime || new Date().getTime() / 1000; }
 
   private checkForEnd(): void {
     if (this.started && !this.ended && this.minutesLeft < 1 && this.secondsLeft < 1) {

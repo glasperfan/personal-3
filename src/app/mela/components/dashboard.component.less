@@ -1,27 +1,21 @@
 @import 'shared';
 
 :host {
-  background-color: #444;
+  background-color: @background-dark;
   width: @dashboard-width;
-  box-shadow: 1px 1px 4px 1px #ccc;
   transition: 0.5s all ease-out;
 }
 
 #credits {
   .center;
-  .small-text;
-  flex-direction: column;
+  .page-text;
+  font-size: initial;
   height: 8em;
-  text-transform: initial;
-
-  .mela-icon {
-    width: 25px;
-    height: 25px;
-  }
 
   .by-us {
-    margin-top: 3px;
-    font-size: 0.85em;
+    margin-left: 0.7em;
+    margin-top: 4px;
+    font-weight: 100;
   }
 }
 
@@ -36,7 +30,7 @@
   height: 16em;
 
   >li {
-    text-transform: capitalize;
+    .page-text;
     .link;
   }
 }

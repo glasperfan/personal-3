@@ -8,7 +8,7 @@ export class PlaylistService {
   public currentSession$: Observable<ISession>;
   public newSessionCreated$: Observable<ISession>;
   public currentPlaylist$: Observable<IPlaylist>;
-  public toggleDashboard = false;
+  public toggleDashboard = true;
   
   private _newSessionCreated$: BehaviorSubject<ISession>;
   private _currentPlaylist$: BehaviorSubject<IPlaylist>;
@@ -36,6 +36,10 @@ export class PlaylistService {
     currentPlaylist.sessions.push(newSession);
     this._newSessionCreated$.next(newSession);
     this._currentPlaylist$.next(currentPlaylist);
+  }
+
+  public deleteCurrentSession(): void {
+    this.deleteSession(0);
   }
 
   public deleteSession(sessionIdx: number): void {

@@ -15,13 +15,16 @@ export class DisplayComponent implements OnInit, OnDestroy {
   public currentTimer: Timer;
   public newSessionName = '';
   public showAddSession = false;
-  public timerCompleted = false;
-  public timerNotStarted = true;
+  public sessionIsFinished = false;
+  public sessionIsRunning = false;
+  public sessionIsPaused = false;
+  public sessionIsReady = false;
   public melaCounts: { [key: string]: number }
   public queuedSessions$: Observable<ISession[]>;
   public currentSession$: Observable<ISession>;
   private readonly sessionTimerElementId = 'session-timer';
   private readonly _subscriptions: Subscription[] = [];
+  private _timerSubscription: Subscription;
 
   @ViewChild('sessionInput') sessionInputEl: ElementRef;
 
@@ -37,7 +40,7 @@ export class DisplayComponent implements OnInit, OnDestroy {
   ngOnInit() {
     if (this.playlistSvc.TotalQueuedSessions > 0) {
       this.createTimer();
-      this.timerNotStarted = true;
+      this.sessionIsReady = true;
     }
     this.createChart(this.sessionTimerElementId, MELA_SESSION_LENGTH);
     this._subscriptions.push(
@@ -45,7 +48,7 @@ export class DisplayComponent implements OnInit, OnDestroy {
       this.playlistSvc.newSessionCreated$.subscribe(_ => {
         if (this.playlistSvc.TotalQueuedSessions === 1) {
           this.createTimer();
-          this.timerNotStarted = true;
+          this.sessionIsReady = true;
         }
       })
     );
@@ -93,37 +96,52 @@ export class DisplayComponent implements OnInit, OnDestroy {
     if (sessionIdx === 0) {
       this.createTimer();
       if (this.playlistSvc.TotalQueuedSessions > 1) {
-        this.timerNotStarted = true;
+        this.sessionIsReady = true;
       } else {
-        this.timerNotStarted = false;
+        this.sessionIsReady = false;
         this.deleteTimer();
       }
     }
-    this.timerCompleted = false;
+    this.sessionIsFinished = false;
     this.playlistSvc.deleteSession(sessionIdx);
   }
 
   onTimerEnd(): void {
-    this.timerNotStarted = false;
-    this.timerCompleted = true;
+    this.sessionIsFinished = true;
   }
   
   onTimerComplete(): void {
     // update streak
     this.melaCounts[this.playlistSvc.currentSession.mela] += 1;
-    // delete current session, select next one
-    this.playlistSvc.deleteSession(0);
+    // delete current session and select the next one
+    this.playlistSvc.deleteCurrentSession();
     // reset timer
+    this._timerSubscription.unsubscribe();
+    this._timerSubscription = undefined;
     this.createTimer();
     // remove complete button
-    this.timerCompleted = false;
-    this.timerNotStarted = true;
+    this.sessionIsFinished = false;
+    this.sessionIsRunning = false;
+    this.sessionIsReady = !!this.playlistSvc.currentSession;
   }
 
   onTimerStart(): void {
     this.currentTimer.start();
-    this.currentTimer.timerEnded$.subscribe(() => setTimeout(() => this.onTimerEnd(), 0));
-    this.timerNotStarted = false;
+    this._timerSubscription = this.currentTimer.timerEnded$.subscribe(() => setTimeout(() => this.onTimerEnd(), 0));
+    this.sessionIsReady = false;
+    this.sessionIsRunning = true;
+  }
+
+  onTimerPause(): void {
+    this.sessionIsRunning = false;
+    this.sessionIsPaused = true;
+    this.currentTimer.pause();
+  }
+
+  onTimerResume(): void {
+    this.sessionIsRunning = true;
+    this.sessionIsPaused = false;
+    this.currentTimer.resume();
   }
 
   createTimer(time: number = MELA_SESSION_LENGTH): void {
@@ -134,11 +152,18 @@ export class DisplayComponent implements OnInit, OnDestroy {
     this.currentTimer = undefined;
   }
 
+  get shouldShowComplete(): boolean {
+    return this.sessionIsFinished || this.sessionIsRunning;
+  }
+
+
+  /* --- CHART --- */
+
   createChart(element: string, time: number) {
     const width = 60, height = 60;
 
     const fields = [
-      { value: time, size: time, label: 'm', update: _ => this.currentTimer && this.currentTimer.minutesPassed || 0 },
+      { value: time, size: time, label: 'm', update: _ => this.currentTimer && this.currentTimer.minutesPassed || time },
     ];
 
     const arc = d3.svg.arc()
@@ -148,6 +173,7 @@ export class DisplayComponent implements OnInit, OnDestroy {
     .endAngle(function(d) { return (d.value / d.size) * 2 * Math.PI; });
 
     const svg = d3.select('#' + element).append('svg')
+    .style({'fill': '#f05545', 'stroke': '#f05545'})
     .attr('width', width)
     .attr('height', height);
 

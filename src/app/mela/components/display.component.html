@@ -1,5 +1,8 @@
 <div class="main-display">
 
+  <!-- page header -->
+  <div class="page-header">timer</div>
+
   <!-- timer + streaks -->
   <div class="section current">
     <div id="clock">
@@ -8,11 +11,13 @@
     </div>
     
     <div class="subsection" id="timer">
-      <div class="header">time remaining</div>
+      <div class="header">countdown</div>
       <div class="center-container">
         <div class="info">{{currentTimer?.minutesLeftString || '00'}}:{{currentTimer?.secondsLeftString || '00'}}</div>
-        <div class="button timer-button" *ngIf="timerNotStarted" (click)="onTimerStart()">start</div>
-        <div class="button timer-button" *ngIf="timerCompleted" (click)="onTimerComplete()">complete</div>
+        <div class="button timer-button" *ngIf="sessionIsReady" (click)="onTimerStart()">start</div>
+        <div class="button timer-button" *ngIf="sessionIsRunning" (click)="onTimerPause()">pause</div>
+        <div class="button timer-button" *ngIf="sessionIsPaused" (click)="onTimerResume()">resume</div>
+        <div class="button timer-button" *ngIf="shouldShowComplete" (click)="onTimerComplete()">complete</div>
       </div>
     </div>
     
@@ -30,16 +35,18 @@
   <hr/>
 
   <!-- upcoming sessions -->
-  <div class="section upcoming">
+  <div class="section upcoming"
+  *ngIf="!(queuedSessions$ | async).length; else sessions"
+  (click)="onAddFirstSessionPrompt()">
     <!-- no sessions -->
-    <div class="session-item no-session-item"
-        *ngIf="!(queuedSessions$ | async).length; else sessions"
-        (click)="onAddFirstSessionPrompt()">
-      <div class="button add-first-mela-button">Ready to get started? Click here to make a mela.</div>
+    <div class="session-item no-session-item">
+      Ready to get started? Click here to make a mela.
     </div>
+  </div>
     
-    <!-- existing sessions -->
-    <ng-template #sessions>
+  <!-- existing sessions -->
+  <ng-template #sessions>
+    <div class="section upcoming">
       <div class="session-item" [ngClass]="{'current': i === 0}" *ngFor="let session of queuedSessions$ | async; let i = index">
         <div class="session-type">
             <img class="icon mela-icon" [src]="'assets/mela/' + session.mela + '.png'" />
@@ -52,24 +59,24 @@
           <img class="icon delete-icon" src="/assets/mela/delete.png" />
         </div>
       </div>
-    </ng-template>
-  
-    <!-- add session -->
-    <div class="session-item add-session-item" *ngIf="showAddSession">
-        <div class="session-type">
-            <img class="icon mela-icon" src="assets/mela/red-apple.png" />
-        </div>
-        <input #sessionInput 
-              class="session-name add-session-input"
-              type="text"
-              placeholder="Name your 25-minute session"
-              (keyup)="onAddSessionInput(sessionInput.value)"
-              (keyup.enter)="onSubmitSessionInput()"
-              (keyup.esc)="onCancelSessionInput()">
-        <div class="session-delete" (click)="onCancelSessionInput()">
-          <img class="icon delete-icon" src="/assets/mela/delete.png" />
-        </div>
     </div>
+  </ng-template>
+
+  <!-- add session -->
+  <div class="session-item" *ngIf="showAddSession">
+      <div class="session-type">
+          <img class="icon mela-icon" src="assets/mela/red-apple.png" />
+      </div>
+      <input #sessionInput 
+            class="session-name add-session-input"
+            type="text"
+            placeholder="Name your 25-minute session"
+            (keyup)="onAddSessionInput(sessionInput.value)"
+            (keyup.enter)="onSubmitSessionInput()"
+            (keyup.esc)="onCancelSessionInput()">
+      <div class="session-delete" (click)="onCancelSessionInput()">
+        <img class="icon delete-icon" src="/assets/mela/delete.png" />
+      </div>
   </div>
 
   <!-- add session button -->

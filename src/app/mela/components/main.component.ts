@@ -12,6 +12,10 @@ export class MainComponent implements AfterViewInit {
   constructor(public playlistSvc: PlaylistService, public titleSvc: Title, @Inject(DOCUMENT) private doc: HTMLDocument) {
     // Update title
     this.titleSvc.setTitle('Mela');
+
+    // Set html background color
+    const htmlElement = document.getElementsByTagName("html")[0];
+    htmlElement.style["background-color"] = "#7f0000";
   }
   
   ngAfterViewInit(): void {
