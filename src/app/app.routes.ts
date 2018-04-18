@@ -7,11 +7,6 @@ export const routes: Routes = [
     path: '',
     component: HomeComponent,
     pathMatch: 'full',
-  },
-  {
-    path: 'mela',
-    pathMatch: 'full',
-    loadChildren: './mela/mela.module#MelaModule'
   }
 ];
 
