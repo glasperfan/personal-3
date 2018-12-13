@@ -3,6 +3,7 @@ const express = require('express');
 const path = require('path');
 const http = require('http');
 const cors = require('cors');
+const request = require('request');
 const bodyParser = require('body-parser');
 const nodemailer = require('nodemailer');
 const settings = require('./settings');
@@ -60,6 +61,30 @@ app.post('/email', (req, res) => {
     }
     console.log('Message %s sent: %s', info.messageId, info.response);
   });
+});
+
+app.post('/uber/token', (req, res) => {
+  request.post('https://login.uber.com/oauth/v2/token',
+    { form: { // must be form - it's url-encoded data
+        client_id: settings.uber.clientId,
+        client_secret: settings.uber.clientSecret,
+        redirect_uri: 'http://localhost:4200/footprint', // must match what's in the uber_dashboard
+        grant_type: 'authorization_code',
+        scope: 'history',
+        code: req.body.authorizationCode
+      }
+    },
+    function (error, response, body) {
+      res.cookie()  
+      console.log(response.statusCode);
+        console.log(response.body);
+        if (!error && response.statusCode == 200) {
+            console.log(body);
+        } else {
+          console.log(error);
+        }
+    }
+  );
 });
 
 // Catch all other routes and return the index file

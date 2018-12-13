@@ -1,25 +1,33 @@
-import { BrowserModule } from '@angular/platform-browser';
+import { HttpClientModule } from '@angular/common/http';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { HttpModule } from '@angular/http';
+import { BrowserModule } from '@angular/platform-browser';
 import { AppComponent } from './app.component';
-import { TerminalComponent } from './components/terminal/terminal.component';
-import { HomeComponent } from './components/home/home.component';
-import { FooterComponent } from './components/footer/footer.component';
 import { ROUTES } from './app.routes';
+import { FooterComponent } from "./components/footer/footer.component";
+import { FootprintComponent } from './components/footprint/footprint.component';
+import { HomeComponent } from './components/home/home.component';
+import { TerminalComponent } from './components/terminal/terminal.component';
+import { TerminalService } from './services/terminal.service';
+import { UberAuthService } from './services/uber-auth.service';
 
 @NgModule({
   imports: [
     BrowserModule,
     FormsModule,
-    HttpModule,
+    HttpClientModule,
     ROUTES
   ],
   declarations: [
     AppComponent,
     HomeComponent,
     FooterComponent,
-    TerminalComponent
+    TerminalComponent,
+    FootprintComponent
+  ],
+  providers: [
+    TerminalService,
+    UberAuthService
   ],
   bootstrap: [AppComponent]
 })

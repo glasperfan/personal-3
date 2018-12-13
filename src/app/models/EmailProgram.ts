@@ -1,5 +1,6 @@
 import { Http } from '@angular/http';
-import { Observable } from 'rxjs/Rx';
+import { Observable, of } from 'rxjs';
+import { map, catchError } from 'rxjs/operators';
 import { IProgram, IResponse } from '../interfaces/IProgram';
 
 export class EmailProgram implements IProgram {
@@ -82,14 +83,15 @@ export class EmailProgram implements IProgram {
       email: this.senderEmail,
       message: this.senderMessage
     })
-    .map(_ => <IResponse>{
-      isFinal: true,
-      message: __ => 'Email successfully sent :)',
-    })
-    .catch(_ => Observable.of(<IResponse>{
-      isFinal: true,
-      message: __ => 'Oh no! Something went wrong... awkward.',
-    }));
+    .pipe(
+      map(_ => <IResponse>{
+        isFinal: true,
+        message: __ => 'Email successfully sent :)',
+      }),
+      catchError(_ => of(<IResponse>{
+        isFinal: true,
+        message: __ => 'Oh no! Something went wrong... awkward.',
+      })));
   }
 
   private isLettersAndSpaces(name: string): boolean {
