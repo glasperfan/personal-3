@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { UberAuthService } from '../../services/uber-auth.service';
 
 @Component({
@@ -10,18 +10,33 @@ import { UberAuthService } from '../../services/uber-auth.service';
 export class FootprintComponent implements OnInit {
     public copyright: string;
 
-    constructor(private activatedRoute: ActivatedRoute, private uberAuthService: UberAuthService) { }
+    constructor(
+        private activatedRoute: ActivatedRoute,
+        private router: Router,
+        private uberAuth: UberAuthService) { }
 
     ngOnInit() {
+        if (!this.uberAuth.isCurrentUserAuthorized) {
+            this.parseAuthCodeFromQueryParams();
+        }
+    }
+
+    parseAuthCodeFromQueryParams(): void {
         this.activatedRoute.queryParams.subscribe(params => {
             const authCode = params['code'];
             if (authCode) {
-                this.uberAuthService.exchangeAuthCodeForToken(authCode).subscribe();
+                this.authorizeUberAPI(authCode);
             }
         });
     }
 
-    getUberAuthUrl() {
-        return this.uberAuthService.uberAuthorizationUrl;
+    authorizeUberAPI(authCode: string): void {
+        this.uberAuth.exchangeAuthCodeForToken(authCode).subscribe(isTokenAcquired => {
+            if (isTokenAcquired) {
+                this.router.navigateByUrl('/footprint');
+            } else {
+
+            }
+        });
     }
 }

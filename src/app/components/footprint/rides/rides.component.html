@@ -1,0 +1,30 @@
+<div class="host h-100">
+    <div *ngIf="componentLoading; else loading">
+        <div class="rides">
+            <div *ngFor="let ride of rideHistory.history">
+                <div class="ride">
+                    <div class="ride-emissions">
+                        <div class="ride-emissions-est">{{calculate(ride)}}</div>
+                        <div class="ride-emmissions-desc">estimated emissions</div>
+                    </div>
+                    <div class="ride-header">
+                        <div class="ride-title">{{ride.start_city.display_name}}</div>
+                        <div class="ride-type">UberX ({{ride.product_id}})</div>
+                        <div class="ride-metrics">
+                            <div class="ride-dist">{{ride.distance}}</div>
+                            <div class="ride-time">{{calculateTime(ride.request_time, ride.end_time)}}</div>
+                        </div>
+                    </div>
+                    <div class="ride-details">
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <ng-template #loading>
+        <div class="spinner">
+            <mat-spinner></mat-spinner>
+        </div>
+    </ng-template>
+</div>

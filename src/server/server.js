@@ -63,6 +63,10 @@ app.post('/email', (req, res) => {
   });
 });
 
+function noError(error, response) {
+  return !error && response.statusCode == 200;
+}
+
 app.post('/uber/token', (req, res) => {
   request.post('https://login.uber.com/oauth/v2/token',
     { form: { // must be form - it's url-encoded data
@@ -74,17 +78,35 @@ app.post('/uber/token', (req, res) => {
         code: req.body.authorizationCode
       }
     },
-    function (error, response, body) {
-      res.cookie()  
-      console.log(response.statusCode);
-        console.log(response.body);
-        if (!error && response.statusCode == 200) {
-            console.log(body);
+    function (error, response, body) {  
+      if (noError(error, response)) {
+          const json = JSON.parse(body);
+          res.send({ accessToken: json.access_token });
         } else {
           console.log(error);
+          res.error('Failed to obtain access token: ' + (error ? error.error : '[no error message]'));
         }
     }
   );
+});
+
+app.get('/uber/history', (req, res) => {
+  request.get('https://api.uber.com/v1.2/history', {
+    qs: req.query.offset ? { offset: req.query.offset } : {},
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${req.query.accessToken}`,
+      'Accept-Language': 'en_US'
+    }
+  },
+  (err, response, body) => {
+    if (noError(err, response)) {
+      const json = JSON.parse(body);
+      res.send(json);
+    } else {
+      res.error('Failed to retrieve ride history ' + (error ? error.error : '[no error message]'));
+    }
+  });
 });
 
 // Catch all other routes and return the index file

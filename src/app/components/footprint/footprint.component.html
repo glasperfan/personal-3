@@ -1,2 +1,7 @@
-
-<a href="{{uberAuthService.uberAuthorizationUrl}}">Login to Uber!</a>
+<div *ngIf="uberAuth.isCurrentUserAuthorized; else unauthorized">
+    <p3-uber-navbar></p3-uber-navbar>
+    <p3-uber-rides></p3-uber-rides>
+</div>
+<ng-template #unauthorized>
+    <a href="{{uberAuth.uberAuthorizationUrl}}">Login to Uber!</a>
+</ng-template>
