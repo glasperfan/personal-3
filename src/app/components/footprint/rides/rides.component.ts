@@ -24,7 +24,7 @@ export class RidesComponent implements OnInit {
     }
 
     calculate(ride: IHistoricalRide) {
-        return ride.distance;
+        return Math.ceil(ride.distance);
     }
 
     calculateTime(startTime: number, endTime: number) {

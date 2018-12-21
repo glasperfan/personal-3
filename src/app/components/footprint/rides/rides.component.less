@@ -11,3 +11,34 @@
     justify-content: center;
     align-items: center;
 }
+
+.center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.ride {
+    display: flex;
+    flex-direction: row;
+
+    .ride-emissions {
+        width: 120px;
+        flex-direction: column;
+        .center;
+
+        .ride-emissions-est {
+            border: 2px solid #ae2b4e;
+            border-radius: 100%;
+            width: 75px;
+            height: 75px;
+            .center;
+        }
+
+        .ride-emissions-desc {
+            font-style: italic;
+            font-size: 11px;
+            width: 60px;
+        }
+    }
+}

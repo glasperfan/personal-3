@@ -1,11 +1,11 @@
 <div class="host h-100">
-    <div *ngIf="componentLoading; else loading">
+    <div *ngIf="!componentLoading; else loading">
         <div class="rides">
             <div *ngFor="let ride of rideHistory.history">
                 <div class="ride">
                     <div class="ride-emissions">
                         <div class="ride-emissions-est">{{calculate(ride)}}</div>
-                        <div class="ride-emmissions-desc">estimated emissions</div>
+                        <div class="ride-emissions-desc">estimated emissions</div>
                     </div>
                     <div class="ride-header">
                         <div class="ride-title">{{ride.start_city.display_name}}</div>
