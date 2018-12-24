@@ -14,6 +14,7 @@ export interface IAccessToken extends HttpStringParams {
 
 
 export interface IRideHistoryRequest extends IAccessToken {
+    limit?: string;
     offset?: string;
 }
 
@@ -59,6 +60,7 @@ export class UberApiService {
     getRideHistory(offset?: number, limit?: number): Observable<IRideHistoryResponse> {
         const request: IRideHistoryRequest = {
             offset: offset ? offset.toString() : '0',
+            limit: limit ? limit.toString(): '6',
             accessToken: this.authService.currentUserToken
         }
         return this.http.get<IRideHistoryResponse>(API.history, { params: request })

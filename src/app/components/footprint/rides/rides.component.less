@@ -1,12 +1,10 @@
 .host {
-    width: 600px;
-    min-height: 100%;
+    width: 500px;
     border-right: 1px solid #ccc;
 }
 
 .spinner {
     width: 100%;
-    height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -18,27 +16,72 @@
     justify-content: center;
 }
 
-.ride {
-    display: flex;
-    flex-direction: row;
+.small-text {
+    font-style: italic;
+    font-size: 11px;
+    width: 60px;
+}
 
-    .ride-emissions {
-        width: 120px;
-        flex-direction: column;
-        .center;
+@ride-height: 150px;
 
-        .ride-emissions-est {
-            border: 2px solid #ae2b4e;
-            border-radius: 100%;
-            width: 75px;
-            height: 75px;
-            .center;
+.rides {
+    overflow-y: scroll;
+
+    .ride {
+        height: 150px;
+        display: flex;
+        flex-direction: row;
+        padding: 20px 16px;
+        align-items: center;
+        transition: background-color 0.5s ease-out;
+    
+        &:hover {
+            background-color: #ddd;
         }
-
-        .ride-emissions-desc {
-            font-style: italic;
-            font-size: 11px;
-            width: 60px;
+    
+        .ride-emissions {
+            width: 120px;
+            flex-direction: column;
+            .center;
+            text-align: center;
+    
+            .ride-emissions-est {
+                border: 2px solid #bbbbbb;
+                border-radius: 20px;
+                width: 75px;
+                height: 75px;
+                .center;
+                flex-direction: column;
+            }
+    
+            .ride-emissions-unit {
+                .small-text;
+            }
+    
+            .ride-emissions-desc {
+                .small-text;
+            }
+        }
+    
+        .ride-header {
+            .ride-title {
+    
+            }
+    
+            .ride-type {
+    
+            }
+    
+            .ride-metrics {
+                display: flex;
+                color: #999;
+                align-items: center;
+                font-size: 14px;
+    
+                * {
+                    margin-right: 6px;
+                }
+            }
         }
     }
 }

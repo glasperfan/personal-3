@@ -1,18 +1,30 @@
 <div class="host h-100">
     <div *ngIf="!componentLoading; else loading">
-        <div class="rides">
+        <div class="rides" [style.height.px]="sidebarHeight">
             <div *ngFor="let ride of rideHistory.history">
                 <div class="ride">
                     <div class="ride-emissions">
-                        <div class="ride-emissions-est">{{calculate(ride)}}</div>
+                        <div class="ride-emissions-est">
+                            <div>{{calculate(ride)}}</div>
+                            <span class="ride-emissions-unit"><var>g/cm2</var></span>
+                        </div>
                         <div class="ride-emissions-desc">estimated emissions</div>
                     </div>
                     <div class="ride-header">
-                        <div class="ride-title">{{ride.start_city.display_name}}</div>
-                        <div class="ride-type">UberX ({{ride.product_id}})</div>
+                        <h4>
+                            {{ride.start_city.display_name}}
+                            <small class="text-muted">UberX</small>
+                        </h4>
                         <div class="ride-metrics">
-                            <div class="ride-dist">{{ride.distance}}</div>
-                            <div class="ride-time">{{calculateTime(ride.request_time, ride.end_time)}}</div>
+                            <div class="ride-dist">
+                                <span class="material-icons">{{ICON.COMMUTE}}</span>
+                                <span>{{ride.distance}}</span>
+                            </div>
+                            <div>|</div>
+                            <div class="ride-time">
+                                <span class="material-icons">{{ICON.TIME}}</span>
+                                <span>{{calculateTime(ride.request_time, ride.end_time)}}</span>
+                            </div>
                         </div>
                     </div>
                     <div class="ride-details">

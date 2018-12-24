@@ -92,7 +92,7 @@ app.post('/uber/token', (req, res) => {
 
 app.get('/uber/history', (req, res) => {
   request.get('https://api.uber.com/v1.2/history', {
-    qs: req.query.offset ? { offset: req.query.offset } : {},
+    qs: { limit: req.query.limit, offset: req.query.offset },
     headers: {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${req.query.accessToken}`,
