@@ -1,8 +1,8 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
-import { UberAuthService } from "./uber-auth.service";
 import { Observable } from "rxjs";
-import { tap, map } from "rxjs/operators";
+import { map } from "rxjs/operators";
+import { UberAuthService } from "./uber-auth.service";
 
 export type HttpStringParams = {
     [param: string]: string | string[];

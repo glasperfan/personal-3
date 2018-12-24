@@ -136,10 +136,10 @@ function retrieveRideHistoryAsync(token, limit, offset) {
   });
 }
 
-function retrieveRideHistory(token, maxRidesPerQuery, ridesArr) {
+function retrieveRideHistory(token, maxRidesPerQuery, ridesArr, getAll) {
   return retrieveRideHistoryAsync(token, maxRidesPerQuery, ridesArr.length).then(rides => {
     console.log('Retrieved response');
-    if (rides.history.length) {
+    if (rides.history.length && getAll) {
       ridesArr.push.apply(ridesArr, rides.history);
       console.log('Total stored: ' + ridesArr.length);
       return retrieveRideHistory(token, maxRidesPerQuery, ridesArr);
@@ -155,25 +155,19 @@ function retrieveRideHistory(token, maxRidesPerQuery, ridesArr) {
  * @param {string} token 
  */
 function retrieveAllRideHistory(token) {
-  return retrieveRideHistory(token, 50, []).then(allRides => {
-    console.log('DONE: ' + allRides.length);
-    return allRides;
-  })
+  return retrieveRideHistory(token, 50, [], true);
+}
+
+function toRideModels(rides, userId) {
+  rides.forEach(r => r.user_id = userId);
+  return rides.map(r => new Rides(r));
 }
 
 async function storeRides(rides, userId) {
-  rides.forEach(r => r.user_id = userId);
-  const rideObjects = rides.map(r => new Rides(r));
-  return Rides.create(rideObjects, { ordered: false }).then((err, savedObjects) => {
-    if (err) {
-      Promise.reject(err);
-    }
-    return savedObjects;
-  });
+  return Rides.create(toRideModels(rides, userId), { ordered: false }).then(_ => rides);
 }
 
 app.get('/uber/me', (req, res) => {
-  console.log('getting rider profile');
   request.get('https://api.uber.com/v1.2/me', {
     headers: {
       'Content-Type': 'application/json',
@@ -184,7 +178,6 @@ app.get('/uber/me', (req, res) => {
   (err, response, body) => {
     if (noError(err, response)) {
       const json = JSON.parse(body);
-      console.log(json);
       res.send(json);
     } else {
       res.error('Failed to retrieve rider profile ' + (error ? error.error : '[no error message]'));
@@ -204,6 +197,18 @@ app.get('/uber/history/all', (req, res) => {
         .then(rides => storeRides(rides, userId))
         .then(rides => res.send(rides));
     }
+  });
+});
+
+app.post('/uber/history/refresh', (req, res) => {
+  const userId = req.query.userId;
+  const accessToken = req.query.accessToken;
+  Rides.count({ user_id: userId }, (err, count) => {
+    if (err) {
+      console.error(err);
+    }
+    const retrieve = count ? retrieveRideHistory(accessToken, 50, [], false) : this.retrieveAllRideHistory(accessToken);
+    retrieve.then(rides => storeRides(rides, userId)).then(rides => res.send(rides));
   });
 });
 

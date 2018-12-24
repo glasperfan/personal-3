@@ -25,7 +25,7 @@ export class RidesComponent implements OnInit {
     ngOnInit(): void {
         this.componentLoading = true;
         this.api.getAllRides().pipe(
-            map(response => response.rides.slice(6))
+            map(response => response.rides.sort((a: IHistoricalRide, b: IHistoricalRide) => b.start_time - a.start_time))
         ).subscribe(rides => {
             this.rideHistory = rides;
             this.componentLoading = false;
@@ -42,6 +42,10 @@ export class RidesComponent implements OnInit {
 
     formatDistance(distance: number): string {
         return `${distance.toFixed(2)} miles`;
+    }
+
+    formatRideTime(startTime: number) {
+        return moment.unix(startTime).format('DD/MM/YY');
     }
 
     get sidebarHeight(): number {

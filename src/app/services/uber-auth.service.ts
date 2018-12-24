@@ -27,7 +27,7 @@ export class UberAuthService {
     public currentUserAuthorized: boolean;
 
     constructor(private http: HttpClient, private cookie: CookieService) {
-        // this.cookie.delete(this.cookieUserKey);
+        // this.cookie.delete(this.cookieUserTokenKey);
         // this.cookie.delete(this.cookieUserIdKey);
     }
 
