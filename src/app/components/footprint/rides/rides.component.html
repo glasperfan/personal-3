@@ -1,12 +1,15 @@
 <div class="host h-100">
+    <div id="ride-options">
+
+    </div>
     <div *ngIf="!componentLoading; else loading">
         <div class="rides" [style.height.px]="sidebarHeight">
-            <div *ngFor="let ride of rideHistory.history">
+            <div *ngFor="let ride of rideHistory">
                 <div class="ride">
                     <div class="ride-emissions">
                         <div class="ride-emissions-est">
                             <div>{{calculate(ride)}}</div>
-                            <span class="ride-emissions-unit"><var>g/cm2</var></span>
+                            <span class="ride-emissions-unit"><var>grams/mile</var></span>
                         </div>
                         <div class="ride-emissions-desc">estimated emissions</div>
                     </div>
@@ -18,7 +21,7 @@
                         <div class="ride-metrics">
                             <div class="ride-dist">
                                 <span class="material-icons">{{ICON.COMMUTE}}</span>
-                                <span>{{ride.distance}}</span>
+                                <span>{{formatDistance(ride.distance)}}</span>
                             </div>
                             <div>|</div>
                             <div class="ride-time">

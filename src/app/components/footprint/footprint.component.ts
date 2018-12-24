@@ -31,7 +31,7 @@ export class FootprintComponent implements OnInit {
     }
 
     authorizeUberAPI(authCode: string): void {
-        this.uberAuth.exchangeAuthCodeForToken(authCode).subscribe(isTokenAcquired => {
+        this.uberAuth.authorize(authCode).subscribe(isTokenAcquired => {
             if (isTokenAcquired) {
                 this.router.navigateByUrl('/footprint');
             } else {

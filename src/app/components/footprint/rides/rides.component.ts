@@ -1,12 +1,9 @@
 import { Component, OnInit } from "@angular/core";
 import * as moment from 'moment';
-import { 
-    EmissionsService,
-    EPAStandardEmissionsProps,
-    EPAStandardEmissionsService
-} from "../../../services/emissions.service";
-import { IHistoricalRide, IRideHistoryResponse, UberApiService } from "../../../services/uber-api.service";
+import { map } from "rxjs/operators";
 import { ICON } from '../../../models/Icon';
+import { EmissionsService, EPAStandardEmissionsProps, EPAStandardEmissionsService } from "../../../services/emissions.service";
+import { IHistoricalRide, UberApiService } from "../../../services/uber-api.service";
 
 @Component({
     selector: 'p3-uber-rides',
@@ -15,7 +12,7 @@ import { ICON } from '../../../models/Icon';
 })
 export class RidesComponent implements OnInit {
     
-    rideHistory: IRideHistoryResponse;
+    rideHistory: IHistoricalRide[];
     componentLoading: boolean;
     emissionsService: EmissionsService<EPAStandardEmissionsProps>;
     ICON = ICON;
@@ -27,7 +24,9 @@ export class RidesComponent implements OnInit {
     
     ngOnInit(): void {
         this.componentLoading = true;
-        this.api.getRideHistory().subscribe(rides => {
+        this.api.getAllRides().pipe(
+            map(response => response.rides.slice(6))
+        ).subscribe(rides => {
             this.rideHistory = rides;
             this.componentLoading = false;
         });
@@ -39,6 +38,10 @@ export class RidesComponent implements OnInit {
 
     calculateTime(startTime: number, endTime: number) {
         return moment.duration(moment(endTime).diff(startTime), 'seconds').humanize();
+    }
+
+    formatDistance(distance: number): string {
+        return `${distance.toFixed(2)} miles`;
     }
 
     get sidebarHeight(): number {

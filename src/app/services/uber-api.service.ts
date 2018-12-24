@@ -1,8 +1,8 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
-import { tap } from "rxjs/operators";
 import { UberAuthService } from "./uber-auth.service";
 import { Observable } from "rxjs";
+import { tap, map } from "rxjs/operators";
 
 export type HttpStringParams = {
     [param: string]: string | string[];
@@ -10,6 +10,14 @@ export type HttpStringParams = {
 
 export interface IAccessToken extends HttpStringParams {
     accessToken: string;
+}
+
+export interface IGetAllRidesRequest extends IAccessToken {
+    userId: string;
+}
+
+export interface IGetAllRidesResponse {
+    rides: IHistoricalRide[];
 }
 
 
@@ -43,7 +51,8 @@ export interface IRideHistoryResponse {
 }
 
 const API = {
-    history: 'http://localhost:6060/uber/history'
+    history: 'http://localhost:6060/uber/history',
+    allHistory: 'http://localhost:6060/uber/history/all'
 };
 
 
@@ -57,15 +66,26 @@ export class UberApiService {
      * @param offset Offset the list of returned results by this amount. Default is zero.
      * @param limit Number of items to retrieve. Default is 5, maximum is 50.
      */
-    getRideHistory(offset?: number, limit?: number): Observable<IRideHistoryResponse> {
-        const request: IRideHistoryRequest = {
-            offset: offset ? offset.toString() : '0',
-            limit: limit ? limit.toString(): '6',
+    // getRideHistory(offset?: number, limit?: number): Observable<IRideHistoryResponse> {
+    //     const request: IRideHistoryRequest = {
+    //         offset: offset ? offset.toString() : '0',
+    //         limit: limit ? limit.toString(): '6',
+    //         accessToken: this.authService.currentUserToken
+    //     }
+    //     return this.http.get<IRideHistoryResponse>(API.history, { params: request })
+    //         .pipe(
+    //             tap(body => console.log(body))
+    //         );
+    // }
+
+    getAllRides(): Observable<IGetAllRidesResponse> {
+        const request: IGetAllRidesRequest = {
+            userId: this.authService.currentUserId,
             accessToken: this.authService.currentUserToken
-        }
-        return this.http.get<IRideHistoryResponse>(API.history, { params: request })
-            .pipe(
-                tap(body => console.log(body))
-            );
+        };
+        console.log(request);
+        return this.http.get<IHistoricalRide[]>(API.allHistory, { params: request }).pipe(
+            map(rides => ({ rides: rides }))
+        );
     }
 }

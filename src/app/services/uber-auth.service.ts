@@ -2,25 +2,53 @@ import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { CookieService } from 'ngx-cookie-service';
 import { Observable, of } from "rxjs";
-import { catchError, map, tap } from "rxjs/operators";
+import { catchError, map, tap, flatMap } from "rxjs/operators";
 
 interface ITokenResponse {
     accessToken: string;
+}
+
+export interface IRiderProfile { 
+    picture: string;
+    first_name: string;
+    last_name: string;
+    rider_id: string;
+    email: string;
+    uuid: string;
 }
 
 @Injectable()
 export class UberAuthService {
 
     private readonly clientId: string = 'QKa6ZyD-Bqtc_oPjXEXuHymD9Gn-k0o4';
-    private readonly cookieUserKey: string = 'uber-footprint-access-token';
-
-    public uberAuthorizationUrl = `https://login.uber.com/oauth/v2/authorize?client_id=${this.clientId}&response_type=code&scope=history`;
+    private readonly cookieUserTokenKey: string = 'uber-footprint-access-token';
+    private readonly cookieUserIdKey: string = 'uber-footprint-user-id';
+    public uberAuthorizationUrl = `https://login.uber.com/oauth/v2/authorize?client_id=${this.clientId}&response_type=code&scope=history+profile`;
     public currentUserAuthorized: boolean;
 
-    constructor(private http: HttpClient, private cookie: CookieService) { }
+    constructor(private http: HttpClient, private cookie: CookieService) {
+        // this.cookie.delete(this.cookieUserKey);
+        // this.cookie.delete(this.cookieUserIdKey);
+    }
 
-    exchangeAuthCodeForToken(authorizationCode: string): Observable<boolean> {
-        if (this.isCurrentUserAuthorized) {
+    authorize(authorizationCode: string): Observable<boolean> {
+        return this.exchangeAuthCodeForToken(authorizationCode)
+            .pipe(
+                flatMap(_ => this.getRiderProfile())
+            );
+    }
+
+    getRiderProfile(): Observable<boolean> {
+        console.log('getRiderId');
+        return this.http.get<IRiderProfile>(`http://localhost:6060/uber/me`, { params: { accessToken: this.currentUserToken }})
+            .pipe(
+                tap(body => this.storeCurrentUserId(body.uuid)),
+                map(body => true)
+            );
+    }
+
+    private exchangeAuthCodeForToken(authorizationCode: string): Observable<boolean> {
+        if (this.hasAccessToken) {
             console.log('retrieving cached token');
             return of(true);
         }
@@ -39,14 +67,26 @@ export class UberAuthService {
     }
     
     get isCurrentUserAuthorized(): boolean {
-        return this.cookie.check(this.cookieUserKey);
+        return this.hasAccessToken && this.cookie.check(this.cookieUserIdKey);
+    }
+
+    private get hasAccessToken(): boolean {
+        return this.cookie.check(this.cookieUserTokenKey);
     }
 
     get currentUserToken(): string {
-        return this.cookie.get(this.cookieUserKey);
+        return this.cookie.get(this.cookieUserTokenKey);
+    }
+
+    get currentUserId(): string {
+        return this.cookie.get(this.cookieUserIdKey);
     }
 
     private storeCurrentUserAccessToken(accessToken: string): void {
-        this.cookie.set(this.cookieUserKey, accessToken);
+        this.cookie.set(this.cookieUserTokenKey, accessToken);
+    }
+
+    private storeCurrentUserId(userId: string): void {
+        this.cookie.set(this.cookieUserIdKey, userId);
     }
 }

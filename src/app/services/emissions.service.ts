@@ -8,7 +8,7 @@ export interface EPAStandardEmissionsProps {
 }
 
 export class EPAStandardEmissionsService implements EmissionsService<EPAStandardEmissionsProps> {
-    private readonly gramsPerMile = 404;
+    private readonly gramsPerMile = 170;
     
     /**
      *  Source: https://www.epa.gov/greenvehicles/greenhouse-gas-emissions-typical-passenger-vehicle
