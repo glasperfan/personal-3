@@ -45,7 +45,7 @@ export class RidesComponent implements OnInit {
     }
 
     formatRideTime(startTime: number) {
-        return moment.unix(startTime).format('DD/MM/YY');
+        return moment.unix(startTime).format('DD MMM YYYY HH:mm:ss a');
     }
 
     get sidebarHeight(): number {

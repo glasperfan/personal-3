@@ -1,3 +1,4 @@
+import { Injectable } from "@angular/core";
 
 export interface EmissionsService<T> {
     calculateEmissions(info: T): number;
@@ -7,6 +8,7 @@ export interface EPAStandardEmissionsProps {
     miles: number;
 }
 
+@Injectable()
 export class EPAStandardEmissionsService implements EmissionsService<EPAStandardEmissionsProps> {
     private readonly gramsPerMile = 170;
     

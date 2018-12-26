@@ -1,9 +1,18 @@
 import { Component, OnInit } from '@angular/core';
+import { Subscription } from 'rxjs';
+import { take } from 'rxjs/operators';
+import { IAggregateRow, RideStatsAggregator, RideStatsInterval, RideStatsService } from '../../../services/ride-stats.service';
 import { IHistoricalRide, UberApiService } from '../../../services/uber-api.service';
-import { groupBy, forOwn } from 'lodash-es';
-import * as moment from 'moment';
+import { unsubscribe } from '../../../utils';
+import { MatSelectChange } from '@angular/material/select';
 
 declare const google: any;
+
+interface IGoogleChartLabel {
+    label: string;
+    id: string;
+    type: string;
+}
 
 @Component({
     selector: 'p3-uber-dashboard',
@@ -13,31 +22,64 @@ declare const google: any;
 export class DashboardComponent implements OnInit {
     
     rides: IHistoricalRide[];
+
+    componentLoading: boolean = false;
     
-    constructor(private api: UberApiService) { }
+    defaultSelectedInterval: RideStatsInterval = 'week';
+    selectedInterval: RideStatsInterval = this.defaultSelectedInterval;
+
+    defaultSelectedAggregator: RideStatsAggregator = 'rideCount';
+    selectedAggregator: RideStatsAggregator = this.defaultSelectedAggregator;
+    
+    dataSubscription: Subscription;
+
+    chart: any;
+    chartLabels: IGoogleChartLabel[];
+    chartOptions: any;
+    dataTable: any;
+    
+    constructor(private api: UberApiService, private stats: RideStatsService) { }
     
     ngOnInit(): void {
-        this.api.getAllRides().subscribe(rides => {
-            this.rides = rides.rides;
-            this.createChart(this.rides);
-        })
+        this.stats.onStatsReady.subscribe(ready => {
+            this.componentLoading = !ready;
+            if (ready) {
+                this.retrieveStatsBasedOnCurrentSelection();
+            }
+        });
+        this.api.getAllRides().pipe(take(1)).subscribe(result => this.stats.rides = result.rides);
     }
 
-    createChart(rides: IHistoricalRide[]) {
-        google.charts.load('current', {'packages':['corechart']});
-        google.charts.setOnLoadCallback(drawChart);
-        let groupedResults = groupBy(rides, (r: IHistoricalRide) => moment.unix(r.start_time).startOf('month').format("MMM 'YY"));
-        console.log(groupedResults);
-        function drawChart() {
-            var data = new google.visualization.DataTable();
-            data.addColumn('string', 'Month');
-            data.addColumn('number', 'Ride Count');
-            const rows = [];
-            forOwn(groupedResults, (value: IHistoricalRide[], key: string) => rows.push([value[0].start_time, key, value.length]));
-            const sortedRows = rows.sort((a, b) => b[0] - a[0]).map(v => v.slice(1));
-            data.addRows(sortedRows);
+    onIntervalSelection(selectionChange: MatSelectChange) {
+        this.retrieveStatsBasedOnCurrentSelection();
+    }
 
-            var options = {
+    onAggregatorSelection(selection: MatSelectChange) {
+        this.retrieveStatsBasedOnCurrentSelection();
+    }
+
+    retrieveStatsBasedOnCurrentSelection(): void {
+        unsubscribe(this.dataSubscription);
+        this.dataSubscription = this.stats
+                    .getAggregationsBy(this.selectedAggregator, this.selectedInterval)
+                    .subscribe(aggregateRows => this.updateChart(aggregateRows));
+    }
+
+    updateChart(rows: IAggregateRow[]) {
+        if (!this.chart) {
+            this.drawChart(rows);
+        } else {
+            this.updateChartData(rows);
+            this.chart.draw(this.dataTable, this.chartOptions);
+        }
+    }
+
+    drawChart(rows: IAggregateRow[]) {
+        google.charts.load('current', { 'packages' : [ 'corechart' ] });
+        google.charts.setOnLoadCallback(() => {
+            this.updateChartData(rows);
+
+            this.chartOptions = {
                 title: 'Your Footprint',
                 curveType: 'function',
                 width: 1000,
@@ -57,9 +99,19 @@ export class DashboardComponent implements OnInit {
                 legend: { position: 'bottom' }
             };
 
-        var chart = new google.visualization.LineChart(document.getElementById('main-chart'));
+            this.chart = new google.visualization.LineChart(document.getElementById('main-chart'));
+            this.chart.draw(this.dataTable, this.chartOptions);
+        });
+    }
 
-        chart.draw(data, options);
-      }
+    updateChartData(rows: IAggregateRow[]): void {
+        this.chartLabels = [
+            { label: this.stats.IntervalOptions[this.selectedInterval], id: this.selectedInterval, type: 'string' },
+            { label: this.stats.AggregatorOptions[this.selectedAggregator], id: this.selectedAggregator, type: 'number' }
+        ];
+        this.dataTable = google.visualization.arrayToDataTable([
+            this.chartLabels,
+            ...rows
+        ], false);
     }
 }

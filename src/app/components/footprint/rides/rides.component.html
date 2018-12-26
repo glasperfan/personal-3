@@ -9,7 +9,7 @@
                     <div class="ride-emissions">
                         <div class="ride-emissions-est">
                             <div>{{calculate(ride)}}</div>
-                            <span class="ride-emissions-unit"><var>grams/mile</var></span>
+                            <span class="ride-emissions-unit"><var>grams</var></span>
                         </div>
                         <div class="ride-emissions-desc">estimated emissions</div>
                     </div>
@@ -29,7 +29,7 @@
                                 <span>{{calculateTime(ride.request_time, ride.end_time)}}</span>
                             </div>
                         </div>
-                        <div>{{formatRideTime(ride.start_time)}}</div>
+                        <div class="ride-start-time">{{formatRideTime(ride.start_time)}}</div>
                     </div>
                     <div class="ride-details">
 
