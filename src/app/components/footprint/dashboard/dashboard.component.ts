@@ -34,6 +34,7 @@ export class DashboardComponent implements OnInit {
     dataSubscription: Subscription;
 
     chart: any;
+    chartHeight = 400;
     chartLabels: IGoogleChartLabel[];
     chartOptions: any;
     dataTable: any;
@@ -75,16 +76,23 @@ export class DashboardComponent implements OnInit {
     }
 
     drawChart(rows: IAggregateRow[]) {
-        google.charts.load('current', { 'packages' : [ 'corechart' ] });
+        google.charts.load('current', { 'packages' : [ 'line' ] });
         google.charts.setOnLoadCallback(() => {
             this.updateChartData(rows);
 
             this.chartOptions = {
-                title: 'Your Footprint',
+                chart: {
+                    title: 'Your Footprint',
+                    subtitle: 'Select from the options to the right to examine your ride history by different metrics.'
+                },
+                explorer: { axis: 'horizontal' },
                 curveType: 'function',
-                width: 1000,
-                height: 400,
+                width: 850,
+                height: this.chartHeight,
                 chartArea:{
+                    left: 75,
+                    width: 775,
+                    top: 20
                 },
                 hAxis: { 
                     direction: -1,
@@ -96,11 +104,11 @@ export class DashboardComponent implements OnInit {
                     duration: 1000,
                     easing: 'inAndOut'
                 },
-                legend: { position: 'bottom' }
+                legend: { position: 'none' }
             };
 
-            this.chart = new google.visualization.LineChart(document.getElementById('main-chart'));
-            this.chart.draw(this.dataTable, this.chartOptions);
+            this.chart = new google.charts.Line(document.getElementById('main-chart'));
+            this.chart.draw(this.dataTable, google.charts.Line.convertOptions(this.chartOptions));
         });
     }
 
@@ -113,5 +121,9 @@ export class DashboardComponent implements OnInit {
             this.chartLabels,
             ...rows
         ], false);
+    }
+
+    get componentHeight(): number {
+        return window.innerHeight - document.getElementById('navbar').offsetHeight;
     }
 }

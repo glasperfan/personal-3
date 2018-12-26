@@ -1,4 +1,26 @@
+.flex {
+    display: flex;
+}
+
 :host {
     width: 100%;
     height: 100%;
+
+    .component {
+        margin: 0 25px;
+    }
+
+    .chart-with-options {
+        .flex;
+        justify-content: space-between;
+
+        .chart-options {
+            .flex;
+            flex-direction: column;
+
+            .chart-option {
+                margin: 20px 0;
+            }
+        }
+    }
 }

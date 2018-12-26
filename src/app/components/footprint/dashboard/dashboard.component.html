@@ -1,24 +1,36 @@
 <div class="wrapper">
     <div *ngIf="!componentLoading; else loading">
-        <div id="main-chart"></div>
-        <mat-select 
-            placeholder="Select an aggregator..."
-            [(value)]="selectedAggregator"
-            (selectionChange)="onAggregatorSelection($event)"
-        >
-            <mat-option *ngFor="let agg of stats.AggregatorOptions | keyvalue" [value]="agg.key">{{agg.value}}</mat-option>
-        </mat-select>
-        <mat-select
-            placeholder="Select an interval..."
-            [(value)]="selectedInterval"
-            (selectionChange)="onIntervalSelection($event)"
-        >
-            <mat-option *ngFor="let opt of stats.IntervalOptions | keyvalue" [value]="opt.key">{{opt.value}}</mat-option>
-        </mat-select>
+        <div class="component">
+            <!-- Chart -->
+            <div class="chart-with-options" [style.height.px]="chartHeight">
+                <div id="main-chart"></div>
+                <div class="chart-options">
+                    <mat-form-field class="chart-option">
+                        <mat-select 
+                            placeholder="Select an aggregator..."
+                            [(value)]="selectedAggregator"
+                            (selectionChange)="onAggregatorSelection($event)"
+                        >
+                            <mat-option *ngFor="let agg of stats.AggregatorOptions | keyvalue" [value]="agg.key">{{agg.value}}</mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                    <mat-form-field class="chart-option">
+                        <mat-select
+                            placeholder="Select an interval..."
+                            [(value)]="selectedInterval"
+                            (selectionChange)="onIntervalSelection($event)"
+                        >
+                            <mat-option *ngFor="let opt of stats.IntervalOptions | keyvalue" [value]="opt.key">{{opt.value}}</mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+            </div>
+            <!-- Trends -->
+        </div>
     </div>
     <ng-template #loading>
         <div class="spinner">
-            <mat-spinner></mat-spinner>
+            <p3-loading [height]="componentHeight"></p3-loading>
         </div>
     </ng-template>
 </div>

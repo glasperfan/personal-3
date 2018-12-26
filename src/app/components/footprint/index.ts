@@ -1,3 +1,4 @@
+export { LoadingComponent } from './loading/loading.component';
 export { DashboardComponent } from './dashboard/dashboard.component';
 export { FootprintComponent } from './footprint.component';
 export { NavbarComponent } from './navbar/navbar.component';
