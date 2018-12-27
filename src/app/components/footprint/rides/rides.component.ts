@@ -2,8 +2,9 @@ import { Component, OnInit } from "@angular/core";
 import * as moment from 'moment';
 import { ICON } from '../../../models/Icon';
 import { IHistoricalRideWithProduct } from "../../../models/RideHistory";
-import { EmissionsService, EPAStandardEmissionsProps, EPAStandardEmissionsService } from "../../../services/emissions.service";
+import { EmissionsService, EPAStandardEmissionsProps, EPAStandardEmissionsService, EmissionsUnits } from "../../../services/emissions.service";
 import { UberApiService } from "../../../services/uber-api.service";
+import { roundRobin } from "../../../utils";
 
 @Component({
     selector: 'p3-uber-rides',
@@ -13,9 +14,12 @@ import { UberApiService } from "../../../services/uber-api.service";
 export class RidesComponent implements OnInit {
     
     rideHistory: IHistoricalRideWithProduct[];
+    rideEmissions: string[]; // an array is used so change detection is triggered when units are changed
     componentLoading: boolean;
     emissionsService: EmissionsService<EPAStandardEmissionsProps>;
     ICON = ICON;
+
+    private displayUnits: EmissionsUnits[] = ['grams', 'kilograms', 'pounds'];
 
     constructor(private api: UberApiService) {
         this.componentLoading = false;
@@ -26,12 +30,25 @@ export class RidesComponent implements OnInit {
         this.componentLoading = true;
         this.api.getAllRides().subscribe(rides => {
             this.rideHistory = this.sortRides(rides);
+            this.refreshEmissionsForRides();
             this.componentLoading = false;
         });
     }
 
-    calculate(ride: IHistoricalRideWithProduct) {
-        return Math.round(this.emissionsService.calculateEmissions({ miles: ride.distance, isSharedRide: ride.product.shared }));
+    calculateEmissions(ride: IHistoricalRideWithProduct): string {
+        const raw = this.emissionsService.calculateEmissions({ miles: ride.distance, isSharedRide: ride.product.shared });
+        if (raw < 10) return raw.toPrecision(2);
+        if (raw < 100) return raw.toPrecision(1);
+        return Math.round(raw).toString();
+    }
+
+    refreshEmissionsForRides() {
+        this.rideEmissions = this.rideHistory.map(r => this.calculateEmissions(r));
+    }
+
+    onEmissionsUnitChange() {
+        this.emissionsService.units = roundRobin(this.displayUnits, this.displayUnits.indexOf(this.emissionsService.units));
+        this.refreshEmissionsForRides();
     }
 
     calculateTime(startTime: number, endTime: number) {

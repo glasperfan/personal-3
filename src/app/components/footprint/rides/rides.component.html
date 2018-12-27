@@ -4,12 +4,12 @@
     </div>
     <div *ngIf="!componentLoading; else loading">
         <div class="rides" [style.height.px]="sidebarHeight">
-            <div *ngFor="let ride of rideHistory">
+            <div *ngFor="let ride of rideHistory; index as i">
                 <div class="ride">
-                    <div class="ride-emissions">
+                    <div class="ride-emissions" (click)="onEmissionsUnitChange($event)">
                         <div class="ride-emissions-est">
-                            <div>{{calculate(ride)}}</div>
-                            <span class="ride-emissions-unit"><var>grams</var></span>
+                            <div>{{rideEmissions[i]}}</div>
+                            <span class="ride-emissions-unit"><var>{{emissionsService.displayUnits}}</var></span>
                         </div>
                         <div class="ride-emissions-desc">estimated emissions</div>
                     </div>

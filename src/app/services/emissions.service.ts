@@ -1,7 +1,37 @@
-import { Injectable } from "@angular/core";
+export type EmissionsUnits = 'grams' | 'pounds' | 'kilograms';
 
-export interface EmissionsService<T> {
-    calculateEmissions(info: T): number;
+const UnitsMap: { [U in EmissionsUnits]: string } = {
+    grams: 'grams',
+    pounds: 'lbs',
+    kilograms: 'kg'
+};
+
+export abstract class EmissionsService<T> {
+    protected converters: { [U in EmissionsUnits]: Function } = {
+        grams: (grams: number) => grams,
+        pounds: (grams: number): number => (grams * 0.00220462),
+        kilograms: (grams: number): number => (grams / 1000)
+    };
+
+    protected selectedUnit: EmissionsUnits = 'grams';
+    
+    set units(unit: EmissionsUnits) {
+        this.selectedUnit = unit;
+    }
+
+    get units(): EmissionsUnits {
+        return this.selectedUnit;
+    }
+
+    get displayUnits(): string {
+        return UnitsMap[this.selectedUnit];
+    }
+
+    abstract calculateEmissions(info: T): number;
+    
+    protected convertToUnits(grams: number) {
+        return this.converters[this.selectedUnit](grams);
+    }
 }
 
 export interface EPAStandardEmissionsProps {
@@ -9,8 +39,7 @@ export interface EPAStandardEmissionsProps {
     isSharedRide: boolean;
 }
 
-@Injectable()
-export class EPAStandardEmissionsService implements EmissionsService<EPAStandardEmissionsProps> {
+export class EPAStandardEmissionsService extends EmissionsService<EPAStandardEmissionsProps> {
     private readonly gramsPerMile = 170;
     
     /**
@@ -19,8 +48,8 @@ export class EPAStandardEmissionsService implements EmissionsService<EPAStandard
      * @param info 
      */    
     calculateEmissions(info: EPAStandardEmissionsProps): number {
-        const base = info.miles * this.gramsPerMile;
-        return info.isSharedRide ? base / 2 : base;
+        let base = info.miles * this.gramsPerMile;
+        base = info.isSharedRide ? base / 2 : base;
+        return this.convertToUnits(base);
     }
-    
 }

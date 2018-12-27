@@ -24,6 +24,7 @@ export class UberAuthService {
     private readonly cookieUserTokenKey: string = 'uber-footprint-access-token';
     private readonly cookieUserIdKey: string = 'uber-footprint-user-id';
     public uberAuthorizationUrl = `https://login.uber.com/oauth/v2/authorize?client_id=${this.clientId}&response_type=code&scope=history+profile`;
+    public privacyPolicyUrl = 'https://app.termly.io/document/privacy-policy/0b244b38-f8b7-4de0-a61d-da0faaf8fb40';
     public currentUserAuthorized: boolean;
 
     constructor(private http: HttpClient, private cookie: CookieService) {

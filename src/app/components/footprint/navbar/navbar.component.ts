@@ -1,4 +1,5 @@
 import { Component } from "@angular/core";
+import { UberAuthService } from "../../../services/uber-auth.service";
 
 
 @Component({
@@ -6,4 +7,6 @@ import { Component } from "@angular/core";
     templateUrl: 'navbar.component.html',
     styleUrls: [ 'navbar.component.less' ]
 })
-export class NavbarComponent { }
+export class NavbarComponent {
+    constructor (public auth: UberAuthService) { }
+}
