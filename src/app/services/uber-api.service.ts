@@ -2,7 +2,10 @@ import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { Observable } from "rxjs";
 import { UberAuthService } from "./uber-auth.service";
-import { IGetAllRidesResponse, IGetAllRidesRequest } from "../models/RideHistory";
+import { IGetAllRidesResponse, IGetAllRidesRequest, IHistoricalRideWithProduct } from "../models/RideHistory";
+import { map } from "rxjs/operators";
+import { keyBy } from "lodash-es";
+import { IRideProduct } from "../models/RideProduct";
 
 const API = {
     history: 'http://localhost:6060/uber/history',
@@ -32,11 +35,17 @@ export class UberApiService {
     //         );
     // }
 
-    getAllRides(): Observable<IGetAllRidesResponse> {
+    getAllRides(): Observable<IHistoricalRideWithProduct[]> {
         const request: IGetAllRidesRequest = {
             userId: this.authService.currentUserId,
             accessToken: this.authService.currentUserToken
         };
-        return this.http.get<IGetAllRidesResponse>(API.allHistory, { params: request });
+        return this.http.get<IGetAllRidesResponse>(API.allHistory, { params: request }).pipe(map(response => {
+            const productMap = keyBy(response.products, (rp: IRideProduct) => rp.product_id);
+            return response.rides.map((ride: IHistoricalRideWithProduct) => {
+                ride.product = productMap[ride.product_id];
+                return ride;
+            });
+        }));
     }
 }

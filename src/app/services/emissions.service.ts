@@ -6,6 +6,7 @@ export interface EmissionsService<T> {
 
 export interface EPAStandardEmissionsProps {
     miles: number;
+    isSharedRide: boolean;
 }
 
 @Injectable()
@@ -18,7 +19,8 @@ export class EPAStandardEmissionsService implements EmissionsService<EPAStandard
      * @param info 
      */    
     calculateEmissions(info: EPAStandardEmissionsProps): number {
-        return info.miles * this.gramsPerMile;
+        const base = info.miles * this.gramsPerMile;
+        return info.isSharedRide ? base / 2 : base;
     }
     
 }

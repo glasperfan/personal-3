@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { MatSelectChange } from '@angular/material/select';
 import { Subscription } from 'rxjs';
 import { take } from 'rxjs/operators';
-import { IHistoricalRide } from '../../../models/RideHistory';
+import { IHistoricalRideWithProduct } from '../../../models/RideHistory';
 import { IAggregateRow, RideStatsAggregator, RideStatsInterval, RideStatsService } from '../../../services/ride-stats.service';
 import { UberApiService } from '../../../services/uber-api.service';
 import { unsubscribe } from '../../../utils';
@@ -22,7 +22,7 @@ interface IGoogleChartLabel {
 })
 export class DashboardComponent implements OnInit {
     
-    rides: IHistoricalRide[];
+    rides: IHistoricalRideWithProduct[];
 
     componentLoading: boolean = false;
     
@@ -49,7 +49,7 @@ export class DashboardComponent implements OnInit {
                 this.retrieveStatsBasedOnCurrentSelection();
             }
         });
-        this.api.getAllRides().pipe(take(1)).subscribe(result => this.stats.rides = result.rides);
+        this.api.getAllRides().pipe(take(1)).subscribe(rides => this.stats.rides = rides);
     }
 
     onIntervalSelection(selectionChange: MatSelectChange) {

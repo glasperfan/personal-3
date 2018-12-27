@@ -40,6 +40,10 @@ export interface IHistoricalRide {
     end_time: number;
 }
 
+export interface IHistoricalRideWithProduct extends IHistoricalRide {
+    product: IRideProduct;
+}
+
 export interface IRideHistoryResponse {
     offset: number;
     limit: number;
