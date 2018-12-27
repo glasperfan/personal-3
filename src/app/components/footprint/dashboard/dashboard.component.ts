@@ -1,10 +1,11 @@
 import { Component, OnInit } from '@angular/core';
+import { MatSelectChange } from '@angular/material/select';
 import { Subscription } from 'rxjs';
 import { take } from 'rxjs/operators';
+import { IHistoricalRide } from '../../../models/RideHistory';
 import { IAggregateRow, RideStatsAggregator, RideStatsInterval, RideStatsService } from '../../../services/ride-stats.service';
-import { IHistoricalRide, UberApiService } from '../../../services/uber-api.service';
+import { UberApiService } from '../../../services/uber-api.service';
 import { unsubscribe } from '../../../utils';
-import { MatSelectChange } from '@angular/material/select';
 
 declare const google: any;
 
@@ -95,7 +96,7 @@ export class DashboardComponent implements OnInit {
                     top: 20
                 },
                 hAxis: { 
-                    direction: -1,
+                    // direction: -1,
                     slantedText: true,
                     minTextSpacing: 50
                 },

@@ -1,10 +1,10 @@
 import { Injectable } from "@angular/core";
 import { Observable, BehaviorSubject } from "rxjs";
-import { IHistoricalRide } from "./uber-api.service";
 import { groupBy, mapValues, values } from "lodash-es";
 import * as moment from 'moment';
 import { EPAStandardEmissionsService } from "./emissions.service";
 import { map } from "rxjs/operators";
+import { IHistoricalRide } from "../models/RideHistory";
 
 export type RideStatsAggregator = 'rideCount' | 'totalEmissions';
 export type RideStatsInterval = 'week' | 'month' | 'year';

@@ -39,7 +39,6 @@ export class UberAuthService {
     }
 
     getRiderProfile(): Observable<boolean> {
-        console.log('getRiderId');
         return this.http.get<IRiderProfile>(`http://localhost:6060/uber/me`, { params: { accessToken: this.currentUserToken }})
             .pipe(
                 tap(body => this.storeCurrentUserId(body.uuid)),
@@ -49,7 +48,6 @@ export class UberAuthService {
 
     private exchangeAuthCodeForToken(authorizationCode: string): Observable<boolean> {
         if (this.hasAccessToken) {
-            console.log('retrieving cached token');
             return of(true);
         }
         return this.http.post<ITokenResponse>(`http://localhost:6060/uber/token`, { authorizationCode })

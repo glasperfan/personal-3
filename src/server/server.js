@@ -4,10 +4,13 @@ const path = require('path');
 const http = require('http');
 const cors = require('cors');
 const request = require('request-promise');
+const q = require('q');
+const _ = require('lodash');
 const bodyParser = require('body-parser');
 const nodemailer = require('nodemailer');
 const mongoose = require('mongoose');
 const Rides = require('./models/Rides');
+const RideProducts = require('./models/RideProducts');
 const settings = require('./settings');
 
 const app = express();
@@ -85,6 +88,14 @@ function noError(error, response) {
   return !error && response.statusCode == 200;
 }
 
+function uberHeaders(token) {
+  return {
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${token}`,
+    'Accept-Language': 'en_US'
+  }
+}
+
 app.post('/uber/token', (req, res) => {
   console.log('acquiring access token');
   console.log(req.body.authorizationCode);
@@ -116,18 +127,29 @@ function sleeper(ms) {
   };
 }
 
-function retrieveRideHistoryAsync(token, limit, offset) {
-  console.log('Request retrieved');
+async function retrieveRideProductAsync(token, productId) {
+  return request({
+    method: 'GET',
+    uri: `https://api.uber.com/v1.2/products/${productId}`,
+    json: true,
+    headers: uberHeaders(token)
+  }).then((productDetails) => new RideProducts(productDetails));
+}
+
+async function retrieveAllRideProducts(token, productIds) {
+  return q.all(productIds.map(p => retrieveRideProductAsync(token, p))).then(allProducts => {
+    console.log(allProducts);
+    return allProducts;
+  });
+}
+
+async function retrieveRideHistoryAsync(token, limit, offset) {
   return request({
     method: 'GET', 
     uri: 'https://api.uber.com/v1.2/history',
     json: true, // Automatically parses the JSON string in the response
     qs: { limit: limit, offset: offset },
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`,
-      'Accept-Language': 'en_US'
-    }
+    headers: uberHeaders(token)
   }).then(function (rides) {
     console.log('Retrieved ' + rides.history.length + ' rides');
     return Promise.resolve(rides);
@@ -167,14 +189,13 @@ async function storeRides(rides, userId) {
   return Rides.create(toRideModels(rides, userId), { ordered: false }).then(_ => rides);
 }
 
+async function storeRideProducts(products) {
+  return RideProducts.create(products, { ordered: false }); // returns a promise
+}
+
 app.get('/uber/me', (req, res) => {
-  request.get('https://api.uber.com/v1.2/me', {
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${req.query.accessToken}`,
-      'Accept-Language': 'en_US'
-    }
-  },
+  request.get('https://api.uber.com/v1.2/me',
+  { headers: uberHeaders(req.query,accessToken) },
   (err, response, body) => {
     if (noError(err, response)) {
       const json = JSON.parse(body);
@@ -185,17 +206,42 @@ app.get('/uber/me', (req, res) => {
   });
 });
 
+async function getProductsForRides(token, rides) {
+  const allProductIds = _.uniq(rides.map(r => r.product_id)); 
+  return new Promise((resolve, reject) => RideProducts.find({ product_id: { $in: allProductIds }}, (err, results) => {
+    if (err) reject(err);
+    resolve(results);
+  })).then(results => {
+    if (allProductIds.length === results.length) {
+      // We already have all ride products stored
+      return results;
+    } else {
+      // Else, return the ones we have plus the ones we now retrieve (and store).
+      const resultIds = results.map(r => r.product_id);
+      const notYetStoredIds = _.difference(allProductIds, resultIds);
+      return retrieveAllRideProducts(token, notYetStoredIds)
+        .then(retrievedProducts => storeRideProducts(retrievedProducts))
+        .then(storedProducts => storedProducts.concat(results));
+    }
+  });
+}
+
 app.get('/uber/history/all', (req, res) => {
   const userId = req.query.userId;
+  const token = req.query.accessToken;
   Rides.find({ user_id: userId }, (err, results) => {
     if (err) {
       console.error(err);
     } else if (!!results.length) {
-      res.send(results);
+      return getProductsForRides(token, results)
+        .then(products => res.send({ rides: results, products: products }));
     } else {
-      retrieveAllRideHistory(req.query.accessToken)
+      let retrievedRides = undefined;
+      retrieveAllRideHistory(token)
+        .then(rides => { retrievedRides = rides; return rides; })
         .then(rides => storeRides(rides, userId))
-        .then(rides => res.send(rides));
+        .then(rides => getProductsForRides(token, rides))
+        .then(products => res.send({ rides: retrievedRides, products: products }));
     }
   });
 });
@@ -215,11 +261,7 @@ app.post('/uber/history/refresh', (req, res) => {
 app.get('/uber/history', (req, res) => {
   request.get('https://api.uber.com/v1.2/history', {
     qs: { limit: req.query.limit, offset: req.query.offset },
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${req.query.accessToken}`,
-      'Accept-Language': 'en_US'
-    }
+    headers: uberHeaders(req.query.accessToken)
   },
   (err, response, body) => {
     if (noError(err, response)) {

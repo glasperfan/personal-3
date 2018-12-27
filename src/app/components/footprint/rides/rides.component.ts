@@ -1,9 +1,11 @@
 import { Component, OnInit } from "@angular/core";
+import { keyBy } from "lodash-es";
 import * as moment from 'moment';
-import { map } from "rxjs/operators";
 import { ICON } from '../../../models/Icon';
+import { IHistoricalRide } from "../../../models/RideHistory";
+import { IRideProduct } from "../../../models/RideProduct";
 import { EmissionsService, EPAStandardEmissionsProps, EPAStandardEmissionsService } from "../../../services/emissions.service";
-import { IHistoricalRide, UberApiService } from "../../../services/uber-api.service";
+import { UberApiService } from "../../../services/uber-api.service";
 
 @Component({
     selector: 'p3-uber-rides',
@@ -13,6 +15,7 @@ import { IHistoricalRide, UberApiService } from "../../../services/uber-api.serv
 export class RidesComponent implements OnInit {
     
     rideHistory: IHistoricalRide[];
+    rideProducts: { [productId: string]: IRideProduct };
     componentLoading: boolean;
     emissionsService: EmissionsService<EPAStandardEmissionsProps>;
     ICON = ICON;
@@ -24,10 +27,9 @@ export class RidesComponent implements OnInit {
     
     ngOnInit(): void {
         this.componentLoading = true;
-        this.api.getAllRides().pipe(
-            map(response => response.rides.sort((a: IHistoricalRide, b: IHistoricalRide) => b.start_time - a.start_time))
-        ).subscribe(rides => {
-            this.rideHistory = rides;
+        this.api.getAllRides().subscribe(response => {
+            this.rideHistory = this.sortRides(response.rides);
+            this.rideProducts = keyBy(response.products, (rp: IRideProduct) => rp.product_id);
             this.componentLoading = false;
         });
     }
@@ -48,7 +50,15 @@ export class RidesComponent implements OnInit {
         return moment.unix(startTime).format('DD MMM YYYY HH:mm:ss a');
     }
 
+    formatProduct(product_id: string) {
+        return this.rideProducts[product_id].display_name;
+    }
+
     get sidebarHeight(): number {
         return window.innerHeight - document.getElementById('navbar').offsetHeight;
+    }
+
+    sortRides(rides: IHistoricalRide[]): IHistoricalRide[] {
+        return rides.sort((a: IHistoricalRide, b: IHistoricalRide) => b.start_time - a.start_time);
     }
 }
