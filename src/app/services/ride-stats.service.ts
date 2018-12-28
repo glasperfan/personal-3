@@ -14,6 +14,7 @@ type AggregateRides = { [time: string]: IHistoricalRideWithProduct[] };
 type AggregateRows = { [I in RideStatsInterval]: IAggregateRow[] };
 // collections of rides grouped by times grouped by interval
 type Aggregations = { [I in RideStatsInterval]: AggregateRides };
+type Trends = { [A in RideStatsAggregator]: { [I in RideStatsInterval]: ITrend }};
 
 export type IAggregateRow = any[];
 
@@ -21,6 +22,11 @@ export interface IGoogleChartLabel {
     label: string;
     id: string;
     type: string;
+}
+
+export interface ITrend {
+    thisInterval: number;
+    lastInterval: number;
 }
 
 @Injectable()
@@ -32,11 +38,19 @@ export class RideStatsService {
         year: 'Yearly'
     };
 
+    public readonly IntervalsInOrder: RideStatsInterval[] = ['week', 'month', 'year']; 
+
     public readonly AggregatorOptions: { [I in RideStatsAggregator]: string } = {
         rideCount: 'By Ride Count',
         totalEmissions: 'By Total Emissions',
         productType: 'By Product Type'
     };
+
+    public readonly TrendTitles: { [I in RideStatsAggregator]: string } = {
+        rideCount: 'Ride Count',
+        totalEmissions: 'Total Emissions',
+        productType: 'Product Type'
+    }
 
     private readonly UberLabels = {
         'uberx': 'Uber X',
@@ -58,6 +72,7 @@ export class RideStatsService {
     private _productTypeBy: BehaviorSubject<AggregateRows> = new BehaviorSubject(this.EMPTY_AGGREGATES);
     private _productTypeBy$: Observable<AggregateRows>;
     private _columns: { [A in RideStatsAggregator]: IGoogleChartLabel[] };
+    private _trends: Trends;
     
     private groupedAggregates: Aggregations;
 
@@ -105,6 +120,7 @@ export class RideStatsService {
      * What are my carbon emissions by week/month/year?
      * What are the trends?
      *  Average over all weeks/months/years vs last week/month/year?
+     *  Compare this __ against last __ and all time. (week/month/year) 
      * What is the impact?
      *  How does my emissions from last month of Uber rides compare to a one-way flight to London?
      * 
@@ -113,25 +129,48 @@ export class RideStatsService {
      */
 
     getAggregationsBy(aggregator: RideStatsAggregator, interval: RideStatsInterval): Observable<IAggregateRow[]> {
-        if (aggregator === 'rideCount') return this.getRideCountBy(interval);
-        if (aggregator === 'totalEmissions') return this.getCarbonEmissionsBy(interval);
-        if (aggregator === 'productType') return this.getProductTypeBy(interval);
+        if (aggregator === 'rideCount') return this.getRideCountBy$(interval);
+        if (aggregator === 'totalEmissions') return this.getCarbonEmissionsBy$(interval);
+        if (aggregator === 'productType') return this.getProductTypeBy$(interval);
         throw new Error('invalid aggregation option');
+    }
+
+    getTrendsBy(aggregator: RideStatsAggregator): { [I in RideStatsInterval]: ITrend } {
+        return this._trends[aggregator];
     }
 
     columns(A: RideStatsAggregator): IGoogleChartLabel[] {
         return this._columns[A];
     }
+
+    private getAggregations(aggregator: RideStatsAggregator): AggregateRows {
+        if (aggregator === 'rideCount') return this.getRideCountBy();
+        if (aggregator === 'totalEmissions') return this.getCarbonEmissionsBy();
+        if (aggregator === 'productType') return this.getProductTypeBy();
+        throw new Error('invalid aggregation option');
+    }
+
+    private getRideCountBy(): AggregateRows {
+        return this._rideCountBy.getValue();
+    }
     
-    private getRideCountBy(interval: RideStatsInterval): Observable<IAggregateRow[]> {
+    private getRideCountBy$(interval: RideStatsInterval): Observable<IAggregateRow[]> {
         return this._rideCountBy$.pipe(map(byInterval => byInterval[interval]));
     }
 
-    private getCarbonEmissionsBy(interval: RideStatsInterval): Observable<IAggregateRow[]>{
+    private getCarbonEmissionsBy(): AggregateRows {
+        return this._emissionsBy.getValue();
+    }
+
+    private getCarbonEmissionsBy$(interval: RideStatsInterval): Observable<IAggregateRow[]>{
         return this._emissionsBy$.pipe(map(byInterval => byInterval[interval]));
     }
 
-    private getProductTypeBy(interval: RideStatsInterval): Observable<IAggregateRow[]> {
+    private getProductTypeBy(): AggregateRows {
+        return this._productTypeBy.getValue();
+    }
+
+    private getProductTypeBy$(interval: RideStatsInterval): Observable<IAggregateRow[]> {
         return this._productTypeBy$.pipe(map(byInterval => byInterval[interval]));
     }
 
@@ -152,6 +191,7 @@ export class RideStatsService {
         this.calculateRideCountBy();
         this.calculateCarbonEmissionsBy();
         this.calculateProductTypeBy();
+        this.calculateTrends();
     }
 
     /**
@@ -223,5 +263,31 @@ export class RideStatsService {
         const typeArr = uniq(this.rides.map(r => r.product.product_group));
         this._columns.productType = typeArr.map(t => ({ id: t, label: this.UberLabels[t], type: 'number' } as IGoogleChartLabel));
         return typeArr;
+    }
+
+    private calculateTrends() {
+        this._trends = {
+            productType: this.generateTrendForAggregate('productType'),
+            rideCount: this.generateTrendForAggregate('rideCount'),
+            totalEmissions: this.generateTrendForAggregate('totalEmissions')
+        }
+    }
+
+    private generateTrendForAggregate(aggregator: RideStatsAggregator): ({ [I in RideStatsInterval]: ITrend }) {
+        const agg = this.getAggregations(aggregator);
+        return {
+            week: this.generateTrend(agg.week),
+            month: this.generateTrend(agg.month),
+            year: this.generateTrend(agg.year)
+        }
+    }
+    
+    private generateTrend(rows: IAggregateRow[]): ITrend {
+        // Rows are sorted so that the latest interval object is the last.
+        // Choose row[1] because row[0] is the key.
+        return {
+            lastInterval: rows[rows.length - 2][1],
+            thisInterval: rows[rows.length - 1][1]
+        } as ITrend;
     }
 }

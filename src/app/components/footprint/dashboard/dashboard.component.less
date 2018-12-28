@@ -23,4 +23,51 @@
             }
         }
     }
+
+    .trends {
+        margin-top: 40px;
+
+        .trend-banner {
+            font-weight: 200;
+            line-height: 2;
+            font-size: 16px;
+            color: #757575;
+        }
+
+        .trend-container {
+            display: flex;
+            justify-content: space-evenly;
+            align-items: center;
+            min-height: 200px;
+
+
+            .trend {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                padding: 12px;
+                
+                .material-icons {
+                    font-size: 24px;
+
+                    &.trending_up {
+                        color: orange;
+                    }
+
+                    &.trending_down {
+                        color: green;
+                    }
+                }
+
+                .trend-value {
+                    font-size: 24px;
+                }
+
+                .trend-desc {
+                    color: #BBB;
+                    font-size: 13px;
+                }
+            }
+        }
+    }
 }

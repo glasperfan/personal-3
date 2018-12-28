@@ -29,7 +29,10 @@
                                 <span>{{calculateTime(ride.request_time, ride.end_time)}}</span>
                             </div>
                         </div>
-                        <div class="ride-start-time">{{formatRideTime(ride.start_time)}}</div>
+                        <div class="ride-start-time">
+                            <span class="material-icons">{{ICON.DATE}}</span>
+                            <span>{{formatRideTime(ride.start_time)}}</span>
+                        </div>
                     </div>
                     <div class="ride-details">
 
