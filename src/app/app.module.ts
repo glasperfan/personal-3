@@ -14,6 +14,9 @@ import * as UberEmissions from './components/footprint';
 import { HomeComponent } from './components/home/home.component';
 import { TerminalComponent } from './components/terminal/terminal.component';
 import * as ModuleServices from './services';
+import { ServerAPI } from './models/ServerApi';
+import { environment } from '../environments/environment';
+import { UberAPI } from './models/UberApi';
 
 const UberModules = [
   MatProgressSpinnerModule,
@@ -43,6 +46,8 @@ const Services = Object.keys(ModuleServices).map(key => ModuleServices[key]);
   providers: [
     CookieService,
     HttpClient,
+    { provide: ServerAPI, useValue: new ServerAPI(environment.apiUrl) },
+    { provide: UberAPI, useValue: new UberAPI(environment.clientId) },
     ...Services
   ],
   bootstrap: [AppComponent]

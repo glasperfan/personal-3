@@ -28,7 +28,7 @@ export class RidesComponent implements OnInit {
     
     ngOnInit(): void {
         this.componentLoading = true;
-        this.api.getAllRides().subscribe(rides => {
+        this.api.getAllRideHistory().subscribe(rides => {
             this.rideHistory = this.sortRides(rides);
             this.refreshEmissionsForRides();
             this.componentLoading = false;

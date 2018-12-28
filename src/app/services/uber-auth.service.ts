@@ -3,6 +3,8 @@ import { Injectable } from "@angular/core";
 import { CookieService } from 'ngx-cookie-service';
 import { Observable, of } from "rxjs";
 import { catchError, map, tap, flatMap } from "rxjs/operators";
+import { ServerAPI } from "../models/ServerApi";
+import { UberAPI } from "../models/UberApi";
 
 interface ITokenResponse {
     accessToken: string;
@@ -20,14 +22,12 @@ export interface IRiderProfile {
 @Injectable()
 export class UberAuthService {
 
-    private readonly clientId: string = 'QKa6ZyD-Bqtc_oPjXEXuHymD9Gn-k0o4';
     private readonly cookieUserTokenKey: string = 'uber-footprint-access-token';
     private readonly cookieUserIdKey: string = 'uber-footprint-user-id';
-    public uberAuthorizationUrl = `https://login.uber.com/oauth/v2/authorize?client_id=${this.clientId}&response_type=code&scope=history+profile`;
     public privacyPolicyUrl = 'https://app.termly.io/document/privacy-policy/0b244b38-f8b7-4de0-a61d-da0faaf8fb40';
     public currentUserAuthorized: boolean;
 
-    constructor(private http: HttpClient, private cookie: CookieService) {
+    constructor(private http: HttpClient, private cookie: CookieService, private server: ServerAPI, private uber: UberAPI) {
         // this.cookie.delete(this.cookieUserTokenKey);
         // this.cookie.delete(this.cookieUserIdKey);
     }
@@ -40,7 +40,7 @@ export class UberAuthService {
     }
 
     getRiderProfile(): Observable<boolean> {
-        return this.http.get<IRiderProfile>(`http://localhost:6060/uber/me`, { params: { accessToken: this.currentUserToken }})
+        return this.http.get<IRiderProfile>(this.server.GetUserProfile, { params: { accessToken: this.currentUserToken }})
             .pipe(
                 tap(body => this.storeCurrentUserId(body.uuid)),
                 map(body => true)
@@ -51,7 +51,7 @@ export class UberAuthService {
         if (this.hasAccessToken) {
             return of(true);
         }
-        return this.http.post<ITokenResponse>(`http://localhost:6060/uber/token`, { authorizationCode })
+        return this.http.post<ITokenResponse>(this.server.GetUserToken, { authorizationCode })
             .pipe(
                 tap(body => this.storeCurrentUserAccessToken(body.accessToken)),
                 map(body => true),
@@ -87,5 +87,9 @@ export class UberAuthService {
 
     private storeCurrentUserId(userId: string): void {
         this.cookie.set(this.cookieUserIdKey, userId);
+    }
+
+    private get uberAuthorizationUrl() {
+        return `https://login.uber.com/oauth/v2/authorize?client_id=${this.uber.ClientId}&response_type=code&scope=history+profile`;
     }
 }

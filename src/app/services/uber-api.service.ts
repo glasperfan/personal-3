@@ -6,17 +6,12 @@ import { IGetAllRidesResponse, IGetAllRidesRequest, IHistoricalRideWithProduct }
 import { map } from "rxjs/operators";
 import { keyBy } from "lodash-es";
 import { IRideProduct } from "../models/RideProduct";
-
-const API = {
-    history: 'http://localhost:6060/uber/history',
-    allHistory: 'http://localhost:6060/uber/history/all'
-};
-
+import { ServerAPI } from "../models/ServerApi";
 
 @Injectable()
 export class UberApiService {
 
-    constructor(private authService: UberAuthService, private http: HttpClient) { }
+    constructor(private authService: UberAuthService, private http: HttpClient, private server: ServerAPI) { }
 
     /**
      * Returns a limited amount of data about a user’s lifetime activity with Uber
@@ -35,12 +30,12 @@ export class UberApiService {
     //         );
     // }
 
-    getAllRides(): Observable<IHistoricalRideWithProduct[]> {
+    getAllRideHistory(): Observable<IHistoricalRideWithProduct[]> {
         const request: IGetAllRidesRequest = {
             userId: this.authService.currentUserId,
             accessToken: this.authService.currentUserToken
         };
-        return this.http.get<IGetAllRidesResponse>(API.allHistory, { params: request }).pipe(map(response => {
+        return this.http.get<IGetAllRidesResponse>(this.server.GetAllHistory, { params: request }).pipe(map(response => {
             const productMap = keyBy(response.products, (rp: IRideProduct) => rp.product_id);
             return response.rides.map((ride: IHistoricalRideWithProduct) => {
                 ride.product = productMap[ride.product_id];

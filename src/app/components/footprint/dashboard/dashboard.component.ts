@@ -3,17 +3,11 @@ import { MatSelectChange } from '@angular/material/select';
 import { Subscription } from 'rxjs';
 import { take } from 'rxjs/operators';
 import { IHistoricalRideWithProduct } from '../../../models/RideHistory';
-import { IAggregateRow, RideStatsAggregator, RideStatsInterval, RideStatsService } from '../../../services/ride-stats.service';
+import { IAggregateRow, RideStatsAggregator, RideStatsInterval, RideStatsService, IGoogleChartLabel } from '../../../services/ride-stats.service';
 import { UberApiService } from '../../../services/uber-api.service';
 import { unsubscribe } from '../../../utils';
 
 declare const google: any;
-
-interface IGoogleChartLabel {
-    label: string;
-    id: string;
-    type: string;
-}
 
 @Component({
     selector: 'p3-uber-dashboard',
@@ -49,7 +43,7 @@ export class DashboardComponent implements OnInit {
                 this.retrieveStatsBasedOnCurrentSelection();
             }
         });
-        this.api.getAllRides().pipe(take(1)).subscribe(rides => this.stats.rides = rides);
+        this.api.getAllRideHistory().pipe(take(1)).subscribe(rides => this.stats.rides = rides);
     }
 
     onIntervalSelection(selectionChange: MatSelectChange) {
@@ -96,7 +90,6 @@ export class DashboardComponent implements OnInit {
                     top: 20
                 },
                 hAxis: { 
-                    // direction: -1,
                     slantedText: true,
                     minTextSpacing: 50
                 },
@@ -105,7 +98,7 @@ export class DashboardComponent implements OnInit {
                     duration: 1000,
                     easing: 'inAndOut'
                 },
-                legend: { position: 'none' }
+                legend: { position: 'left' }
             };
 
             this.chart = new google.charts.Line(document.getElementById('main-chart'));
@@ -116,7 +109,7 @@ export class DashboardComponent implements OnInit {
     updateChartData(rows: IAggregateRow[]): void {
         this.chartLabels = [
             { label: this.stats.IntervalOptions[this.selectedInterval], id: this.selectedInterval, type: 'string' },
-            { label: this.stats.AggregatorOptions[this.selectedAggregator], id: this.selectedAggregator, type: 'number' }
+            ...this.stats.columns(this.selectedAggregator)
         ];
         this.dataTable = google.visualization.arrayToDataTable([
             this.chartLabels,
