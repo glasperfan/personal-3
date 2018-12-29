@@ -197,7 +197,7 @@ async function storeRideProducts(products) {
 
 app.get('/uber/me', (req, res) => {
   request.get('https://api.uber.com/v1.2/me',
-  { headers: uberHeaders(req.query,accessToken) },
+  { headers: uberHeaders(req.query.accessToken) },
   (err, response, body) => {
     if (noError(err, response)) {
       const json = JSON.parse(body);
