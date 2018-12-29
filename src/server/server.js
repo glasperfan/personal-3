@@ -105,7 +105,7 @@ app.post('/uber/token', (req, res) => {
     { form: { // must be form - it's url-encoded data
         client_id: settings.uber.clientId,
         client_secret: settings.uber.clientSecret,
-        redirect_uri: 'http://localhost:4200/footprint', // must match what's in the uber_dashboard
+        redirect_uri: settings.uber.redirectHost, // must match what's in the uber_dashboard
         grant_type: 'authorization_code',
         scope: 'history+profile',
         code: req.body.authorizationCode
