@@ -1,7 +1,9 @@
 // Get dependencies
 const express = require('express');
 const path = require('path');
+const fs = require('fs');
 const http = require('http');
+const https = require('https');
 const cors = require('cors');
 const request = require('request-promise');
 const q = require('q');
@@ -281,13 +283,16 @@ app.get('*', (req, res) => {
 /**
  * Get port from environment and store in Express.
  */
-const port = process.env.PORT || '6060';
+const port = settings.port;
 app.set('port', port);
 
 /**
  * Create HTTP server.
  */
-const server = http.createServer(app);
+const server = settings.production ? https.createServer(app, {
+  key: fs.readFileSync(path.join(__dirname, 'security', 'server.key')),
+  cert: fs.readFileSync(path.join(__dirname, 'security', 'server.cert'))
+}) : http.createServer(app);
 mongoose.connect(settings.mongoUri(), { useNewUrlParser: true });
 
 /**

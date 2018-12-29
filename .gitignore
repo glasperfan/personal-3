@@ -12,7 +12,9 @@ yarn-error.log
 package-lock.json
 
 # misc
+**/server/security/**
 **/settings.js
+**/settings.prod.js
 **/*.pem
 
 # IDEs and editors

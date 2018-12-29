@@ -6,10 +6,13 @@ Start the app (thanks, Angular CLI):
 `ng serve`
 
 
-## Mela (v.0.5)
+## Footprint App (v.0.1)
 
-Potential features for v.1.0
-- Ability to pause the timer
-- Ability to edit descriptions of existing melas
-- Ability to store mela streaks between sessions (cookie-based)
+Remaining MVP features:
+- Show total rides by product type (Uber Pool, Uber XL, Uber X)
+- Show trends
+- Show impact statements ("If you took an uber Pool for every ride in your history, you would have saved X trees")
 
+Also
+- Update prof pic
+- Update c. 2017 as text that shows up on google searches
