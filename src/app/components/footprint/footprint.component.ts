@@ -13,7 +13,7 @@ export class FootprintComponent implements OnInit {
     constructor(
         private activatedRoute: ActivatedRoute,
         private router: Router,
-        private uberAuth: UberAuthService) { }
+        public uberAuth: UberAuthService) { }
 
     ngOnInit() {
         if (!this.uberAuth.isCurrentUserAuthorized) {

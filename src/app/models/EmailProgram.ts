@@ -2,6 +2,7 @@ import { Http } from '@angular/http';
 import { Observable, of } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
 import { IProgram, IResponse } from '../interfaces/IProgram';
+import { ServerAPI } from './ServerApi';
 
 export class EmailProgram implements IProgram {
   private senderName: string;
@@ -11,7 +12,7 @@ export class EmailProgram implements IProgram {
 
   public readonly id: string;
 
-  constructor(private http: Http) {
+  constructor(private http: Http, private server: ServerAPI) {
     this.id = 'email';
   }
 
@@ -78,7 +79,7 @@ export class EmailProgram implements IProgram {
   }
 
   private send(): Observable<IResponse> {
-    return this.http.post('http://34.208.81.159:6060/email', {
+    return this.http.post(this.server.SendEmail, {
       name: this.senderName,
       email: this.senderEmail,
       message: this.senderMessage

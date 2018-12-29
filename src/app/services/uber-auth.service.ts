@@ -51,11 +51,14 @@ export class UberAuthService {
         if (this.hasAccessToken) {
             return of(true);
         }
-        return this.http.post<ITokenResponse>(this.server.GetUserToken, { authorizationCode })
+        return this.http.post<ITokenResponse>(this.server.GetUserToken, { authorizationCode: authorizationCode })
             .pipe(
                 tap(body => this.storeCurrentUserAccessToken(body.accessToken)),
-                map(body => true),
-                catchError(err => of(false))
+                map(_ => true),
+                catchError(err => {
+                    console.log(err);
+                    return of(false)
+                })
             );
     }
 

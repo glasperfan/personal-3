@@ -3,6 +3,7 @@ import { Http } from '@angular/http';
 import { IProgram, IResponse } from '../interfaces/IProgram';
 import { ILog } from '../interfaces/ILog';
 import { EmailProgram } from '../models/EmailProgram';
+import { ServerAPI } from '../models/ServerApi';
 
 @Injectable()
 export class TerminalService {
@@ -10,7 +11,7 @@ export class TerminalService {
   public logs: ILog[];
   private prevResponse: IResponse;
 
-  constructor(private http: Http) {
+  constructor(private http: Http, private server: ServerAPI) {
     this.logs = [];
   }
 
@@ -64,7 +65,7 @@ export class TerminalService {
   public getProgramById(id: string): IProgram {
     switch (id) {
       case 'email':
-        return new EmailProgram(this.http);
+        return new EmailProgram(this.http, this.server);
       default:
         return undefined;
     }

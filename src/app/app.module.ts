@@ -10,45 +10,48 @@ import { CookieService } from 'ngx-cookie-service';
 import { AppComponent } from './app.component';
 import { ROUTES } from './app.routes';
 import { FooterComponent } from "./components/footer/footer.component";
-import * as UberEmissions from './components/footprint';
 import { HomeComponent } from './components/home/home.component';
 import { TerminalComponent } from './components/terminal/terminal.component';
 import * as ModuleServices from './services';
 import { ServerAPI } from './models/ServerApi';
 import { environment } from '../environments/environment';
 import { UberAPI } from './models/UberApi';
-
-const UberModules = [
-  MatProgressSpinnerModule,
-  MatSelectModule,
-  BrowserAnimationsModule
-];
-
-const UberEmissionsComponents = Object.keys(UberEmissions).map(key => UberEmissions[key]);
-const Services = Object.keys(ModuleServices).map(key => ModuleServices[key]);
+import { FootprintComponent } from './components/footprint/footprint.component';
+import { LoadingComponent } from './components/footprint/loading/loading.component';
+import { NavbarComponent } from './components/footprint/navbar/navbar.component';
+import { RidesComponent } from './components/footprint/rides/rides.component';
+import { DashboardComponent } from './components/footprint/dashboard/dashboard.component';
 
 @NgModule({
   imports: [
-    BrowserModule,
-    FormsModule,
     HttpModule,
     HttpClientModule,
-    ROUTES,
-    ...UberModules
+    BrowserModule,
+    MatProgressSpinnerModule,
+    MatSelectModule,
+    BrowserAnimationsModule,
+    FormsModule,
+    ROUTES
   ],
   declarations: [
     AppComponent,
     HomeComponent,
     FooterComponent,
     TerminalComponent,
-    ...UberEmissionsComponents
+    FootprintComponent,
+    LoadingComponent,
+    NavbarComponent,
+    RidesComponent,
+    DashboardComponent
   ],
   providers: [
     CookieService,
+    ModuleServices.UberAuthService,
+    ModuleServices.UberApiService,
+    ModuleServices.RideStatsService,
     HttpClient,
     { provide: ServerAPI, useValue: new ServerAPI(environment.apiUrl) },
-    { provide: UberAPI, useValue: new UberAPI(environment.clientId) },
-    ...Services
+    { provide: UberAPI, useValue: new UberAPI(environment.clientId) }
   ],
   bootstrap: [AppComponent]
 })
