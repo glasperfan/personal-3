@@ -16,6 +16,7 @@ package-lock.json
 **/settings.js
 **/settings.prod.js
 **/*.pem
+cmds.md
 
 # IDEs and editors
 /.idea
