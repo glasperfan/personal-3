@@ -292,7 +292,7 @@ app.set('port', port);
 const server = settings.production ? https.createServer({
   key: fs.readFileSync(path.join(__dirname, 'security', 'server.key')),
   cert: fs.readFileSync(path.join(__dirname, 'security', 'server.cert'))
-}, options) : http.createServer(app);
+}, app) : http.createServer(app);
 mongoose.connect(settings.mongoUri(), { useNewUrlParser: true });
 
 /**
