@@ -21,6 +21,7 @@ import { LoadingComponent } from './components/footprint/loading/loading.compone
 import { NavbarComponent } from './components/footprint/navbar/navbar.component';
 import { RidesComponent } from './components/footprint/rides/rides.component';
 import { DashboardComponent } from './components/footprint/dashboard/dashboard.component';
+import { FootprintLoginComponent } from './components/footprint/login/login.component';
 
 @NgModule({
   imports: [
@@ -42,7 +43,8 @@ import { DashboardComponent } from './components/footprint/dashboard/dashboard.c
     LoadingComponent,
     NavbarComponent,
     RidesComponent,
-    DashboardComponent
+    DashboardComponent,
+    FootprintLoginComponent
   ],
   providers: [
     CookieService,
