@@ -22,7 +22,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
 // Point static path to dist
-app.use(express.static(__dirname, { dotfiles: 'allow' }));
+app.use(express.static(__dirname + '/static', { dotfiles: 'allow' }));
 
 // Allows CORS
 app.use(function(req, res, next) {
@@ -277,27 +277,35 @@ app.get('/uber/history', (req, res) => {
 
 // Catch all other routes and return the index file
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../../dist/404.html'));
+  res.sendFile(path.resolve(__dirname + '/static' + req.path), { dotfiles: 'allow' });
 });
 
-/**
- * Get port from environment and store in Express.
- */
-const port = settings.port;
-app.set('port', port);
 
 /**
- * Create HTTP server.
+ * Create HTTP and HTTPS servers.
  */
-const server = settings.production ? https.createServer({
-  key: fs.readFileSync(path.join(__dirname, 'security', 'server.key')),
-  cert: fs.readFileSync(path.join(__dirname, 'security', 'server.cert'))
-}, app) : http.createServer(app);
+const httpPort= settings.port;
+const httpsPort = 443;
+
+const httpServer = http.createServer(app);
+httpServer.listen(httpPort, () => {
+  console.log(`HTTP server running on port ${httpPort}`);
+});
+
+if (!!settings.production) {
+  const privateKey = fs.readFileSync('/etc/letsencrypt/live/hughzabriskieserver.com/privkey.pem', 'utf8');
+  const certificate = fs.readFileSync('/etc/letsencrypt/live/hughzabriskieserver.com/cert.pem', 'utf8');
+  const ca = fs.readFileSync('/etc/letsencrypt/live/hughzabriskieserver.com/chain.pem', 'utf8');
+
+  const credentials = {
+    key: privateKey,
+    cert: certificate,
+    ca: ca
+  };
+  const httpsServer = https.createServer(credentials, app);
+  httpsServer.listen(httpsPort, () => {
+    console.log(`HTTPS server running on port ${httpsPort}`);
+  });
+}
+
 mongoose.connect(settings.mongoUri(), { useNewUrlParser: true });
-
-/**
- * Listen on provided port, on all network interfaces.
- */
-server.listen(port, () => {
-  console.log(`API running on localhost:${port}`);
-});
