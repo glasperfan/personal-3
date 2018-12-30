@@ -296,7 +296,7 @@ if (!settings.production) {
 }
 
 if (settings.production) {
-  const redirectApp = express.createServer();
+  const redirectApp = express();
 
   redirectApp.get('*', function(req, res) {  
     res.redirect('https://' + req.headers.host + req.url);
