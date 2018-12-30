@@ -284,15 +284,26 @@ app.get('*', (req, res) => {
 /**
  * Create HTTP and HTTPS servers.
  */
-const httpPort= settings.port;
+const httpPort = settings.port;
+const redirectHttpPort = 80;
 const httpsPort = 443;
 
-const httpServer = http.createServer(app);
-httpServer.listen(httpPort, () => {
-  console.log(`HTTP server running on port ${httpPort}`);
-});
+if (!settings.production) {
+  const httpServer = http.createServer(app);
+  httpServer.listen(httpPort, () => {
+    console.log(`HTTP server running on port ${httpPort}`);
+  });
+}
 
-if (!!settings.production) {
+if (settings.production) {
+  const redirectApp = express.createServer();
+
+  redirectApp.get('*', function(req, res) {  
+    res.redirect('https://' + req.headers.host + req.url);
+  });
+
+  redirectApp.listen(redirectHttpPort);
+  
   const privateKey = fs.readFileSync('/etc/letsencrypt/live/hughzabriskieserver.com/privkey.pem', 'utf8');
   const certificate = fs.readFileSync('/etc/letsencrypt/live/hughzabriskieserver.com/cert.pem', 'utf8');
   const ca = fs.readFileSync('/etc/letsencrypt/live/hughzabriskieserver.com/chain.pem', 'utf8');
