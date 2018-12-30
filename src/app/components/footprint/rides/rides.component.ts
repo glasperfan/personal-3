@@ -2,7 +2,8 @@ import { Component, OnInit } from "@angular/core";
 import * as moment from 'moment';
 import { ICON } from '../../../models/Icon';
 import { IHistoricalRideWithProduct } from "../../../models/RideHistory";
-import { EmissionsService, EPAStandardEmissionsProps, EPAStandardEmissionsService, EmissionsUnits } from "../../../services/emissions.service";
+import { EPAStandardEmissionsProps, EPAStandardEmissionsService } from "../../../services/emissions-epa.service";
+import { EmissionsService, EmissionsUnits } from "../../../services/emissions.service";
 import { UberApiService } from "../../../services/uber-api.service";
 import { roundRobin } from "../../../utils";
 

@@ -49,6 +49,7 @@ import { DashboardComponent } from './components/footprint/dashboard/dashboard.c
     ModuleServices.UberAuthService,
     ModuleServices.UberApiService,
     ModuleServices.RideStatsService,
+    ModuleServices.EPAStandardEmissionsService,
     HttpClient,
     { provide: ServerAPI, useValue: new ServerAPI(environment.apiUrl) },
     { provide: UberAPI, useValue: new UberAPI(environment.clientId) }

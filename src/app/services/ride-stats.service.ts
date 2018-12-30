@@ -2,14 +2,14 @@ import { Injectable } from "@angular/core";
 import { Observable, BehaviorSubject } from "rxjs";
 import { groupBy, mapValues, values, uniq, keyBy, invert } from "lodash-es";
 import * as moment from 'moment';
-import { EPAStandardEmissionsService } from "./emissions.service";
+import { EPAStandardEmissionsService } from "./emissions-epa.service";
 import { map } from "rxjs/operators";
 import { IHistoricalRideWithProduct } from "../models/RideHistory";
 
 export type RideStatsAggregator = 'rideCount' | 'totalEmissions' | 'productType';
 export type RideStatsInterval = 'week' | 'month' | 'year';
 // collections of rides grouped by times
-type AggregateRides = { [time: string]: IHistoricalRideWithProduct[] };
+type AggregateRides = { [time: string]: (IHistoricalRideWithProduct | IPlaceholderRide)[] };
 // collections of rows grouped by interval
 type AggregateRows = { [I in RideStatsInterval]: IAggregateRow[] };
 // collections of rides grouped by times grouped by interval
@@ -17,6 +17,7 @@ type Aggregations = { [I in RideStatsInterval]: AggregateRides };
 type Trends = { [A in RideStatsAggregator]: { [I in RideStatsInterval]: ITrend }};
 
 export type IAggregateRow = any[];
+export type IPlaceholderRide = { start_time: number, placeholder: true };
 
 export interface IGoogleChartLabel {
     label: string;
@@ -60,6 +61,9 @@ export class RideStatsService {
     };
     
     private readonly EMPTY_AGGREGATES: AggregateRows = { } as AggregateRows;
+    private readonly weekFormat = "MMM Do 'YY";
+    private readonly monthFormat = "MMM 'YY";
+    private readonly yearFormat = "YYYY";
     
     private _rides: BehaviorSubject<IHistoricalRideWithProduct[]> = new BehaviorSubject([]);  
     private _rides$: Observable<IHistoricalRideWithProduct[]>;
@@ -75,6 +79,7 @@ export class RideStatsService {
     private _trends: Trends;
     
     private groupedAggregates: Aggregations;
+
 
     constructor(private emissions: EPAStandardEmissionsService) {
         this._rides$ = this._rides.asObservable();
@@ -198,9 +203,35 @@ export class RideStatsService {
      * Note that no collections of rides are sorted here. Sort happens after the reduce.
      */
     private calculateGroupBy(): void {
-        const groupByWeek: AggregateRides = groupBy(this.rides, (r: IHistoricalRideWithProduct) => moment.unix(r.start_time).startOf('isoWeek').format("MMM Do 'YY"));
-        const groupByMonth: AggregateRides = groupBy(this.rides, (r: IHistoricalRideWithProduct) => moment.unix(r.start_time).startOf('month').format("MMM 'YY"));
-        const groupByYear: AggregateRides = groupBy(this.rides, (r: IHistoricalRideWithProduct) => moment.unix(r.start_time).startOf('year').format("YYYY"));
+        const groupByWeek: AggregateRides = groupBy(this.rides, (r: IHistoricalRideWithProduct) => moment.unix(r.start_time).startOf('isoWeek').format(this.weekFormat));
+        const groupByMonth: AggregateRides = groupBy(this.rides, (r: IHistoricalRideWithProduct) => moment.unix(r.start_time).startOf('month').format(this.monthFormat));
+        const groupByYear: AggregateRides = groupBy(this.rides, (r: IHistoricalRideWithProduct) => moment.unix(r.start_time).startOf('year').format(this.yearFormat));
+        
+        let earliest_t = this.rides[0].start_time;
+        this.rides.forEach(r => {
+            if (r.start_time < earliest_t) earliest_t = r.start_time;
+        });
+
+        const earliest = moment.unix(earliest_t);
+        const latest = moment(new Date());
+
+        for (var m = moment(earliest).startOf('isoWeek'); m.isBefore(latest); m.add(1, 'week')) {
+            const wf = m.format(this.weekFormat);
+            if (!groupByWeek[wf]) {
+                groupByWeek[wf] = [{ start_time: m.unix(), placeholder: true }];
+            }
+            const mv = moment(m).startOf('month');
+            const mf = mv.format(this.monthFormat);
+            if (!groupByMonth[mf]) {
+                groupByMonth[mf] = [{ start_time: mv.unix(), placeholder: true }];
+            }
+            const yv = moment(m).startOf('year');
+            const yf = yv.format(this.yearFormat);
+            if (!groupByYear[yf]) {
+                groupByYear[yf] = [{ start_time: yv.unix(), placeholder: true }];
+            }
+        }
+
         this.groupedAggregates = {
             'week': groupByWeek,
             'month': groupByMonth,
@@ -209,15 +240,17 @@ export class RideStatsService {
     }
 
     private calculateRideCountBy(): void {
-        const aggFn = (rides: IHistoricalRideWithProduct[], key: string): IAggregateRow => [rides[0].start_time, key, rides.length];
-        const sortFn = (rides: any[]): IAggregateRow[] => rides.sort((a, b) => a[0] - b[0]).map(v => [v[1], v[2]] as IAggregateRow);
+        const aggFn = (rides: IHistoricalRideWithProduct[], key: string): IAggregateRow => 
+            'placeholder' in rides[0] 
+            ? [rides[0].start_time, key, 0]
+            : [rides[0].start_time, key, rides.length];
         const rideCountByWeek: IAggregateRow[] = values(mapValues(this.groupedAggregates.week, aggFn));
         const rideCountByMonth: IAggregateRow[] = values(mapValues(this.groupedAggregates.month, aggFn));
         const rideCountByYear: IAggregateRow[] = values(mapValues(this.groupedAggregates.year, aggFn));
         this.setRideCountBy({
-            week: sortFn(rideCountByWeek),
-            month: sortFn(rideCountByMonth),
-            year: sortFn(rideCountByYear)
+            week: this.sortFn(rideCountByWeek),
+            month: this.sortFn(rideCountByMonth),
+            year: this.sortFn(rideCountByYear)
         });
     }
 
@@ -226,36 +259,37 @@ export class RideStatsService {
         const emissionsFn = (rides: IHistoricalRideWithProduct[]): number => 
             rides.map(r => this.emissions.calculateEmissions({ miles: r.distance, isSharedRide: r.product.shared })).reduce(sumFn);
         const aggFn = (rides: IHistoricalRideWithProduct[], key: string): IAggregateRow => 
-            [rides[0].start_time, key, emissionsFn(rides)]
-        const sortFn = (rides: any[]): IAggregateRow[] => 
-            rides.sort((a, b) => a[0] - b[0]).map(v => [v[1], v[2]] as IAggregateRow);
+            'placeholder' in rides[0]
+            ? [rides[0].start_time, key, 0]
+            : [rides[0].start_time, key, emissionsFn(rides)]
         const emissionsByWeek = values(mapValues(this.groupedAggregates.week, aggFn));
         const emissionsByMonth = values(mapValues(this.groupedAggregates.month, aggFn));
         const emissionsByYear = values(mapValues(this.groupedAggregates.year, aggFn));
         this.setCarbonEmissionsBy({
-            week: sortFn(emissionsByWeek),
-            month: sortFn(emissionsByMonth),
-            year: sortFn(emissionsByYear)
+            week: this.sortFn(emissionsByWeek),
+            month: this.sortFn(emissionsByMonth),
+            year: this.sortFn(emissionsByYear)
         });
     }
 
     private calculateProductTypeBy(): void {
         const allProducts = this.calculateUniqueProductTypes();
-        const indexToProductMap: { [key: string]: number } = invert(keyBy(allProducts, (productName: string) => allProducts.indexOf(productName) + 2));
+        const indexToProductMap: { [key: number]: string } = invert(keyBy(allProducts, (productName: string) => allProducts.indexOf(productName) + 2));
         const aggFn = (rides: IHistoricalRideWithProduct[], key: string): IAggregateRow => {
             const row: IAggregateRow = [rides[0].start_time, key].concat(allProducts.map(_ => 0));
+            if ('placeholder' in rides[0]) {
+                return row;
+            }
             rides.forEach(r => { row[indexToProductMap[r.product.product_group]]++; });
             return row;
         }
-        const sortFn = (rides: any[]): IAggregateRow[] => 
-            rides.sort((a, b) => a[0] - b[0]).map(v => v.slice(1) as IAggregateRow);
         const productTypeByWeek = values(mapValues(this.groupedAggregates.week, aggFn));
         const productTypeByMonth = values(mapValues(this.groupedAggregates.month, aggFn));
         const productTypeByYear = values(mapValues(this.groupedAggregates.year, aggFn));
         this.setProductTypeBy({
-            week: sortFn(productTypeByWeek),
-            month: sortFn(productTypeByMonth),
-            year: sortFn(productTypeByYear)
+            week: this.sortFn(productTypeByWeek),
+            month: this.sortFn(productTypeByMonth),
+            year: this.sortFn(productTypeByYear)
         });
     }
 
@@ -290,4 +324,6 @@ export class RideStatsService {
             thisInterval: rows[rows.length - 1][1]
         } as ITrend;
     }
+
+    private sortFn = (rides: any[]): IAggregateRow[] => rides.sort((a, b) => a[0] - b[0]).map(v => v.slice(1) as IAggregateRow);
 }

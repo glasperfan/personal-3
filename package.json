@@ -5,7 +5,8 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "build": "ng build --env=prod && gulp",
+    "build": "ng build --configuration=production",
+    "ship": "rm -rf dist && ng build --configuration=production && cd dist/personal-3 && aws s3 sync . s3://hughzabriskie.com --no-verify-ssl && cd ../..",
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e"
