@@ -1,9 +1,3 @@
-### How to set up the server
-1. Add a `settings.js` in this directory.
-2. Add a `security` folder.
-3. Run `openssl` to generate a self-signed certificate.
-4. `nodemon server.js`
-
 # How to set up an HTTPS client and server in AWS (S3, EC2)
 
 This guide is for future me or whoever else might be trying to achieve the same thing. It took me somewhere between 8-15 hours to convert my site from HTTP to HTTPS (I lost count of the hours) due to my lack of experience with virtually every technology involved.
@@ -185,7 +179,7 @@ This is a setting in the CloudFront zone. It's a required for a secure site veri
 
 ## Set up an HTTPS web server
 
-The server is equally if not more complicated. This is in part because there's no nice and simple way to install a certificate. There's a way to do this a with a _self-signed_ certificate, which provides encryption, but browsers like Chrome will designate this server as "insecure".
+The server is equally if not more complicated. This is in part because there's no nice and simple way to install a certificate. There's a way to do this a with a _self-signed_ certificate, which provides encryption, but browsers like Chrome will designate this server as "insecure". A self-signed certificate could be quickly created with the `openssl` library, and the key and cert created are then specified in the credentials when initializing the HTTPS server. An example of this is [here](https://www.npmjs.com/package/pem).
 
 As explained [here](https://www.globalsign.com/en/ssl-information-center/dangers-self-signed-certificates/):
 > While self-signed SSL Certificates also encrypt customers' log in and other personal account credentials, they prompt most web servers to display a security alert because the certificate was not verified by a trusted Certificate Authority. Often the alerts advise the visitor to abort browsing the page for security reasons.
