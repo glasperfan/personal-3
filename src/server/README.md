@@ -244,6 +244,10 @@ Then kill the process(es):
 sudo kill <PROCESS_ID>
 ```
 
+#### Hide confidential files in settings.js
+
+There are certainly better ways to do this, but I hide all secrets in a `src/server/settings.js` file that is never uploaded to git. I keep a separate `src/server/settings.prod.js` as well. These are akin to the environment files used in setting up the web client. In order to apply production settings, simply add the local `settings.prod.js` onto the server as `src/server/settings.js`. The local dev mode will reference the local `settings.js` and ignore the production version.
+
 ### Obtaining a trusted CA certificate with Let's Encrypt
 
 [Let's Encrypt](https://letsencrypt.org/) is a free service for issuing trusted CA certificates. It uses the `certbot` from the Electronic Frontier Foundation (EFF), a well-known non-profit digital rights organization, to automatically issue certificates.
@@ -342,6 +346,8 @@ if (settings.production) {
   });
 }
 ```
+
+Importantly, note that with this setup, we can seamlessly transition between development and production mode. The mode is toggled by a production key set in a separate `settings.js` file located in the same directory as `server.js`. In dev mode, we'll only instantiate an HTTP server on the port specified by `settings.port`. In production, we'll create an HTTP server AND an HTTPS server. The HTTPS server will be our app, while a simple HTTP server is spun up to redirect requests to HTTPS. 
 
 #### Disable TLS v1
 
