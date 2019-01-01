@@ -312,8 +312,7 @@ if (settings.production) {
     key: privateKey,
     cert: certificate,
     ca: ca,
-    secureOptions: require('constants').SSL_OP_NO_TLSv1,
-    pfx: certificate
+    secureOptions: require('constants').SSL_OP_NO_TLSv1
   };
   const httpsServer = https.createServer(credentials, app);
   httpsServer.listen(httpsPort, () => {
