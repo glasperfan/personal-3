@@ -361,3 +361,18 @@ As of June 30, 2018, all websites are required to upgrade to TLS 1.1 or 1.2 to m
 Source: [blog.pcistandards.org](https://blog.pcisecuritystandards.org/are-you-ready-for-30-june-2018-sayin-goodbye-to-ssl-early-tls)
 
 Run the check at [whynopadlock.com](https://www.whynopadlock.com/) again. Now everything should pass. Congratulations, your webserver is now securely serving HTTPS connections!
+
+## MongoDB
+
+I highly recommend using MongoDB's Atlas for a cloud cluster rather than setting up a local DB.
+
+If you have connection issues (errors like `MongoNetworkError` or `TransientTransactionError`), you have to whitelist any inbound IPs on MongoDB's Atlas. That includes your local dev IP and your production box IP. Alternatively, whitelist all IPs.
+
+Using Mongoose, connecting to the cluster is as easy as
+```
+function mongoUri(adminUser, pwd) {
+    return `mongodb+srv://${adminUser}:${pwd}@uber-footprint-ydfcz.azure.mongodb.net/database?retryWrites=true`;
+}
+
+mongoose.connect(mongoUri('admin', 'blahblah'), { useNewUrlParser: true });
+```
