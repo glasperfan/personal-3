@@ -103,7 +103,6 @@ function uberHeaders(token) {
 
 app.post('/uber/token', (req, res) => {
   console.log('acquiring access token');
-  console.log(req.body.authorizationCode);
   request.post('https://login.uber.com/oauth/v2/token',
     { form: { // must be form - it's url-encoded data
         client_id: settings.uber.clientId,
