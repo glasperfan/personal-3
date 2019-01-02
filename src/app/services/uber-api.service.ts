@@ -13,29 +13,12 @@ export class UberApiService {
 
     constructor(private authService: UberAuthService, private http: HttpClient, private server: ServerAPI) { }
 
-    /**
-     * Returns a limited amount of data about a user’s lifetime activity with Uber
-     * @param offset Offset the list of returned results by this amount. Default is zero.
-     * @param limit Number of items to retrieve. Default is 5, maximum is 50.
-     */
-    // getRideHistory(offset?: number, limit?: number): Observable<IRideHistoryResponse> {
-    //     const request: IRideHistoryRequest = {
-    //         offset: offset ? offset.toString() : '0',
-    //         limit: limit ? limit.toString(): '6',
-    //         accessToken: this.authService.currentUserToken
-    //     }
-    //     return this.http.get<IRideHistoryResponse>(API.history, { params: request })
-    //         .pipe(
-    //             tap(body => console.log(body))
-    //         );
-    // }
-
-    getAllRideHistory(): Observable<IHistoricalRideWithProduct[]> {
+    getRideHistory(): Observable<IHistoricalRideWithProduct[]> {
         const request: IGetAllRidesRequest = {
             userId: this.authService.currentUserId,
             accessToken: this.authService.currentUserToken
         };
-        return this.http.get<IGetAllRidesResponse>(this.server.GetAllHistory, { params: request }).pipe(map(response => {
+        return this.http.get<IGetAllRidesResponse>(this.server.GetHistory, { params: request }).pipe(map(response => {
             const productMap = keyBy(response.products, (rp: IRideProduct) => rp.product_id);
             return response.rides.map((ride: IHistoricalRideWithProduct) => {
                 ride.product = productMap[ride.product_id];

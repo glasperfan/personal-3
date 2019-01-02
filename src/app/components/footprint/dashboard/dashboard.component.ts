@@ -48,7 +48,7 @@ export class DashboardComponent implements OnInit {
                 this.retrieveTrendsBasedOnCurrentSelection();
             }
         });
-        this.api.getAllRideHistory().pipe(take(1)).subscribe(rides => this.stats.rides = rides);
+        this.api.getRideHistory().pipe(take(1)).subscribe(rides => this.stats.rides = rides);
     }
 
     onIntervalSelection(selectionChange: MatSelectChange) {

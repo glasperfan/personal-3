@@ -6,6 +6,7 @@ import { EPAStandardEmissionsProps, EPAStandardEmissionsService } from "../../..
 import { EmissionsService, EmissionsUnits } from "../../../services/emissions.service";
 import { UberApiService } from "../../../services/uber-api.service";
 import { roundRobin } from "../../../utils";
+import { take } from "rxjs/operators";
 
 @Component({
     selector: 'p3-uber-rides',
@@ -29,7 +30,7 @@ export class RidesComponent implements OnInit {
     
     ngOnInit(): void {
         this.componentLoading = true;
-        this.api.getAllRideHistory().subscribe(rides => {
+        this.api.getRideHistory().pipe(take(1)).subscribe(rides => {
             this.rideHistory = this.sortRides(rides);
             this.refreshEmissionsForRides();
             this.componentLoading = false;

@@ -14,3 +14,4 @@ Remaining MVP features:
 
 After MVP features:
 - Provide a logout system
+- Provide a "delete your data" system 

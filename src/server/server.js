@@ -15,6 +15,9 @@ const Rides = require('./models/Rides');
 const RideProducts = require('./models/RideProducts');
 const settings = require('./settings');
 
+const ERR_CACHE_FAILURE = 'ERR_CACHE_FAILURE';
+
+
 const app = express();
 
 // Parsers for POST data
@@ -160,6 +163,20 @@ async function retrieveRideHistoryAsync(token, limit, offset) {
   });
 }
 
+async function retrieveRideHistoryWithLimit(token, totalRides, ridesArr) {
+  return retrieveRideHistoryAsync(token, totalRides, ridesArr.length).then(rides => {
+    ridesArr.push.apply(ridesArr, rides.history);
+    totalRides = totalRides - ridesArr.length;
+    if (totalRides > 0) {
+      return retrieveRideHistoryWithLimit(token, totalRides, ridesArr);
+    } else if (totalRides === 0) {
+      return ridesArr;
+    } else {
+      throw new Error('Retrieved too many rides?');
+    }
+  });
+}
+
 function retrieveRideHistory(token, maxRidesPerQuery, ridesArr, getAll) {
   return retrieveRideHistoryAsync(token, maxRidesPerQuery, ridesArr.length).then(rides => {
     console.log('Retrieved response');
@@ -228,50 +245,54 @@ async function getProductsForRides(token, rides) {
   });
 }
 
-app.get('/uber/history/all', (req, res) => {
+async function sendAllRideHistoryAndProducts(token, userId) {
+  let retrievedRides = undefined;
+  retrieveAllRideHistory(token)
+    .then(rides => { retrievedRides = rides; return rides; })
+    .then(rides => storeRides(rides, userId))
+    .then(rides => getProductsForRides(token, rides))
+    .then(products => res.send({ rides: retrievedRides, products: products }));
+}
+
+app.get('/uber/history', (req, res) => {
   const userId = req.query.userId;
   const token = req.query.accessToken;
-  Rides.find({ user_id: userId }, (err, results) => {
-    if (err) {
-      console.error(err);
-    } else if (!!results.length) {
-      return getProductsForRides(token, results)
-        .then(products => res.send({ rides: results, products: products }));
-    } else {
-      let retrievedRides = undefined;
-      retrieveAllRideHistory(token)
-        .then(rides => { retrievedRides = rides; return rides; })
-        .then(rides => storeRides(rides, userId))
-        .then(rides => getProductsForRides(token, rides))
-        .then(products => res.send({ rides: retrievedRides, products: products }));
-    }
-  });
-});
-
-app.post('/uber/history/refresh', (req, res) => {
-  const userId = req.query.userId;
-  const accessToken = req.query.accessToken;
   Rides.count({ user_id: userId }, (err, count) => {
     if (err) {
       console.error(err);
     }
-    const retrieve = count ? retrieveRideHistory(accessToken, 50, [], false) : this.retrieveAllRideHistory(accessToken);
-    retrieve.then(rides => storeRides(rides, userId)).then(rides => res.send(rides));
-  });
-});
-
-app.get('/uber/history', (req, res) => {
-  request.get('https://api.uber.com/v1.2/history', {
-    qs: { limit: req.query.limit, offset: req.query.offset },
-    headers: uberHeaders(req.query.accessToken)
-  },
-  (err, response, body) => {
-    if (noError(err, response)) {
-      const json = JSON.parse(body);
-      res.send(json);
-    } else {
-      res.error('Failed to retrieve ride history ' + (error ? error.error : '[no error message]'));
+    if (!count) {
+      sendAllRideHistoryAndProducts(token, userId);
     }
+    retrieveRideHistoryAsync(token, 1, 0).then(rides => {
+      const totalRideCount = rides.count;
+      // If all results are cached, serve them
+      if (count === totalRideCount) {
+        Rides.find({ user_id: userId }, (err, results) => {
+          if (err) {
+            res.send(500, {
+              code: ERR_CACHE_FAILURE,
+              message: 'Failed to retrieve ride cache results.',
+              error: err
+            });
+          } else {
+            getProductsForRides(token, results).then(products => res.send({ rides: results, products: products }));
+          }
+        });
+      } else if (count < totalRideCount) {
+        let retrievedRides = undefined;
+        retrieveRideHistoryWithLimit(token, totalRideCount - count, [])
+          .then(rides => { retrievedRides = rides; return rides; })
+          .then(rides => storeRides(rides, userId))
+          .then(rides => getProductsForRides(token, rides))
+          .then(products => res.send({ rides: retrievedRides, products: products }));
+      } else {
+        res.send(500, {
+          code: ERR_CACHE_FAILURE,
+          message: 'Ride cache is in an invalid state, refresh by invalidating the cache.'
+        });
+      }
+    });
   });
 });
 
