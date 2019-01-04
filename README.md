@@ -9,8 +9,6 @@ Start the app: `ng serve`
 
 Remaining MVP features:
 - Show impact statements ("If you took an uber Pool for every ride in your history, you would have saved X trees")
-- Provide total emissions over all time
-- List the privacy policy on the authorization page
 
 After MVP features:
 - Provide a logout system

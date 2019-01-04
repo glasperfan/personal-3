@@ -1,9 +1,14 @@
 <div class="authorize">
     <a href="{{auth.uberAuthorizationUrl}}" class="btn btn-outline-info">Authorize Uber</a>
     <p class="description">
-        This will authorize my app to view your Uber ride history and profile (name, email). 
+        This will authorize Footprint to view your Uber ride history and profile (name, email). 
         A detail explanation of Uber API authorization scopes are <a href="https://developer.uber.com/docs/riders/guides/scopes">here</a>. 
-        The code behind this is entirely available on GitHub, and you can always email me at 
-        <a href="mailto:zabriskiehugh@gmail.com">zabriskiehugh@gmail.com</a> to have your data removed.
+    </p>
+    <p class="description">
+        The code behind this is available on GitHub, and you can always email me at 
+        <a href="mailto:zabriskiehugh@gmail.com">zabriskiehugh@gmail.com</a> with questions or concerns.
+    </p>
+    <p class="description">
+        For more details, the privacy policy is available <a [href]="auth.privacyPolicyUrl">here</a>.
     </p>
 </div>
