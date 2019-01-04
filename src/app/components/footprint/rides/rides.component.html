@@ -4,6 +4,16 @@
     </div>
     <div *ngIf="!componentLoading; else loading">
         <div class="rides" [style.height.px]="sidebarHeight">
+            <div class="totals">
+                <div class="total">
+                    <span class="total-value">{{totals.emissions}} {{emissionsService.displayUnits}}</span>
+                    <span class="total-label">Total Emissions</span>
+                </div>
+                <div class="total">
+                    <span class="total-value">{{totals.rides}}</span>
+                    <span class="total-label">Total Rides</span>
+                </div>
+            </div>
             <div *ngFor="let ride of rideHistory; index as i">
                 <div class="ride">
                     <div class="ride-emissions" (click)="onEmissionsUnitChange($event)">

@@ -7,6 +7,7 @@ import { EmissionsService, EmissionsUnits } from "../../../services/emissions.se
 import { UberApiService } from "../../../services/uber-api.service";
 import { roundRobin } from "../../../utils";
 import { take } from "rxjs/operators";
+import { sum } from "lodash-es";
 
 @Component({
     selector: 'p3-uber-rides',
@@ -17,6 +18,10 @@ export class RidesComponent implements OnInit {
     
     rideHistory: IHistoricalRideWithProduct[];
     rideEmissions: string[]; // an array is used so change detection is triggered when units are changed
+    totals: {
+        emissions: string; // with units
+        rides: number;
+    }
     componentLoading: boolean;
     emissionsService: EmissionsService<EPAStandardEmissionsProps>;
     ICON = ICON;
@@ -26,26 +31,44 @@ export class RidesComponent implements OnInit {
     constructor(private api: UberApiService) {
         this.componentLoading = false;
         this.emissionsService = new EPAStandardEmissionsService();
+        this.totals = { emissions: '--', rides: 0 };
     }
     
     ngOnInit(): void {
         this.componentLoading = true;
         this.api.getRideHistory().pipe(take(1)).subscribe(rides => {
             this.rideHistory = this.sortRides(rides);
+            this.totals = {
+                emissions: this.calculateAllEmissions(rides),
+                rides: rides.length
+            }
             this.refreshEmissionsForRides();
             this.componentLoading = false;
         });
     }
 
-    calculateEmissions(ride: IHistoricalRideWithProduct): string {
-        const raw = this.emissionsService.calculateEmissions({ miles: ride.distance, isSharedRide: ride.product.shared });
+    calculateAllEmissionsFn = (rides: IHistoricalRideWithProduct[]): number => sum(rides.map(this.calculateEmissionsFn))
+
+    calculateEmissionsFn = (ride: IHistoricalRideWithProduct): number =>
+        this.emissionsService.calculateEmissions({ miles: ride.distance, isSharedRide: ride.product.shared });
+
+    formatEmissions = (raw: number): string => {
         if (raw < 10) return raw.toPrecision(2);
         if (raw < 100) return raw.toPrecision(1);
         return Math.round(raw).toString();
     }
 
+    calculateAllEmissions(rides: IHistoricalRideWithProduct[]): string {
+        return this.formatEmissions(this.calculateAllEmissionsFn(rides));
+    }
+
+    calculateEmissions(ride: IHistoricalRideWithProduct): string {
+        return this.formatEmissions(this.calculateEmissionsFn(ride));
+    }
+
     refreshEmissionsForRides() {
         this.rideEmissions = this.rideHistory.map(r => this.calculateEmissions(r));
+        this.totals.emissions = this.calculateAllEmissions(this.rideHistory);
     }
 
     onEmissionsUnitChange() {

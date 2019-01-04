@@ -13,7 +13,7 @@ export abstract class EmissionsService<T> {
         kilograms: (grams: number): number => (grams / 1000)
     };
 
-    protected selectedUnit: EmissionsUnits = 'grams';
+    protected selectedUnit: EmissionsUnits = 'pounds';
     
     set units(unit: EmissionsUnits) {
         this.selectedUnit = unit;
