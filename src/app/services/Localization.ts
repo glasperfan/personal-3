@@ -83,17 +83,16 @@ export const Locals: ILocals = {
       header: 'About',
       elementId: 'about',
       content: [
-        `I recently moved to the Northwest, and I keep busy with a million little projects.
+        `I recently back to the East Coast, where I keep myself busy with a million little projects.
         Statistically, there's a good chance one of them is a million-dollar project.
         You can see the results from some of them <a href="#work">below</a> and on
         <a href="https://github.com/glasperfan" target="_blank">GitHub</a>.`,
-        `I'm participating in as many duathlons, triathlons, and long-distance cycling events
-        as I can possibly fit in. My BMC Time Machine SLR02 is a natural extension of my being.
+        `I'm always exploring new cycling routes, or going for a run in a different part of the world. 
         You can check <a href="http://strava.com/athletes/zabriskie" target="_blank">Strava</a> to see what I'm up to.`,
         `I also spent 4 years at Harvard playing piano with the
         <a href="https://www.hastypudding.org/" target="_blank">Hasty Pudding Theatricals</a>,
         and I arranged and orchestrated starting as a sophmore. I continue to work as an orchestrator as an alumnus.`,
-        `I'm always interested in freelance work, both as a versatile developer and as a pianist for almost any setting or occasion.`
+        `I'm always interested in freelance work, either as a versatile developer or pianist with strong sightreading and accompanying skills.`
       ]
     },
     Work: {
@@ -105,6 +104,7 @@ export const Locals: ILocals = {
       header: 'Content',
       elementId: 'content',
       content: [
+        `<a href="/footprint">Uber Footprint</a> - visualize your Uber ride usage and resolve to reduce your carbon footprint`,
         `<a href="http://mela.app.s3-website-us-west-2.amazonaws.com/">Mela</a> - a better Pomodoro`
       ],
     },
