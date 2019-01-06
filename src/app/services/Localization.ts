@@ -16,6 +16,7 @@ export interface ILocals {
     Contact: ILink;
   };
   Work: {
+    Engineer: IRole;
     Microsoft: IRole;
     Cringle: IRole;
     Cuthbert: IRole;
@@ -45,10 +46,17 @@ export const Locals: ILocals = {
     Contact: { name: 'Contact', route: '/#contact' }
   },
   Work: {
+    Engineer: {
+      organization: '<i>Undisclosed</i>',
+      position: 'Forward Deployed Engineer',
+      dates: `June '18 - Present`,
+      location: 'New York, NY',
+      link: ''
+    },
     Microsoft: {
       organization: 'Microsoft',
       position: 'Software Engineer',
-      dates: `Sep '16 - March '18`,
+      dates: `Sep '16 - Apr '18`,
       location: 'Redmond, WA',
       link: 'https://azure.microsoft.com/en-us/'
     },
@@ -72,26 +80,26 @@ export const Locals: ILocals = {
       header: 'Home',
       elementId: 'home',
       content: [
-        `I'm a software engineer, cyclist, and pianist that explores the union and intersection of these fields.
+        `I'm a software engineer, cyclist, and pianist who explores the union and intersection of these fields.
         By day, I work as a software engineer based in New York City, although I operate across a variety of industries, regions, and languages.
         By night, I train for triathlons and read about <a href="https://www.goodreads.com/quotes/807-the-place-to-improve-the-world-is-first-in-one-s"><i>Quality</i></a>.`,
         `I graduated from Harvard in 2016 with a joint concentration in Computer Science and Music.`,
-        `If you would like to get in touch, please use the simple but robot-proof message system below.`
+        `If you would like to get in touch, please use the simple (but robot-proof) message system below.`
       ]
     },
     About: {
       header: 'About',
       elementId: 'about',
       content: [
-        `I recently back to the East Coast, where I keep myself busy with a million little projects.
+        `I recently moved back to the East Coast, where I keep myself busy with a million little projects.
         Statistically, there's a good chance one of them is a million-dollar project.
-        You can see the results from some of them <a href="#work">below</a> and on
+        You can see the results from some of them <a href="#content">below</a> and on
         <a href="https://github.com/glasperfan" target="_blank">GitHub</a>.`,
         `I'm always exploring new cycling routes, or going for a run in a different part of the world. 
         You can check <a href="http://strava.com/athletes/zabriskie" target="_blank">Strava</a> to see what I'm up to.`,
-        `I also spent 4 years at Harvard playing piano with the
+        `I also spent four years at Harvard playing piano with the
         <a href="https://www.hastypudding.org/" target="_blank">Hasty Pudding Theatricals</a>,
-        and I arranged and orchestrated starting as a sophmore. I continue to work as an orchestrator as an alumnus.`,
+        and I arranged and orchestrated starting as a sophmore. I continue to work as an alumni orchestrator.`,
         `I'm always interested in freelance work, either as a versatile developer or pianist with strong sightreading and accompanying skills.`
       ]
     },

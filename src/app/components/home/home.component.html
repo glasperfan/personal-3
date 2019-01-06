@@ -23,7 +23,7 @@
       <p *ngFor="let paragraph of work.content; let i = index" [class.top]="i === 0" [innerHTML]="paragraph"></p>
       <div class="item" *ngFor="let role of roles">
         <div class="line">
-          <a class="organization left" [href]="role.link">{{role.organization}}</a>
+          <a class="organization left" [href]="role.link"><span [innerHTML]="role.organization"></span></a>
           <div class="position right">{{role.position}}</div>
         </div>
         <div class="line">

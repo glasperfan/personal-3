@@ -33,6 +33,7 @@ export class HomeComponent {
     ];
 
     this.roles = [
+      Locals.Work.Engineer,
       Locals.Work.Microsoft,
       Locals.Work.Cuthbert,
       Locals.Work.Cringle
