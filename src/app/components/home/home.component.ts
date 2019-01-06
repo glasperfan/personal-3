@@ -19,6 +19,8 @@ export class HomeComponent {
   public content: ISection;
   public contact: ISection;
 
+  public currentYear: number = new Date().getFullYear();
+
   constructor() {
     this.title = Locals.Links.Title;
     this.navTitle = Locals.Nav.Title;

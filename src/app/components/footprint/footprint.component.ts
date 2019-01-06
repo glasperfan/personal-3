@@ -9,7 +9,7 @@ import { UberAuthService } from '../../services/uber-auth.service';
 })
 export class FootprintComponent implements OnInit {
     public copyright: string;
-
+    
     constructor(
         private activatedRoute: ActivatedRoute,
         private router: Router,

@@ -8,9 +8,10 @@ import { Locals } from '../../services/Localization';
 })
 export class FooterComponent implements OnInit {
   public copyright: string;
+  public currentYear: number = new Date().getFullYear();
 
   constructor() {
-    this.copyright = Locals.About.Copyright(Locals.About.Name, Locals.About.Year);
+    this.copyright = Locals.About.Copyright(Locals.About.Name, this.currentYear);
   }
 
   ngOnInit() { }

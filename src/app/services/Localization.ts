@@ -3,8 +3,7 @@ import { ILink, IRole, ISection } from '../interfaces/Locals';
 export interface ILocals {
   About: {
     Name: string;
-    Year: number;
-    Copyright: (name, year) => string;
+    Copyright: (name: string, year: number) => string;
   };
   Nav: {
     Title: string;
@@ -33,7 +32,6 @@ export interface ILocals {
 export const Locals: ILocals = {
   About: {
     Name: 'Hugh Zabriskie',
-    Year: 2018,
     Copyright: (name, year) => `Copyright &copy; ${year} ${name}`
   },
   Nav: {
@@ -50,7 +48,7 @@ export const Locals: ILocals = {
     Microsoft: {
       organization: 'Microsoft',
       position: 'Software Engineer',
-      dates: `Sep '16 -`,
+      dates: `Sep '16 - March '18`,
       location: 'Redmond, WA',
       link: 'https://azure.microsoft.com/en-us/'
     },
@@ -74,14 +72,11 @@ export const Locals: ILocals = {
       header: 'Home',
       elementId: 'home',
       content: [
-        `I'm a musician and software engineer, enthralled by everything in the union,
-        and specifically the intersection, of these two fields. By day, I work as a software engineer
-        in Seattle. I'm a full-stack developer at
-        <a href="https://azure.microsoft.com/en-us/services/machine-learning-services/" target="_blank">Microsoft</a>,
-        working on an enterprise machine learning and data science platform. By night,
-        I transcribe tunes from Kind of Blue and train for triathlons.`,
+        `I'm a software engineer, cyclist, and pianist that explores the union and intersection of these fields.
+        By day, I work as a software engineer based in New York City, although I operate across a variety of industries, regions, and languages.
+        By night, I train for triathlons and read about <a href="https://www.goodreads.com/quotes/807-the-place-to-improve-the-world-is-first-in-one-s"><i>Quality</i></a>.`,
         `I graduated from Harvard in 2016 with a joint concentration in Computer Science and Music.`,
-        `If you would like to get in touch with me, please use the robot-proof message system below.`
+        `If you would like to get in touch, please use the simple but robot-proof message system below.`
       ]
     },
     About: {
