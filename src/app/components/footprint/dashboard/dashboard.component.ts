@@ -139,15 +139,23 @@ export class DashboardComponent implements OnInit {
 
     formatTrend(t: ITrend): string {
         if (!t.lastInterval) {
-            return '- -';
+            return '0 to ' + t.thisInterval;
         }
         const perc = Math.abs(t.thisInterval - t.lastInterval) / t.lastInterval * 100;
         return Math.round(perc) + '%';
+    }
+
+    get shouldInvertTrend(): string {
+        // Add aggregates where down is bad and up is good
+        if (this.selectedAggregator === 'productType') {
+            return 'invert';
+        }
+        return '';
     }
 
     sortByInterval = (a: KeyValue<RideStatsInterval,ITrend>, b: KeyValue<RideStatsInterval,ITrend>): number => {
         const aOrder = this.stats.IntervalsInOrder.indexOf(a.key);
         const bOrder = this.stats.IntervalsInOrder.indexOf(b.key);
         return aOrder - bOrder;
-      }
+    }
 }

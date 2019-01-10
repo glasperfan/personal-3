@@ -30,7 +30,7 @@
                 <div class="trend-banner">{{trendBanner}}</div>
                 <div class="trend-container">
                     <div class="trend" *ngFor="let t of trends | keyvalue: sortByInterval">
-                        <span [ngClass]="['material-icons', iconForTrend(t.value)]">{{iconForTrend(t.value)}}</span>
+                        <span [ngClass]="['material-icons', iconForTrend(t.value), shouldInvertTrend]">{{iconForTrend(t.value)}}</span>
                         <span class="trend-value">{{formatTrend(t.value)}}</span>
                         <span class="trend-desc">Compared to last {{t.key}}</span>
                     </div>

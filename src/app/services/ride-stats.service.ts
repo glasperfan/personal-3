@@ -50,7 +50,7 @@ export class RideStatsService {
     public readonly TrendTitles: { [I in RideStatsAggregator]: string } = {
         rideCount: 'Ride Count',
         totalEmissions: 'Total Emissions',
-        productType: 'Product Type'
+        productType: 'Ride Share Usage'
     }
 
     private readonly UberLabels = {
@@ -76,6 +76,7 @@ export class RideStatsService {
     private _productTypeBy: BehaviorSubject<AggregateRows> = new BehaviorSubject(this.EMPTY_AGGREGATES);
     private _productTypeBy$: Observable<AggregateRows>;
     private _columns: { [A in RideStatsAggregator]: IGoogleChartLabel[] };
+    private _productToIndex: { [product: string]: number }; // map each product to a data row position
     private _trends: Trends;
     
     private groupedAggregates: Aggregations;
@@ -192,11 +193,11 @@ export class RideStatsService {
     }
 
     private onNewRideData(): void {
-        this.calculateGroupBy();
+        this.calculateGroupBy(); // must occur first
         this.calculateRideCountBy();
         this.calculateCarbonEmissionsBy();
         this.calculateProductTypeBy();
-        this.calculateTrends();
+        this.calculateTrends(); // must occur after calculating product type
     }
 
     /**
@@ -273,14 +274,16 @@ export class RideStatsService {
     }
 
     private calculateProductTypeBy(): void {
-        const allProducts = this.calculateUniqueProductTypes();
-        const indexToProductMap: { [key: number]: string } = invert(keyBy(allProducts, (productName: string) => allProducts.indexOf(productName) + 2));
+        const allProducts = uniq(this.rides.map(r => r.product.product_group));
+        this._columns.productType = allProducts.map(t => ({ id: t, label: this.UberLabels[t], type: 'number' } as IGoogleChartLabel));
+        this._productToIndex = invert(keyBy(allProducts, (productName: string) => allProducts.indexOf(productName) + 2)) as any;
+
         const aggFn = (rides: IHistoricalRideWithProduct[], key: string): IAggregateRow => {
             const row: IAggregateRow = [rides[0].start_time, key].concat(allProducts.map(_ => 0));
             if ('placeholder' in rides[0]) {
                 return row;
             }
-            rides.forEach(r => { row[indexToProductMap[r.product.product_group]]++; });
+            rides.forEach(r => { row[this._productToIndex[r.product.product_group]]++; });
             return row;
         }
         const productTypeByWeek = values(mapValues(this.groupedAggregates.week, aggFn));
@@ -291,12 +294,6 @@ export class RideStatsService {
             month: this.sortFn(productTypeByMonth),
             year: this.sortFn(productTypeByYear)
         });
-    }
-
-    private calculateUniqueProductTypes(): string[]  {
-        const typeArr = uniq(this.rides.map(r => r.product.product_group));
-        this._columns.productType = typeArr.map(t => ({ id: t, label: this.UberLabels[t], type: 'number' } as IGoogleChartLabel));
-        return typeArr;
     }
 
     private calculateTrends() {
@@ -310,19 +307,24 @@ export class RideStatsService {
     private generateTrendForAggregate(aggregator: RideStatsAggregator): ({ [I in RideStatsInterval]: ITrend }) {
         const agg = this.getAggregations(aggregator);
         return {
-            week: this.generateTrend(agg.week),
-            month: this.generateTrend(agg.month),
-            year: this.generateTrend(agg.year)
+            week: this.generateTrend(agg.week, aggregator),
+            month: this.generateTrend(agg.month, aggregator),
+            year: this.generateTrend(agg.year, aggregator)
         }
     }
     
-    private generateTrend(rows: IAggregateRow[]): ITrend {
+    private generateTrend(rows: IAggregateRow[], aggregator: RideStatsAggregator): ITrend {
         // Rows are sorted so that the latest interval object is the last.
         // Choose row[1] because row[0] is the key.
+        let columnPosition = 1; // in most cases, there's a single line in the graph, and the data column is index 1
+        if (aggregator === 'productType') {
+            // For product type we need the index of the ride share column
+            columnPosition = this._productToIndex['rideshare'] - 1;
+        }
         return {
-            lastInterval: rows[rows.length - 2][1],
-            thisInterval: rows[rows.length - 1][1]
-        } as ITrend;
+            lastInterval: rows[rows.length - 2][columnPosition],
+            thisInterval: rows[rows.length - 1][columnPosition]
+        };
     }
 
     private sortFn = (rides: any[]): IAggregateRow[] => rides.sort((a, b) => a[0] - b[0]).map(v => v.slice(1) as IAggregateRow);
