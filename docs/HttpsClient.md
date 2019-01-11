@@ -1,6 +1,10 @@
 # Go HTTPS: Securely Deploy Your Angular 6 App With AWS
 
+<div style="text-align:center">
+
 ![Go HTTPS: Securely Deploy Your Angular 6 App With AWS](logo.png "Go HTTPS")
+
+</div>
 
 In this tutorial, we'll assume you've already built your own Angular 6 application and hosted it on Amazon's S3 service. We also assume you have a custom domain (recommended, with routing configured in Route53) or plan to use the S3 website URL. Finally, we'll assume you have an [Express](https://expressjs.com/) server as your backend that you'd like also to serve over HTTPS. If you haven't, you can learn
 
