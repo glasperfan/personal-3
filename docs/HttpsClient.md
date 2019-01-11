@@ -2,15 +2,16 @@
 
 In this tutorial, we'll assume you've already built your own Angular 6 application and hosted it on Amazon's S3 service. We also assume you have a custom domain (recommended, with routing configured in Route53) or plan to use the S3 website URL. Finally, we'll assume you have an [Express](https://expressjs.com/) server as your backend that you'd like also to serve over HTTPS. If you haven't, you can learn
 
-- how to build a simple Angular 6 application on https://angular.io/tutorial
-- how to [serve your Angular app on S3](https://docs.aws.amazon.com/AmazonS3/latest/dev/WebsiteHosting.html) or [buy a custom domain on AWS Route53](https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/domain-register.html) on https://docs.aws.amazon.com (a `.com` domain is like $12/year)
-- how to create a minimal Express server on https://expressjs.com
+- how to build a simple Angular 6 application on [angular.io](https://angular.io/tutorial)
+- how to [serve your Angular app on S3](https://docs.aws.amazon.com/AmazonS3/latest/dev/WebsiteHosting.html) or [buy a custom domain on AWS Route53](https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/domain-register.html) (a `.com` domain is like $12/year)
+- how to create a minimal Express server on [expressjs.com](https://expressjs.com)
 
-Note the HTTPS links.
+_Note the HTTPS links._
 
-Also note that most of these practices will work for other versions of Angular, likely with small modifications. For example, Angular's top-level config file is named `angular.json` in Angular 6+ when it used to be `.angular-cli.json`.
+Also, note that most of these practices will work for other versions of Angular, but likely with small changes. One of the most significant differences is that Angular's top-level config file is now named `angular.json` in Angular 6 when it used to be `.angular-cli.json`. See below for migration instructions.
 
-The goal is to be able to switch between development in HTTP and deploy to production in HTTPS. You can already launch your app in development with `ng serve` and serve on `localhost:4200`, but by the end of this, you'll be able to serve it over HTTPS online in seconds.
+### Develop locally, publish securely
+Ultimately, the goal is to be able to switch between development in HTTP and deploy to production in HTTPS. You can already launch your app in development with `ng serve` and serve on `localhost:4200`, but by the end of this, you'll be able to serve it over HTTPS online in seconds.
 
 The main tasks involved in configuring your app for HTTPS are to route your API calls based on your environment (dev vs. prod), and host your app with TLS certificate. The latter part is done through AWS, and invovles registering a certificate for your domain and then serving your app over a CDN that enforces HTTPS and provides your certificate.
 
