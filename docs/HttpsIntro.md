@@ -20,7 +20,7 @@ Specifically, here are the services and frameworks involved:
     - [S3](https://aws.amazon.com/s3/)
     - [Route53](https://aws.amazon.com/route53/)
     - [Amazon Certificate Manager (ACM)](https://aws.amazon.com/certificate-manager/)
-- Database _(optional)-  
+- Database _(optional)_ 
     - [MongoDB](https://www.mongodb.com/cloud/atlas)
     - [MongoDB Atlas](https://www.mongodb.com/cloud/atlas)
     - [Mongoose](https://mongoosejs.com)
