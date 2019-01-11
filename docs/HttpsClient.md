@@ -1,4 +1,4 @@
-# Go HTTPS: Deploy Your Angular 6 App Over HTTPS Set up an Angular web app to web client
+# Go HTTPS: Securely Deploy Your Angular 6 App With AWS
 
 In this tutorial, we'll assume you've already built your own Angular 6 application and hosted it on Amazon's S3 service. We also assume you have a custom domain (recommended, with routing configured in Route53) or plan to use the S3 website URL. Finally, we'll assume you have an [Express](https://expressjs.com/) server as your backend that you'd like also to serve over HTTPS. If you haven't, you can learn
 
@@ -28,7 +28,7 @@ Serve your environment locally as you normally would.
 ng serve
 ```
 
-In `src/environments/`, create an `environment.ts` and `environment.prod.ts`. Add an interface to ensure parity in `environment.ts`.
+In `src/environments/`, create an `environment.ts` and `environment.prod.ts`. Add an interface to ensure parity between environment configurations in `environment.ts`.
 
 ```
 // environment.ts
@@ -51,7 +51,7 @@ export const environment: IEnvironment = {
 };
 ```
 
-Adapt those URLs to fit your needs. In this case, I'm assuming my development Express server is being served locally on port 6060, while my production server runs somewhere else and is available at `https://yoursecureserver.com`. This can also be an HTTP server for now. 
+Adapt the URLs above to fit your needs. In this case, I'm assuming my development Express server is being served locally on port 6060, while my production server runs somewhere else and is available at `https://yoursecureserver.com`. This can also be an HTTP server for now. 
 
 Then in `angular.json`, we'll merge in the following configuration.
 
@@ -213,3 +213,7 @@ You probably already have an A record for yourdomain.com that points to your S3 
 #### Ensure a force-redirect from HTTP to HTTPS
 
 This is a setting in the CloudFront zone. It's a required for a secure site verification by Google in the Chrome browser.
+
+## Next Up: An HTTPS Express Server
+
+Stay tuned on how to configure an Express Server to run on HTTPS!
