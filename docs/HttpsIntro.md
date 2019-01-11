@@ -16,15 +16,20 @@ Specifically, here are the services and frameworks involved:
     - S3
     - Route53
     - Amazon Certificate Manager (ACM)
+    - MongoDB Atlas _(optional)_
 - SSL/TLS
     - Let's Encrypt
     - openssl
-- System
+- OS
     - Ubuntu
+- Frameworks
     - Angular 6+
     - Angular CLI 6+
+    - MongoDB _(optional)_
+    - Mongoose _(optional)_
 
 Finally, we'll go through how to seamlessly switch between development and production mode, so you can rapidly iterate locally and then immediately deploy your changes. Deploying your client or server can be a single command.
 
 1. [Go HTTPS: Deploying Your Angular 6 App](HttpsClient.md)
 2. [Go HTTPS: Deploying Your Node.js Express Server](HttpsServer.md)
+3. [Appendix: MongoDB Atlas With Your HTTPS Server](HttpsMongo.md)
