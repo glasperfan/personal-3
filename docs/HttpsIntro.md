@@ -9,28 +9,28 @@ Articles abound on the benefits of HTTPS. It protects your users from intruders 
 
 In Chrome 70 (October 2018), Chrome colors this warning [in an ominous red](https://blog.chromium.org/2018/05/evolving-chromes-security-indicators.html), ensuring users won't miss it. Oh, and in Chrome 69 (September), they removed the green "Secure" label on HTTPS sites, to suggest that "the web is a safe place is default". Sure. But Google is successfully using Chrome's 60+% of the browser market share as a forcing function to migrate everyone to HTTPS.
 
-## An end-to-end guide
+## A different kind of guide
 
-However, HTTPS being free doesn't mean it's always fun or easy to set up. I spent many hours learning how to deploy a basic production client and server in HTTPS instead of HTTP. While this guide is written specifically for an Angular client and an Express server hosted in AWS, many of these steps are easily transferable to other frameworks and servers. I think it's just more useful to have that works 100% for one configuration rather than a general one that doesn't fully work for anyone.
+However, just because HTTPS is "free" doesn't mean it's always fun or easy to set up. I spent a while learning how to deploy a basic production client and server in HTTPS instead of HTTP. Ultimately, I tried to encapsulate that knowledge into this guide. While this guide is written specifically for my setup - an Angular 6 application and an Express server hosted in AWS - many of these steps are easily transferable to other frameworks and servers. I think it's more useful to have that works 100% for one setup rather than a general one that doesn't fully work for anyone. Plus, I've mixed in useful side knowledge (what is a TLS certificate?) and several troubleshooting tips that could save you some time.
 
 Specifically, here are the services and frameworks involved:
 - AWS Services
-    - Cloudfront
-    - EC2
-    - S3
-    - Route53
-    - Amazon Certificate Manager (ACM)
-    - MongoDB Atlas _(optional)_
+    - [Cloudfront](https://aws.amazon.com/cloudfront/)
+    - [EC2](https://aws.amazon.com/ec2/)
+    - [S3](https://aws.amazon.com/s3/)
+    - [Route53](https://aws.amazon.com/route53/)
+    - [Amazon Certificate Manager (ACM)](https://aws.amazon.com/certificate-manager/)
+- Database _(optional)-  
+    - [MongoDB](https://www.mongodb.com/cloud/atlas)
+    - [MongoDB Atlas](https://www.mongodb.com/cloud/atlas)
+    - [Mongoose](https://mongoosejs.com)
 - SSL/TLS
-    - Let's Encrypt
-    - openssl
+    - [Let's Encrypt](https://letsencrypt.org/)
+    - [openssl](https://www.openssl.org/)
 - OS
-    - Ubuntu
+    - [Ubuntu (18.04.1 LTS "Bionic Beaver")](http://releases.ubuntu.com/18.04/)
 - Frameworks
-    - Angular 6+
-    - Angular CLI 6+
-    - MongoDB _(optional)_
-    - Mongoose _(optional)_
+    - [Angular 6](https://angular.io)
 
 ## Make production deployment painless
 
