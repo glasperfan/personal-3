@@ -7,9 +7,9 @@ Start the app: `ng serve`
 
 ## Footprint App (v.0.1)
 
-Remaining MVP features:
+TODO:
 - Show impact statements ("If you took an uber Pool for every ride in your history, you would have saved X trees")
 
 After MVP features:
-- Provide a logout system
-- Provide a "delete your data" system 
+- logout system from Uber auth
+- "delete your data" option 
