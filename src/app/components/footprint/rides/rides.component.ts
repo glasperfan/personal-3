@@ -8,6 +8,7 @@ import { UberApiService } from "../../../services/uber-api.service";
 import { roundRobin } from "../../../utils";
 import { take } from "rxjs/operators";
 import { sum } from "lodash-es";
+const numeral = require('numeral');
 
 @Component({
     selector: 'p3-uber-rides',
@@ -52,18 +53,14 @@ export class RidesComponent implements OnInit {
     calculateEmissionsFn = (ride: IHistoricalRideWithProduct): number =>
         this.emissionsService.calculateEmissions({ miles: ride.distance, isSharedRide: ride.product.shared });
 
-    formatEmissions = (raw: number): string => {
-        if (raw < 10) return raw.toPrecision(2);
-        if (raw < 100) return raw.toPrecision(1);
-        return Math.round(raw).toString();
-    }
+    formatEmissions = (raw: number, roundUp: boolean): string => numeral(raw).format(roundUp ? '0,0' : '0,0.00');
 
     calculateAllEmissions(rides: IHistoricalRideWithProduct[]): string {
-        return this.formatEmissions(this.calculateAllEmissionsFn(rides));
+        return this.formatEmissions(this.calculateAllEmissionsFn(rides), true);
     }
 
     calculateEmissions(ride: IHistoricalRideWithProduct): string {
-        return this.formatEmissions(this.calculateEmissionsFn(ride));
+        return this.formatEmissions(this.calculateEmissionsFn(ride), false);
     }
 
     refreshEmissionsForRides() {
