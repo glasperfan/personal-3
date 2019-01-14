@@ -16,24 +16,24 @@
     font-family: 'Open Sans', sans-serif;
   }
 
-a:link {
+.link, a:link {
     /* Applies to all unvisited links */
     text-decoration: none;
     color: #149ae8;
     transition: color 0.2s ease-in-out;
 }
 
-a:visited {
+.link:visited, a:visited {
     /* Applies to all visited links */
     color:#149ae8;
 }
 
-a:hover   {
+.link:hover, a:hover   {
     /* Applies to links under the pointer */
     color:#44baff;
 }
 
-a:active  {
+.link:active, a:active  {
     /* Applies to activated links */
     color: black;
 }

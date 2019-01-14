@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { UberAuthService } from '../../services/uber-auth.service';
+import { UberAuthService, IError } from '../../services/uber-auth.service';
 
 @Component({
     selector: 'p3-footprint',
@@ -9,6 +9,8 @@ import { UberAuthService } from '../../services/uber-auth.service';
 })
 export class FootprintComponent implements OnInit {
     public copyright: string;
+    public authErr: IError;
+    public loggingIn: boolean = false;
     
     constructor(
         private activatedRoute: ActivatedRoute,
@@ -31,12 +33,17 @@ export class FootprintComponent implements OnInit {
     }
 
     authorizeUberAPI(authCode: string): void {
+        this.loggingIn = true;
         this.uberAuth.authorize(authCode).subscribe(isTokenAcquired => {
+            this.loggingIn = false;
             if (isTokenAcquired) {
                 this.router.navigateByUrl('/footprint');
             } else {
-
+                console.error('Auth call succeeded but no token acquired?');
             }
+        }, (err: IError) => {
+            this.authErr = err;
+            this.loggingIn = false;
         });
     }
 }

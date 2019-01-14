@@ -17,10 +17,14 @@ export class NavbarComponent {
         this.auth.logout().subscribe(userIsLoggedOut => {
             if (userIsLoggedOut) {
                 this.logoutText = 'Now redirecting...';
-                new Location().assign(this.auth.loginUrl);
+                window.location.href = this.auth.logoutUrl;
             } else {
                 this.logoutText = 'Logout failed';
             }
         });
+    }
+
+    privacyPolicy() {
+        window.location.href = this.auth.privacyPolicyUrl;
     }
 }

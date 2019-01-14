@@ -1,10 +1,15 @@
-<div *ngIf="uberAuth.isCurrentUserAuthorized; else unauthorized">
-    <p3-uber-navbar></p3-uber-navbar>
-    <div class="flex">
-        <p3-uber-rides></p3-uber-rides>
-        <p3-uber-dashboard></p3-uber-dashboard>
-    </div>
+<div *ngIf="loggingIn; else finished" class="stretchToFit">
+    <p3-loading></p3-loading>
 </div>
-<ng-template #unauthorized>
-    <p3-footprint-login></p3-footprint-login>
+
+<ng-template #finished>
+    <div *ngIf="uberAuth.isCurrentUserAuthorized">
+        <p3-uber-navbar></p3-uber-navbar>
+        <div class="flex">
+            <p3-uber-rides></p3-uber-rides>
+            <p3-uber-dashboard></p3-uber-dashboard>
+        </div>
+    </div>
+    <p3-footprint-login *ngIf="!uberAuth.isCurrentUserAuthorized"></p3-footprint-login>
+    <p3-error *ngIf="authErr" [error]="authErr"></p3-error>
 </ng-template>

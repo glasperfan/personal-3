@@ -22,6 +22,7 @@ import { NavbarComponent } from './components/footprint/navbar/navbar.component'
 import { RidesComponent } from './components/footprint/rides/rides.component';
 import { DashboardComponent } from './components/footprint/dashboard/dashboard.component';
 import { FootprintLoginComponent } from './components/footprint/login/login.component';
+import { ErrorComponent } from './components/footprint/error/error.component';
 
 @NgModule({
   imports: [
@@ -44,7 +45,8 @@ import { FootprintLoginComponent } from './components/footprint/login/login.comp
     NavbarComponent,
     RidesComponent,
     DashboardComponent,
-    FootprintLoginComponent
+    FootprintLoginComponent,
+    ErrorComponent
   ],
   providers: [
     CookieService,

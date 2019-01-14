@@ -16,7 +16,7 @@ const RideProducts = require('./models/RideProducts');
 const settings = require('./settings');
 
 const ERR_CACHE_FAILURE = 'ERR_CACHE_FAILURE';
-
+const ERR_AUTH = 'ERR_AUTH';
 
 const app = express();
 
@@ -89,8 +89,8 @@ function withMongo(action) {
   }));
 }
 
-function noError(error, response) {
-  return !error && response.statusCode == 200;
+function noError(response) {
+  return response.statusCode == 200;
 }
 
 function uberHeaders(token) {
@@ -114,12 +114,15 @@ app.post('/uber/token', (req, res) => {
       }
     },
     function (error, response, body) {  
-      if (noError(error, response)) {
-          const json = JSON.parse(body);
-          res.send({ accessToken: json.access_token });
+      const json = JSON.parse(body);
+      if (noError(response)) {
+          return res.send({ accessToken: json.access_token });
       } else {
         // console.log(error);
-        res.send('Failed to obtain access token: ' + (error ? error.error : '[no error message]'));
+        return res.send({
+          code: ERR_AUTH,
+          message: 'Failed to obtain access token: ' + json.error
+        });
       }
     }
   );
@@ -233,15 +236,19 @@ async function storeRideProducts(products) {
 }
 
 app.get('/uber/me', (req, res) => {
-  request.get('https://api.uber.com/v1.2/me',
-  { headers: uberHeaders(req.query.accessToken) },
-  (err, response, body) => {
-    if (noError(err, response)) {
-      const json = JSON.parse(body);
-      res.send(json);
-    } else {
-      res.error('Failed to retrieve rider profile ' + (err ? err : '[no error message]'));
-    }
+  const token = req.query.accessToken;
+  return request({
+    method: 'GET',
+    uri: 'https://api.uber.com/v1.2/me',
+    json: true, // Automatically parses the JSON string in the response
+    headers: uberHeaders(token)
+  }).then(function (profile) {
+    res.send(profile);
+  }).catch(function (err) {
+    res.send({
+      code: ERR_AUTH,
+      message: 'Failed to retrieve rider profile ' + err.message
+    });
   });
 });
 

@@ -1,7 +1,7 @@
-<nav class="navbar navbar-expand-md navbar-light bg-light" id="navbar">
+<nav class="navbar affix navbar-expand-lg navbar-light bg-light" id="navbar">
     <span class="navbar-brand mb-0 h1">Uber Footprint</span>
     <div class="nav-links">
-        <a class="small-link nav-link" (click)="logout()">{{logoutText}}</a>
-        <a class="small-link nav-link" [href]="auth.privacyPolicyUrl">Privacy Policy</a>
+        <button class="btn btn-link" (click)="logout()">{{logoutText}}</button>
+        <button class="btn btn-link" (click)="privacyPolicy()">Privacy Policy</button>
     </div>
 </nav>
