@@ -5,6 +5,7 @@ import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { DeviceDetectorModule } from 'ngx-device-detector';
 import { BrowserModule } from '@angular/platform-browser';
 import { CookieService } from 'ngx-cookie-service';
 import { AppComponent } from './app.component';
@@ -33,6 +34,7 @@ import { ErrorComponent } from './components/footprint/error/error.component';
     MatSelectModule,
     BrowserAnimationsModule,
     FormsModule,
+    DeviceDetectorModule.forRoot(),
     ROUTES
   ],
   declarations: [

@@ -5,27 +5,63 @@
 :host {
     width: 100%;
 
-    .component {
-        margin: 0 25px;
-    }
+    @media screen and (max-width: 768px) {
+        .wrapper {
+            margin-top: 10px;
+        }
+        
+        .component {
+            margin: 0 5px;
+        }
 
-    .chart-with-options {
-        .flex;
-        justify-content: space-between;
-
-        .chart-options {
-            .flex;
-            flex-direction: column;
-
-            .chart-option {
-                margin: 20px 0;
+        .chart-with-options {
+            display: block;
+    
+            .chart-options {
+                .flex;
+                flex-direction: column;
+    
+                .chart-option {
+                    margin: 20px 0;
+                }
             }
+        }
+
+        .trends {
+            margin-top: 200px;
+            text-align: center;
         }
     }
 
-    .trends {
-        margin-top: 40px;
+    // desktop
+    @media screen and (min-width: 769px) {
+        .component {
+            margin: 0 25px;
+        }
 
+        .chart-with-options {
+            .flex;
+            justify-content: space-between;
+    
+            .chart-options {
+                .flex;
+                flex-direction: column;
+    
+                .chart-option {
+                    margin: 20px 0;
+                }
+            }
+        }
+
+        .trends {
+            margin-top: 40px;
+        }
+    }
+
+
+
+
+    .trends {
         .trend-banner {
             font-weight: 200;
             line-height: 2;

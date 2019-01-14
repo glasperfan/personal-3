@@ -8,6 +8,7 @@ import { UberApiService } from '../../../services/uber-api.service';
 import { unsubscribe } from '../../../utils';
 import { ICON } from '../../../models/Icon';
 import { KeyValue } from '@angular/common';
+import { DeviceDetectorService } from 'ngx-device-detector';
 
 declare const google: any;
 
@@ -38,7 +39,14 @@ export class DashboardComponent implements OnInit {
     chartOptions: any;
     dataTable: any;
     
-    constructor(private api: UberApiService, private stats: RideStatsService) { }
+    constructor(
+        private api: UberApiService,
+        private stats: RideStatsService,
+        private device: DeviceDetectorService) {
+            if (this.device.isMobile()) {
+                this.chartHeight = 500;
+            }
+        }
     
     ngOnInit(): void {
         this.stats.onStatsReady.subscribe(ready => {
@@ -85,7 +93,8 @@ export class DashboardComponent implements OnInit {
         google.charts.load('current', { 'packages' : [ 'line' ] });
         google.charts.setOnLoadCallback(() => {
             this.updateChartData(rows);
-
+            
+            const isMobile = this.device.isMobile();
             this.chartOptions = {
                 chart: {
                     title: 'Your Footprint',
@@ -93,11 +102,11 @@ export class DashboardComponent implements OnInit {
                 },
                 explorer: { axis: 'horizontal' },
                 curveType: 'function',
-                width: 850,
+                width: isMobile ? screen.width - 10 : 850,
                 height: this.chartHeight,
-                chartArea:{
-                    left: 75,
-                    width: 775,
+                chartArea: {
+                    left: isMobile ? 0 : 75,
+                    width: isMobile ? screen.width : 775,
                     top: 20
                 },
                 hAxis: { 
@@ -109,7 +118,7 @@ export class DashboardComponent implements OnInit {
                     duration: 1000,
                     easing: 'inAndOut'
                 },
-                legend: { position: 'left' }
+                legend: { position: isMobile ? 'none' : 'left' }
             };
 
             this.chart = new google.charts.Line(document.getElementById('main-chart'));

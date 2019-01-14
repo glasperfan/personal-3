@@ -5,6 +5,7 @@ import * as moment from 'moment';
 import { EPAStandardEmissionsService } from "./emissions-epa.service";
 import { map } from "rxjs/operators";
 import { IHistoricalRideWithProduct } from "../models/RideHistory";
+import { DeviceDetectorService } from "ngx-device-detector";
 
 export type RideStatsAggregator = 'rideCount' | 'totalEmissions' | 'productType';
 export type RideStatsInterval = 'week' | 'month' | 'year';
@@ -61,9 +62,11 @@ export class RideStatsService {
     };
     
     private readonly EMPTY_AGGREGATES: AggregateRows = { } as AggregateRows;
-    private readonly weekFormat = "MMM Do 'YY";
-    private readonly monthFormat = "MMM 'YY";
-    private readonly yearFormat = "YYYY";
+    private weekFormat = "MMM Do 'YY";
+    private monthFormat = "MMM 'YY";
+    private yearFormat = "YYYY";
+    private mobileWeekFormat = "M/D/YY";
+    private mobileMonthFormat = "M/YY";
     
     private _rides: BehaviorSubject<IHistoricalRideWithProduct[]> = new BehaviorSubject([]);  
     private _rides$: Observable<IHistoricalRideWithProduct[]>;
@@ -82,7 +85,11 @@ export class RideStatsService {
     private groupedAggregates: Aggregations;
 
 
-    constructor(private emissions: EPAStandardEmissionsService) {
+    constructor(private emissions: EPAStandardEmissionsService, private device: DeviceDetectorService) {
+        if (this.device.isMobile()) {
+            this.weekFormat = this.mobileWeekFormat;
+            this.monthFormat = this.mobileMonthFormat;
+        }
         this._rides$ = this._rides.asObservable();
         this._onStatsReady$ = this._onStatsReady.asObservable();
         this._rideCountBy$ = this._rideCountBy.asObservable();

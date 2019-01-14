@@ -1,5 +1,18 @@
+@base_width: 500px;
+
+@media screen and (max-width: 768px) {
+    .host {
+        width: 100vw;
+    }
+}
+
+@media screen and (min-width: 769px) {
+    .host {
+        width: @base_width;
+    }
+}
+
 .host {
-    width: 500px;
     border-right: 1px solid #ccc;
 }
 
