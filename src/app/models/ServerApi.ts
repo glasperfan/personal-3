@@ -5,4 +5,5 @@ export class ServerAPI {
     GetHistory: string = `${this.baseUrl}/uber/history`;
     GetUserToken: string = `${this.baseUrl}/uber/token`;
     GetUserProfile: string = `${this.baseUrl}/uber/me`;
+    Logout: string = `${this.baseUrl}/uber/logout`;
 }

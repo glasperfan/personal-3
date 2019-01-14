@@ -25,12 +25,14 @@ export class UberAuthService {
     private readonly cookieUserTokenKey: string = 'uber-footprint-access-token';
     private readonly cookieUserIdKey: string = 'uber-footprint-user-id';
     public privacyPolicyUrl = 'https://app.termly.io/document/privacy-policy/0b244b38-f8b7-4de0-a61d-da0faaf8fb40';
+    public loginUrl = `/footprint`;
     public currentUserAuthorized: boolean;
 
-    constructor(private http: HttpClient, private cookie: CookieService, private server: ServerAPI, private uber: UberAPI) {
-        // this.cookie.delete(this.cookieUserTokenKey);
-        // this.cookie.delete(this.cookieUserIdKey);
-    }
+    constructor(
+        private http: HttpClient,
+        private cookie: CookieService,
+        private server: ServerAPI,
+        private uber: UberAPI) {}
 
     authorize(authorizationCode: string): Observable<boolean> {
         return this.exchangeAuthCodeForToken(authorizationCode)
@@ -43,8 +45,20 @@ export class UberAuthService {
         return this.http.get<IRiderProfile>(this.server.GetUserProfile, { params: { accessToken: this.currentUserToken }})
             .pipe(
                 tap(body => this.storeCurrentUserId(body.uuid)),
-                map(body => true)
+                map(_ => true)
             );
+    }
+
+    logout(): Observable<boolean> {
+        return this.http.post<boolean>(this.server.Logout, { accessToken: this.currentUserToken })
+            .pipe(
+                tap(loggedOut => loggedOut ? this.deleteUserCookies() : () => {})
+            );
+    }
+
+    private deleteUserCookies(): void {
+        this.cookie.delete(this.cookieUserTokenKey);
+        this.cookie.delete(this.cookieUserIdKey);
     }
 
     private exchangeAuthCodeForToken(authorizationCode: string): Observable<boolean> {
@@ -92,7 +106,6 @@ export class UberAuthService {
         this.cookie.set(this.cookieUserIdKey, userId);
     }
 
-    private get uberAuthorizationUrl() {
-        return `https://login.uber.com/oauth/v2/authorize?client_id=${this.uber.ClientId}&response_type=code&scope=history+profile`;
-    }
+    private uberAuthorizationUrl = 
+        `https://login.uber.com/oauth/v2/authorize?client_id=${this.uber.ClientId}&response_type=code&scope=history+profile`;
 }

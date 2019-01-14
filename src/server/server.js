@@ -125,6 +125,27 @@ app.post('/uber/token', (req, res) => {
   );
 });
 
+// body: { accessToken: string }
+app.post('/uber/logout', (req, res) => {
+  console.log('Logging out user...');
+  request.post('https://login.uber.com/oauth/v2/revoke',
+    { form: { // must be form - it's url-encoded data
+        client_secret: settings.uber.clientSecret,
+        client_id: settings.uber.clientId,
+        token: req.body.accessToken
+      }
+    },
+    (err, response, body) => {
+      const json = JSON.parse(body);
+      if (json.message === 'OK') {
+        res.send(true);
+      } else {
+        res.status(403).send('Could not logout user. Reason: ' + (err || '[no error]'));
+      }
+    }
+  );
+});
+
 function sleeper(ms) {
   return function(x) {
     return new Promise(resolve => setTimeout(() => resolve(x), ms));
@@ -219,7 +240,7 @@ app.get('/uber/me', (req, res) => {
       const json = JSON.parse(body);
       res.send(json);
     } else {
-      res.error('Failed to retrieve rider profile ' + (error ? error.error : '[no error message]'));
+      res.error('Failed to retrieve rider profile ' + (err ? err : '[no error message]'));
     }
   });
 });

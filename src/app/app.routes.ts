@@ -3,6 +3,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { FootprintComponent } from './components/footprint/footprint.component';
 import { HomeComponent } from './components/home/home.component';
 
+
 export const routes: Routes = [
   {
     path: '',

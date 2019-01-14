@@ -8,5 +8,19 @@ import { UberAuthService } from "../../../services/uber-auth.service";
     styleUrls: [ 'navbar.component.less' ]
 })
 export class NavbarComponent {
+    logoutText = 'Logout';
+    
     constructor (public auth: UberAuthService) { }
+
+    logout() {
+        this.logoutText = 'Logging out...';
+        this.auth.logout().subscribe(userIsLoggedOut => {
+            if (userIsLoggedOut) {
+                this.logoutText = 'Now redirecting...';
+                new Location().assign(this.auth.loginUrl);
+            } else {
+                this.logoutText = 'Logout failed';
+            }
+        });
+    }
 }
