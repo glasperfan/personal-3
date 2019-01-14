@@ -335,13 +335,16 @@ app.get('*', (req, res) => {
 const httpPort = settings.port;
 const redirectHttpPort = 80;
 const httpsPort = 443;
+const servers = [];
 
 if (!settings.production) {
   const httpServer = http.createServer(app);
+  servers.push(httpServer);
   httpServer.listen(httpPort, () => {
     console.log(`HTTP server running on port ${httpPort}`);
   });
 }
+
 
 if (settings.production) {
   const redirectApp = express();
@@ -363,9 +366,22 @@ if (settings.production) {
     secureOptions: require('constants').SSL_OP_NO_TLSv1
   };
   const httpsServer = https.createServer(credentials, app);
+  servers.push(httpsServer);
   httpsServer.listen(httpsPort, () => {
     console.log(`HTTPS server running on port ${httpsPort}`);
   });
 }
+
+function shutDown() {
+  servers.forEach(server => {
+    server.close(() => {
+      console.log('Terminating server');
+    });
+  });
+  process.exit(0);
+}
+
+process.on('SIGTERM', shutDown);
+process.on('SIGINT', shutDown);
 
 mongoose.connect(settings.mongoUri(), { useNewUrlParser: true });
