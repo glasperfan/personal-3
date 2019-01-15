@@ -6,7 +6,7 @@
 /out-tsc
 
 # dependencies
-/node_modules
+**/node_modules
 yarn.lock
 yarn-error.log
 package-lock.json
@@ -14,7 +14,9 @@ package-lock.json
 # misc
 **/server/security/**
 **/settings.js
-**/settings.prod.js
+**/settings.ts
+**/settings.*.js
+**/settings.*.ts
 **/*.pem
 cmds.md
 

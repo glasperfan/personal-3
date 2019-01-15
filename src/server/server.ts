@@ -1,19 +1,25 @@
 // Get dependencies
-const express = require('express');
-const path = require('path');
-const fs = require('fs');
-const http = require('http');
-const https = require('https');
-const cors = require('cors');
-const request = require('request-promise');
-const q = require('q');
-const _ = require('lodash');
-const bodyParser = require('body-parser');
-const nodemailer = require('nodemailer');
-const mongoose = require('mongoose');
-const Rides = require('./models/Rides');
-const RideProducts = require('./models/RideProducts');
-const settings = require('./settings');
+import express from 'express';
+import path = require('path');
+import { readFileSync } from 'fs';
+import { createServer } from 'http';
+import { createServer as createHttpsServer } from 'https';
+import cors from 'cors';
+import request from 'request-promise';
+import q from 'q';
+import _ from 'lodash';
+import bodyParser from 'body-parser';
+import nodemailer from 'nodemailer';
+import mongoose from 'mongoose';
+
+import Rides from './models/Rides';
+import RideProducts from './models/RideProducts';
+
+import SettingsDev from './settings';
+import SettingsProd from './settings.prod';
+import { MongoClient } from 'mongodb';
+
+const Settings = process.env.NODE_ENV === 'production' ? SettingsDev : SettingsProd;
 
 const ERR_CACHE_FAILURE = 'ERR_CACHE_FAILURE';
 const ERR_AUTH = 'ERR_AUTH';
@@ -30,7 +36,7 @@ app.use(express.static(__dirname + '/static', { dotfiles: 'allow' }));
 // Allows CORS
 app.use(function(req, res, next) {
     res.header('Access-Control-Allow-Origin', '*');
-    res.header('Access-Control-Allow-Credentials', true);
+    res.header('Access-Control-Allow-Credentials', 'true');
     res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
     res.header('Access-Control-Allow-Headers', 'Origin,X-Requested-With,Content-Type,Accept,content-type,application/json');
     next();
@@ -48,15 +54,15 @@ app.post('/email', (req, res) => {
   let transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
-      user: settings.email.user,
-      pass: settings.email.pwd
+      user: Settings.email.user,
+      pass: Settings.email.pwd
     }
   });
 
   // setup email data with unicode symbols
   let mailOptions = {
     from: `'${name}' <${email}>`, // sender address
-    to: settings.email.recipient, // list of receivers
+    to: Settings.email.recipients, // list of receivers
     subject: 'Hello!', // Subject line
     text: message // plain text body
   };
@@ -72,22 +78,6 @@ app.post('/email', (req, res) => {
     console.log('Message %s sent: %s', info.messageId, info.response);
   });
 });
-
-function withMongo(action) {
-  const uri = settings.mongoUri();
-  return new Promise((resolve, reject) => MongoClient.connect(uri, { useNewUrlParser: true }, function(err, client) {
-    if (err) {
-      reject(err);
-      console.log('Error occurred while connecting to MongoDB Atlas...\n',err);
-    }
-    console.log('Connected to Mongo...');
-    // const collection = client.db('test').collection('devices');
-    // perform actions on the collection object
-    action(client);
-    client.close();
-    resolve();
-  }));
-}
 
 function noError(response) {
   return response.statusCode == 200;
@@ -105,15 +95,15 @@ app.post('/uber/token', (req, res) => {
   console.log('acquiring access token');
   request.post('https://login.uber.com/oauth/v2/token',
     { form: { // must be form - it's url-encoded data
-        client_id: settings.uber.clientId,
-        client_secret: settings.uber.clientSecret,
-        redirect_uri: settings.uber.redirectHost, // must match what's in the uber_dashboard
+        client_id: Settings.uber.clientId,
+        client_secret: Settings.uber.clientSecret,
+        redirect_uri: Settings.uber.redirectHost, // must match what's in the uber_dashboard
         grant_type: 'authorization_code',
         scope: 'history+profile',
         code: req.body.authorizationCode
       }
     },
-    function (error, response, body) {  
+    function (_, response, body) {  
       const json = JSON.parse(body);
       if (noError(response)) {
           return res.send({ accessToken: json.access_token });
@@ -133,12 +123,12 @@ app.post('/uber/logout', (req, res) => {
   console.log('Logging out user...');
   request.post('https://login.uber.com/oauth/v2/revoke',
     { form: { // must be form - it's url-encoded data
-        client_secret: settings.uber.clientSecret,
-        client_id: settings.uber.clientId,
+        client_secret: Settings.uber.clientSecret,
+        client_id: Settings.uber.clientId,
         token: req.body.accessToken
       }
     },
-    (err, response, body) => {
+    (err, _, body) => {
       const json = JSON.parse(body);
       if (json.message === 'OK') {
         res.send(true);
@@ -149,19 +139,19 @@ app.post('/uber/logout', (req, res) => {
   );
 });
 
-function sleeper(ms) {
-  return function(x) {
+function sleeper(ms: number) {
+  return function(x: any) {
     return new Promise(resolve => setTimeout(() => resolve(x), ms));
   };
 }
 
-async function retrieveRideProductAsync(token, productId) {
+async function retrieveRideProductAsync(token, productId): Promise<RideProducts> {
   return request({
     method: 'GET',
     uri: `https://api.uber.com/v1.2/products/${productId}`,
     json: true,
     headers: uberHeaders(token)
-  }).then((productDetails) => new RideProducts(productDetails));
+  }).then((productDetails: any) => new RideProducts(productDetails));
 }
 
 async function retrieveAllRideProducts(token, productIds) {
@@ -237,7 +227,7 @@ async function storeRideProducts(products) {
 
 app.get('/uber/me', (req, res) => {
   const token = req.query.accessToken;
-  return request({
+  return request<any>({
     method: 'GET',
     uri: 'https://api.uber.com/v1.2/me',
     json: true, // Automatically parses the JSON string in the response
@@ -338,7 +328,7 @@ const httpsPort = 443;
 const servers = [];
 
 if (!settings.production) {
-  const httpServer = http.createServer(app);
+  const httpServer = createServer(app);
   servers.push(httpServer);
   httpServer.listen(httpPort, () => {
     console.log(`HTTP server running on port ${httpPort}`);
@@ -355,9 +345,9 @@ if (settings.production) {
 
   redirectApp.listen(redirectHttpPort);
   
-  const privateKey = fs.readFileSync('/etc/letsencrypt/live/hughzabriskieserver.com/privkey.pem', 'utf8');
-  const certificate = fs.readFileSync('/etc/letsencrypt/live/hughzabriskieserver.com/cert.pem', 'utf8');
-  const ca = fs.readFileSync('/etc/letsencrypt/live/hughzabriskieserver.com/chain.pem', 'utf8');
+  const privateKey = readFileSync('/etc/letsencrypt/live/hughzabriskieserver.com/privkey.pem', 'utf8');
+  const certificate = readFileSync('/etc/letsencrypt/live/hughzabriskieserver.com/cert.pem', 'utf8');
+  const ca = readFileSync('/etc/letsencrypt/live/hughzabriskieserver.com/chain.pem', 'utf8');
 
   const credentials = {
     key: privateKey,
@@ -365,7 +355,7 @@ if (settings.production) {
     ca: ca,
     secureOptions: require('constants').SSL_OP_NO_TLSv1
   };
-  const httpsServer = https.createServer(credentials, app);
+  const httpsServer = createHttpsServer(credentials, app);
   servers.push(httpsServer);
   httpsServer.listen(httpsPort, () => {
     console.log(`HTTPS server running on port ${httpsPort}`);

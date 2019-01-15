@@ -1,9 +1,4 @@
-const mongoose = require('mongoose');
-const Schema = mongoose.Schema;
-
-const NUMBER = { type: Number }
-const STRING = { type: String }
-const BOOLEAN = { type: Boolean }
+import { Schema, model } from "mongoose";
 
 const rideProductsModel = new Schema({
     upfront_fare_enabled: BOOLEAN,
@@ -33,4 +28,4 @@ const rideProductsModel = new Schema({
     description: STRING
 });
 
-module.exports = mongoose.model('rideProducts', rideProductsModel);
+export default model('rideProducts', rideProductsModel);

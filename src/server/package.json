@@ -1,0 +1,25 @@
+{
+  "name": "hughzabriskieserver",
+  "description": "Personal Website Back-End",
+  "main": "./dist/server.js",
+  "scripts": {
+    "tsc": "tsc",
+    "dev": "ts-node-dev --respawn --transpileOnly ./server.ts",
+    "prod": "tsc && node ./dist/server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/glasperfan/personal-3.git"
+  },
+  "author": "Hugh Zabriskie",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/cors": "^2.8.4",
+    "@types/express": "^4.16.0",
+    "@types/mongoose": "^5.3.7",
+    "@types/node": "^10.12.18",
+    "@types/nodemailer": "^4.6.5",
+    "@types/request-promise": "^4.1.42",
+    "typescript": "^3.2.2"
+  }
+}
