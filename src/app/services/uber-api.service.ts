@@ -21,7 +21,7 @@ export class UberApiService {
         return this.http.get<IGetAllRidesResponse>(this.server.GetHistory, { params: request }).pipe(map(response => {
             const productMap = keyBy(response.products, (rp: IRideProduct) => rp.product_id);
             return response.rides.map((ride: IHistoricalRideWithProduct) => {
-                ride.product = productMap[ride.product_id];
+                ride.product = ride.product_id in productMap ? productMap[ride.product_id] : response.products[0];
                 return ride;
             });
         }));
