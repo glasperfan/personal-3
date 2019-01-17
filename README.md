@@ -17,3 +17,20 @@ After MVP features:
 - ranking other users
     - what's the metric?
         - average g/mi?
+
+An aggregator for distance traveled
+
+HUGH Z.
+Jan 14 9:20 PM
+  
+A set of intro slides that explains the motivation - this is NOT to stop you from riding with Uber, sometimes it’s really useful!, but this way you can track and reduce emissions and feel good when you offset with a meaningful donation
+
+HUGH Z.
+Jan 14 9:21 PM
+  
+“Many of us are looking for a way to give back in a practical way and be more conscious of our habits”
+
+HUGH Z.
+Jan 14 9:23 PM
+  
+Note that when you start telling people to donate to offset, they may care about the underlying math more. So cite your sources and explain you have to be vague (unless people provide additional information, like the total riders in your Uber pool, or the make of the car)

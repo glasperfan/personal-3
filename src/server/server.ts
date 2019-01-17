@@ -1,11 +1,11 @@
 // Get dependencies
-import express from 'express';
+import express, { Response, Request } from 'express';
 import path = require('path');
 import { readFileSync } from 'fs';
-import { createServer } from 'http';
-import { createServer as createHttpsServer } from 'https';
+import { createServer, Server as HttpServer } from 'http';
+import { createServer as createHttpsServer, Server as HttpsServer } from 'https';
 import cors from 'cors';
-import request from 'request-promise';
+import http from 'request-promise';
 import q from 'q';
 import _ from 'lodash';
 import bodyParser from 'body-parser';
@@ -18,6 +18,7 @@ import RideProducts from './models/RideProducts';
 import SettingsDev from './settings';
 import SettingsProd from './settings.prod';
 import { MongoClient } from 'mongodb';
+import { RequestCallback } from 'request';
 
 const Settings = process.env.NODE_ENV === 'production' ? SettingsDev : SettingsProd;
 
@@ -34,7 +35,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(__dirname + '/static', { dotfiles: 'allow' }));
 
 // Allows CORS
-app.use(function(req, res, next) {
+app.use(function(req: Request, res: Response, next) {
     res.header('Access-Control-Allow-Origin', '*');
     res.header('Access-Control-Allow-Credentials', 'true');
     res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
@@ -79,11 +80,11 @@ app.post('/email', (req, res) => {
   });
 });
 
-function noError(response) {
+function noError(response: Response) {
   return response.statusCode == 200;
 }
 
-function uberHeaders(token) {
+function uberHeaders(token: string) {
   return {
     'Content-Type': 'application/json',
     'Authorization': `Bearer ${token}`,
@@ -93,7 +94,7 @@ function uberHeaders(token) {
 
 app.post('/uber/token', (req, res) => {
   console.log('acquiring access token');
-  request.post('https://login.uber.com/oauth/v2/token',
+  http.post('https://login.uber.com/oauth/v2/token',
     { form: { // must be form - it's url-encoded data
         client_id: Settings.uber.clientId,
         client_secret: Settings.uber.clientSecret,
@@ -103,7 +104,7 @@ app.post('/uber/token', (req, res) => {
         code: req.body.authorizationCode
       }
     },
-    function (_, response, body) {  
+    (_, response, body): RequestCallback => {  
       const json = JSON.parse(body);
       if (noError(response)) {
           return res.send({ accessToken: json.access_token });
@@ -121,7 +122,7 @@ app.post('/uber/token', (req, res) => {
 // body: { accessToken: string }
 app.post('/uber/logout', (req, res) => {
   console.log('Logging out user...');
-  request.post('https://login.uber.com/oauth/v2/revoke',
+  http.post('https://login.uber.com/oauth/v2/revoke',
     { form: { // must be form - it's url-encoded data
         client_secret: Settings.uber.clientSecret,
         client_id: Settings.uber.clientId,
@@ -145,8 +146,8 @@ function sleeper(ms: number) {
   };
 }
 
-async function retrieveRideProductAsync(token, productId): Promise<RideProducts> {
-  return request({
+async function retrieveRideProductAsync(token: string, productId: string): Promise<RideProducts> {
+  return http({
     method: 'GET',
     uri: `https://api.uber.com/v1.2/products/${productId}`,
     json: true,
@@ -154,15 +155,15 @@ async function retrieveRideProductAsync(token, productId): Promise<RideProducts>
   }).then((productDetails: any) => new RideProducts(productDetails));
 }
 
-async function retrieveAllRideProducts(token, productIds) {
+async function retrieveAllRideProducts(token: string, productIds: string[]) {
   return q.all(productIds.map(p => retrieveRideProductAsync(token, p))).then(allProducts => {
     console.log(allProducts);
     return allProducts;
   });
 }
 
-async function retrieveRideHistoryAsync(token, limit, offset) {
-  return request({
+async function retrieveRideHistoryAsync(token: string, limit: number, offset: number) {
+  return http({
     method: 'GET', 
     uri: 'https://api.uber.com/v1.2/history',
     json: true, // Automatically parses the JSON string in the response
@@ -176,7 +177,7 @@ async function retrieveRideHistoryAsync(token, limit, offset) {
   });
 }
 
-async function retrieveRideHistoryWithLimit(token, totalRides, ridesArr) {
+async function retrieveRideHistoryWithLimit(token: string, totalRides: number, ridesArr: any[]) {
   return retrieveRideHistoryAsync(token, totalRides, ridesArr.length).then(rides => {
     ridesArr.push.apply(ridesArr, rides.history);
     totalRides = totalRides - ridesArr.length;
@@ -190,13 +191,13 @@ async function retrieveRideHistoryWithLimit(token, totalRides, ridesArr) {
   });
 }
 
-function retrieveRideHistory(token, maxRidesPerQuery, ridesArr, getAll) {
+function retrieveRideHistory(token: string, maxRidesPerQuery: number, ridesArr: any[], getAll: boolean) {
   return retrieveRideHistoryAsync(token, maxRidesPerQuery, ridesArr.length).then(rides => {
     console.log('Retrieved response');
     if (rides.history.length && getAll) {
       ridesArr.push.apply(ridesArr, rides.history);
       console.log('Total stored: ' + ridesArr.length);
-      return retrieveRideHistory(token, maxRidesPerQuery, ridesArr);
+      return retrieveRideHistory(token, maxRidesPerQuery, ridesArr, getAll);
     } else {
       return ridesArr;
     }
@@ -208,26 +209,26 @@ function retrieveRideHistory(token, maxRidesPerQuery, ridesArr, getAll) {
  * https://stackoverflow.com/questions/35139145/retrieve-paginated-data-recursively-using-promises
  * @param {string} token 
  */
-function retrieveAllRideHistory(token) {
+function retrieveAllRideHistory(token: string) {
   return retrieveRideHistory(token, 50, [], true);
 }
 
-function toRideModels(rides, userId) {
+function toRideModels(rides: any[], userId: string): Rides[] {
   rides.forEach(r => r.user_id = userId);
   return rides.map(r => new Rides(r));
 }
 
-async function storeRides(rides, userId) {
+async function storeRides(rides: Rides[], userId: string) {
   return Rides.create(toRideModels(rides, userId), { ordered: false }).then(_ => rides);
 }
 
-async function storeRideProducts(products) {
+async function storeRideProducts(products: RideProducts[]): Promise<any> {
   return RideProducts.create(products, { ordered: false }); // returns a promise
 }
 
 app.get('/uber/me', (req, res) => {
   const token = req.query.accessToken;
-  return request<any>({
+  return http({
     method: 'GET',
     uri: 'https://api.uber.com/v1.2/me',
     json: true, // Automatically parses the JSON string in the response
@@ -242,7 +243,9 @@ app.get('/uber/me', (req, res) => {
   });
 });
 
-async function getProductsForRides(token, rides) {
+RideProducts.model()
+
+async function getProductsForRides(token: string, rides: Rides[]) {
   const allProductIds = _.uniq(rides.map(r => r.product_id)); 
   return new Promise((resolve, reject) => RideProducts.find({ product_id: { $in: allProductIds }}, (err, results) => {
     if (err) reject(err);
@@ -262,16 +265,16 @@ async function getProductsForRides(token, rides) {
   });
 }
 
-async function sendAllRideHistoryAndProducts(token, userId) {
-  let retrievedRides = undefined;
+async function sendAllRideHistoryAndProducts(res: Response, token: string, userId: string) {
+  let retrievedRides: Rides[] = undefined;
   retrieveAllRideHistory(token)
-    .then(rides => { retrievedRides = rides; return rides; })
-    .then(rides => storeRides(rides, userId))
-    .then(rides => getProductsForRides(token, rides))
-    .then(products => res.send({ rides: retrievedRides, products: products }));
+    .then((rides: Rides[]) => { retrievedRides = rides; return rides; })
+    .then((rides: Rides[]) => storeRides(rides, userId))
+    .then((rides: Rides[]) => getProductsForRides(token, rides))
+    .then((products: RideProducts[]) => res.send({ rides: retrievedRides, products: products }));
 }
 
-app.get('/uber/history', (req, res) => {
+app.get('/uber/history', (req: Request, res: Response) => {
   const userId = req.query.userId;
   const token = req.query.accessToken;
   Rides.count({ user_id: userId }, (err, count) => {
@@ -279,7 +282,7 @@ app.get('/uber/history', (req, res) => {
       console.error(err);
     }
     if (!count) {
-      sendAllRideHistoryAndProducts(token, userId);
+      sendAllRideHistoryAndProducts(res, token, userId);
     }
     retrieveRideHistoryAsync(token, 1, 0).then(rides => {
       const totalRideCount = rides.count;
@@ -287,7 +290,7 @@ app.get('/uber/history', (req, res) => {
       if (count === totalRideCount) {
         Rides.find({ user_id: userId }, (err, results) => {
           if (err) {
-            res.send(500, {
+            res.status(500).send({
               code: ERR_CACHE_FAILURE,
               message: 'Failed to retrieve ride cache results.',
               error: err
@@ -297,14 +300,14 @@ app.get('/uber/history', (req, res) => {
           }
         });
       } else if (count < totalRideCount) {
-        let retrievedRides = undefined;
+        let retrievedRides: Rides[] = undefined;
         retrieveRideHistoryWithLimit(token, totalRideCount - count, [])
-          .then(rides => { retrievedRides = rides; return rides; })
-          .then(rides => storeRides(rides, userId))
-          .then(rides => getProductsForRides(token, rides))
-          .then(products => res.send({ rides: retrievedRides, products: products }));
+          .then((rides: Rides[]) => { retrievedRides = rides; return rides; })
+          .then((rides: Rides[]) => storeRides(rides, userId))
+          .then((rides: Rides[]) => getProductsForRides(token, rides))
+          .then((products: RideProducts[]) => res.send({ rides: retrievedRides, products: products }));
       } else {
-        res.send(500, {
+        res.status(500).send({
           code: ERR_CACHE_FAILURE,
           message: 'Ride cache is in an invalid state, refresh by invalidating the cache.'
         });
@@ -322,12 +325,12 @@ app.get('*', (req, res) => {
 /**
  * Create HTTP and HTTPS servers.
  */
-const httpPort = settings.port;
+const httpPort = Settings.port;
 const redirectHttpPort = 80;
 const httpsPort = 443;
-const servers = [];
+const servers: (HttpsServer | HttpServer)[] = [];
 
-if (!settings.production) {
+if (!Settings.production) {
   const httpServer = createServer(app);
   servers.push(httpServer);
   httpServer.listen(httpPort, () => {
@@ -336,7 +339,7 @@ if (!settings.production) {
 }
 
 
-if (settings.production) {
+if (Settings.production) {
   const redirectApp = express();
 
   redirectApp.get('*', function(req, res) {  
@@ -374,4 +377,4 @@ function shutDown() {
 process.on('SIGTERM', shutDown);
 process.on('SIGINT', shutDown);
 
-mongoose.connect(settings.mongoUri(), { useNewUrlParser: true });
+mongoose.connect(Settings.mongoUri(), { useNewUrlParser: true });
