@@ -171,7 +171,7 @@ async function retrieveAllRideProducts(token, productIds) {
   return q.all(productIds.map(p => retrieveRideProductAsync(token, p))).then(allProducts => {
     console.log(allProducts);
     return allProducts;
-  }).catch((reason) => );
+  });
 }
 
 async function retrieveRideHistoryAsync(token, limit, offset) {
