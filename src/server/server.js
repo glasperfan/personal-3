@@ -238,23 +238,23 @@ function toRideModels(rides, userId) {
 }
 
 async function storeRides(rides, userId) {
-  return Rides.insertMany(toRideModels(rides, userId), { ordered: false }, (err, docs) => {
+  return new Promise((resolve, reject) => Rides.insertMany(toRideModels(rides, userId), { ordered: false }, (err, docs) => {
     if (err) {
       console.log("an error storing rides", err);
+      reject(err);
     }
-  })
-    .then(_ => rides)
-    .catch(err => console.log("ERRRRRROR1 " + err));
+    resolve(docs);
+  }));
 }
 
 async function storeRideProducts(products) {
-  return RideProducts.insertMany(products, { ordered: false }, (err, docs) => {
+  return new Promise((resolve, reject) => RideProducts.insertMany(products, { ordered: false }, (err, docs) => {
     if (err) {
       console.log("an error storing ride products", err);
+      reject(err);
     }
-  })
-    .then(_ => products)
-    .catch(err => console.log("ERRRRRROR2 " + err));
+    resolve(docs);
+  }));
 }
 
 app.get('/uber/me', (req, res) => {
