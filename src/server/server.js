@@ -168,9 +168,16 @@ async function retrieveRideProductAsync(token, productId) {
 }
 
 async function retrieveAllRideProducts(token, productIds) {
-  return q.all(productIds.map(p => retrieveRideProductAsync(token, p))).then(allProducts => {
-    console.log(allProducts);
-    return allProducts;
+  const retrievedProducts = [];
+  const errors = [];
+  const push = product => retrievedProducts.push(product);
+  const pushError = err => errors.push(err);
+  return q.all(productIds
+      .filter(p => !!p)
+      .map(p => retrieveRideProductAsync(token, p).then(push).catch(pushError)
+  )).then(() => {
+    console.log(`Failed to retrieve ${errors.length} errors.`, errors);
+    return retrievedProducts;
   });
 }
 
@@ -210,14 +217,8 @@ function retrieveRideHistory(token, maxRidesPerQuery, ridesArr, getAll) {
       ridesArr.push.apply(ridesArr, rides.history);
       console.log('Total stored: ' + ridesArr.length);
       return retrieveRideHistory(token, maxRidesPerQuery, ridesArr);
-    } else {
-      // Hotfix for Patrick - rides from Kazakhstan with no product_id
-      console.log(ridesArr.filter(r => r.product_id !== null).length);
-      console.log(ridesArr.filter(r => r.product_id != null).length);
-      console.log(ridesArr.filter(r => r.product_id == null).length);
-      console.log(ridesArr.filter(r => r.product_id === null).length);
-      return ridesArr.filter(r => r.product_id !== null);
     }
+    return ridesArr;
   });
 }
 
