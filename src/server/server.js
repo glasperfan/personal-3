@@ -212,6 +212,10 @@ function retrieveRideHistory(token, maxRidesPerQuery, ridesArr, getAll) {
       return retrieveRideHistory(token, maxRidesPerQuery, ridesArr);
     } else {
       // Hotfix for Patrick - rides from Kazakhstan with no product_id
+      console.log(ridesArr.filter(r => r.product_id !== null).length);
+      console.log(ridesArr.filter(r => r.product_id != null).length);
+      console.log(ridesArr.filter(r => r.product_id == null).length);
+      console.log(ridesArr.filter(r => r.product_id === null).length);
       return ridesArr.filter(r => r.product_id !== null);
     }
   });
