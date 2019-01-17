@@ -237,11 +237,11 @@ function toRideModels(rides, userId) {
 }
 
 async function storeRides(rides, userId) {
-  return Rides.create(toRideModels(rides, userId), { ordered: false }).then(_ => rides);
+  return Rides.update(toRideModels(rides, userId), { upsert: true }).then(_ => rides);
 }
 
 async function storeRideProducts(products) {
-  return RideProducts.create(products, { ordered: false }).then(_ => products); // returns a promise
+  return RideProducts.update(products, { upsert: true }).then(_ => products); // returns a promise
 }
 
 app.get('/uber/me', (req, res) => {
