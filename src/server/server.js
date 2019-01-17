@@ -176,7 +176,7 @@ async function retrieveAllRideProducts(token, productIds) {
       .filter(p => !!p)
       .map(p => retrieveRideProductAsync(token, p).then(push).catch(pushError)
   )).then(() => {
-    console.log(`Failed to retrieve ${errors.length} errors.`, errors);
+    console.log(`Failed to retrieve ${errors.length} product(s).`, errors);
     return retrievedProducts;
   });
 }
@@ -281,7 +281,7 @@ async function getProductsForRides(token, rides) {
   });
 }
 
-async function sendAllRideHistoryAndProducts(token, userId) {
+async function sendAllRideHistoryAndProducts(res, token, userId) {
   let retrievedRides = undefined;
   retrieveAllRideHistory(token)
     .then(rides => { retrievedRides = rides; return rides; })
@@ -298,7 +298,7 @@ app.get('/uber/history', (req, res) => {
       console.error(err);
     }
     if (!count) {
-      sendAllRideHistoryAndProducts(token, userId);
+      sendAllRideHistoryAndProducts(res, token, userId);
     }
     retrieveRideHistoryAsync(token, 1, 0).then(rides => {
       const totalRideCount = rides.count;
