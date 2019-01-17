@@ -222,7 +222,10 @@ function retrieveRideHistory(token, maxRidesPerQuery, ridesArr, getAll) {
  * @param {string} token 
  */
 function retrieveAllRideHistory(token) {
-  return retrieveRideHistory(token, 50, [], true);
+  return retrieveRideHistory(token, 50, [], true).then(rides => {
+    console.log("ALL RIDE HISTORY", rides);
+    return rides;
+  });
 }
 
 function toRideModels(rides, userId) {
