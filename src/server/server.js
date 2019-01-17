@@ -241,7 +241,7 @@ async function storeRides(rides, userId) {
 }
 
 async function storeRideProducts(products) {
-  return RideProducts.create(products, { ordered: false }); // returns a promise
+  return RideProducts.create(products, { ordered: false }).then(_ => products); // returns a promise
 }
 
 app.get('/uber/me', (req, res) => {
