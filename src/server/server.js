@@ -156,6 +156,9 @@ function sleeper(ms) {
 }
 
 async function retrieveRideProductAsync(token, productId) {
+  if (productId === undefined || productId === null || productId === '') {
+    throw new Error('Undefined productId! value: ' + productId);
+  }
   return request({
     method: 'GET',
     uri: `https://api.uber.com/v1.2/products/${productId}`,
