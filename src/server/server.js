@@ -327,6 +327,8 @@ app.get('/uber/history', (req, res) => {
         Rides.remove({ user_id: userId }, (err) => {
           if (err) {
             console.log("Error removing all user's rides: " + err);
+          } else {
+            console.log('Successfully removed all rides for user.');
           }
         });
       }
