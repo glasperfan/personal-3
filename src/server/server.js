@@ -233,15 +233,16 @@ function retrieveAllRideHistory(token) {
 
 function toRideModels(rides, userId) {
   rides.forEach(r => r.user_id = userId);
+  rides.forEach(r => r._id = r.request_id);
   return rides.map(r => new Rides(r));
 }
 
 async function storeRides(rides, userId) {
-  return Rides.update(toRideModels(rides, userId), { upsert: true }).then(_ => rides);
+  return Rides.insertMany(toRideModels(rides, userId), { ordered: false }).then(_ => rides);
 }
 
 async function storeRideProducts(products) {
-  return RideProducts.update(products, { upsert: true }).then(_ => products); // returns a promise
+  return RideProducts.insertMany(products, { ordered: false }).then(_ => products); // returns a promise
 }
 
 app.get('/uber/me', (req, res) => {

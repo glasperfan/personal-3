@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const rideModel = new Schema({
+    _id: { type: String },
     request_id: { type: String },
     request_time: { type: Number },
     start_time: { type: Number },
