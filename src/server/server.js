@@ -211,7 +211,8 @@ function retrieveRideHistory(token, maxRidesPerQuery, ridesArr, getAll) {
       console.log('Total stored: ' + ridesArr.length);
       return retrieveRideHistory(token, maxRidesPerQuery, ridesArr);
     } else {
-      return ridesArr;
+      // Hotfix for Patrick - rides from Kazakhstan with no product_id
+      return ridesArr.filter(r => r.product_id !== null);
     }
   });
 }
@@ -317,9 +318,18 @@ app.get('/uber/history', (req, res) => {
           .then(rides => getProductsForRides(token, rides))
           .then(products => res.send({ rides: retrievedRides, products: products }));
       } else {
-        res.send(500, {
-          code: ERR_CACHE_FAILURE,
-          message: 'Ride cache is in an invalid state, refresh by invalidating the cache.'
+        Rides.remove({ user_id: userId }, (err) => {
+          if (err) {
+            res.status(500).send({
+              code: ERR_CACHE_FAILURE,
+              message: 'Ride cache is in an invalid state and cannot be resolved. Error :' + err
+            });
+          } else {
+            res.status(500).send({
+              code: ERR_CACHE_FAILURE,
+              message: 'Ride cache was in an invalid state, please try refreshing by invalidating the cache.'
+            });
+          }
         });
       }
     });
