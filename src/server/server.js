@@ -284,7 +284,7 @@ async function getProductsForRides(token, rides) {
 async function sendAllRideHistoryAndProducts(token, userId) {
   let retrievedRides = undefined;
   retrieveAllRideHistory(token)
-    .then(rides => { retrievedRides = rides; return rides; })
+    .then(rides => { retrievedRides = rides; console.log(rides); return rides; })
     .then(rides => storeRides(rides, userId))
     .then(rides => getProductsForRides(token, rides))
     .then(products => res.send({ rides: retrievedRides, products: products }));
