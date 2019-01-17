@@ -171,7 +171,7 @@ async function retrieveAllRideProducts(token, productIds) {
   return q.all(productIds.map(p => retrieveRideProductAsync(token, p))).then(allProducts => {
     console.log(allProducts);
     return allProducts;
-  });
+  }).catch((reason) => );
 }
 
 async function retrieveRideHistoryAsync(token, limit, offset) {
@@ -268,6 +268,9 @@ async function getProductsForRides(token, rides) {
       // Else, return the ones we have plus the ones we now retrieve (and store).
       const resultIds = results.map(r => r.product_id);
       const notYetStoredIds = _.difference(allProductIds, resultIds);
+      console.log('allProductIds', allProductIds.length, allProductIds);
+      console.log('resultIds', resultIds.length, resultIds);
+      console.log('notYetStoredIds', notYetStoredIds.length, notYetStoredIds);
       return retrieveAllRideProducts(token, notYetStoredIds)
         .then(retrievedProducts => storeRideProducts(retrievedProducts))
         .then(storedProducts => storedProducts.concat(results));
