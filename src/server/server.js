@@ -223,7 +223,7 @@ function retrieveRideHistory(token, maxRidesPerQuery, ridesArr, getAll) {
  */
 function retrieveAllRideHistory(token) {
   return retrieveRideHistory(token, 50, [], true).then(rides => {
-    console.log("ALL RIDE HISTORY", rides);
+    console.log("ALL RIDE HISTORY", rides.length, rides);
     return rides;
   });
 }
