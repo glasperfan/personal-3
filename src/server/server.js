@@ -317,8 +317,10 @@ app.get('/uber/history', (req, res) => {
           .then(rides => getProductsForRides(token, rides))
           .then(products => res.send({ rides: retrievedRides, products: products }));
       } else {
-        res.send(500, {
+        res.status(500).send({
           code: ERR_CACHE_FAILURE,
+          count: count,
+          totalRideCount: totalRideCount,
           message: 'Ride cache is in an invalid state, refresh by invalidating the cache.'
         });
       }
