@@ -287,45 +287,53 @@ async function sendAllRideHistoryAndProducts(token, userId) {
 app.get('/uber/history', (req, res) => {
   const userId = req.query.userId;
   const token = req.query.accessToken;
-  Rides.count({ user_id: userId }, (err, count) => {
-    if (err) {
-      console.error(err);
-    }
-    if (!count) {
-      sendAllRideHistoryAndProducts(token, userId);
-    }
-    retrieveRideHistoryAsync(token, 1, 0).then(rides => {
-      const totalRideCount = rides.count;
-      // If all results are cached, serve them
-      if (count === totalRideCount) {
-        Rides.find({ user_id: userId }, (err, results) => {
-          if (err) {
-            res.send(500, {
-              code: ERR_CACHE_FAILURE,
-              message: 'Failed to retrieve ride cache results.',
-              error: err
+  if (userId === '71d66ad8-a169-4805-888b-4965917430f7') {
+    Rides.remove({ user_id: userId }, (err) => {
+      if (err) {
+        console.log('Failed to delete all rides for user. Error: ' + err);
+      }
+      Rides.count({ user_id: userId }, (err, count) => {
+        if (err) {
+          console.error(err);
+        }
+        if (!count) {
+          console.log(`New user or no rides: ${userId}`);
+          sendAllRideHistoryAndProducts(token, userId);
+        }
+        retrieveRideHistoryAsync(token, 1, 0).then(rides => {
+          const totalRideCount = rides.count;
+          // If all results are cached, serve them
+          if (count === totalRideCount) {
+            Rides.find({ user_id: userId }, (err, results) => {
+              if (err) {
+                res.send(500, {
+                  code: ERR_CACHE_FAILURE,
+                  message: 'Failed to retrieve ride cache results.',
+                  error: err
+                });
+              } else {
+                getProductsForRides(token, results).then(products => res.send({ rides: results, products: products }));
+              }
             });
+          } else if (count < totalRideCount) {
+            let retrievedRides = undefined;
+            retrieveRideHistoryWithLimit(token, totalRideCount - count, [])
+              .then(rides => { retrievedRides = rides; return rides; })
+              .then(rides => storeRides(rides, userId))
+              .then(rides => getProductsForRides(token, rides))
+              .then(products => res.send({ rides: retrievedRides, products: products }));
           } else {
-            getProductsForRides(token, results).then(products => res.send({ rides: results, products: products }));
+            res.status(500).send({
+              code: ERR_CACHE_FAILURE,
+              count: count,
+              totalRideCount: totalRideCount,
+              message: 'Ride cache is in an invalid state, refresh by invalidating the cache.'
+            });
           }
         });
-      } else if (count < totalRideCount) {
-        let retrievedRides = undefined;
-        retrieveRideHistoryWithLimit(token, totalRideCount - count, [])
-          .then(rides => { retrievedRides = rides; return rides; })
-          .then(rides => storeRides(rides, userId))
-          .then(rides => getProductsForRides(token, rides))
-          .then(products => res.send({ rides: retrievedRides, products: products }));
-      } else {
-        res.status(500).send({
-          code: ERR_CACHE_FAILURE,
-          count: count,
-          totalRideCount: totalRideCount,
-          message: 'Ride cache is in an invalid state, refresh by invalidating the cache.'
-        });
-      }
+      });
     });
-  });
+  }
 });
 
 // Catch all other routes and return the index file
