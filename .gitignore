@@ -28,6 +28,7 @@ cmds.md
 *.launch
 .settings/
 *.sublime-workspace
+private
 
 # IDE - VSCode
 .vscode/*
