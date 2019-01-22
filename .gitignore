@@ -16,6 +16,7 @@ package-lock.json
 **/settings.*
 **/*.pem
 cmds.md
+/private
 
 # IDEs and editors
 /.idea
