@@ -1,17 +1,28 @@
 {
     "compilerOptions": {
         "module": "commonjs",
-        "esModuleInterop": true,
-        "target": "es2018",
-        "noImplicitAny": true,
+        "esModuleInterop": false,
+        "target": "es6",
+        "noImplicitAny": false,
         "moduleResolution": "node",
+        "allowSyntheticDefaultImports": true,
         "sourceMap": true,
         "outDir": "dist",
         "baseUrl": ".",
+        "lib": [
+            "dom",
+            "es6"
+        ],
         "paths": {
             "*": [
                 "node_modules/*"
             ]
         }
-    }
+    },
+    "include": [
+        "./**/*.ts"
+    ],
+    "exclude": [
+        "node_modules"
+    ]
 }
