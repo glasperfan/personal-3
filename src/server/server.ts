@@ -102,7 +102,10 @@ process.on('SIGINT', shutDown);
 
 mongoose.connect(Settings.mongoUri(), { useNewUrlParser: true }, (err) => {
   if (err) {
-    console.error(err);
+    if (err.name === 'MongoNetworkError') {
+      console.error('Mongoose failed to connect to the cloud database. Ensure that you have the proper IP addresses whitelisted.');
+    }
+    console.error(err.message);
     process.exit(1);
   } else {
     console.log('Successfully connected to MongoDB Atlas');
