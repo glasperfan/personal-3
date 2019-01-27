@@ -1,6 +1,5 @@
 import { Schema, model, Model, Document, HookNextFunction } from "mongoose";
-import { STRING, NUMBER, BOOLEAN } from "./types";
-import { domainToASCII } from "url";
+import { STRING, NUMBER } from "./types";
 
 export interface IRide extends Document {
     request_id?: string;
@@ -18,7 +17,6 @@ export interface IRide extends Document {
     title?: string;
     author?: string;
     user_id?: string;
-    has_product: boolean;
 }
 
 const rideModel: Schema = new Schema({
@@ -36,7 +34,7 @@ const rideModel: Schema = new Schema({
     end_time: NUMBER,
     title: STRING,
     author: STRING,
-    user_id: STRING,
+    user_id: STRING
 });
 
 const validateRide = (next: HookNextFunction, docs: IRide[]) => validateThenNext(validateRideFn, next, docs);
