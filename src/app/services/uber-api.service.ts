@@ -7,12 +7,14 @@ import { map } from "rxjs/operators";
 import { keyBy } from "lodash-es";
 import { IRideProduct } from "../models/RideProduct";
 import { ServerAPI } from "../models/ServerApi";
+import { Cacheable } from 'ngx-cacheable';
 
 @Injectable()
 export class UberApiService {
 
     constructor(private authService: UberAuthService, private http: HttpClient, private server: ServerAPI) { }
 
+    @Cacheable()
     getRideHistory(): Observable<IHistoricalRideWithProduct[]> {
         const request: IGetAllRidesRequest = {
             userId: this.authService.currentUserId,
