@@ -9,6 +9,7 @@ Start the app: `ng serve`
 
 TODO:
 - Notification system ("You're now taking more ride share rides than private rides!")
+- Handle missing or "not found" ride products
 
 After MVP features:
 - "delete your data" option

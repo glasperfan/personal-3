@@ -13,12 +13,10 @@ package-lock.json
 
 # misc
 **/server/security/**
-**/settings.js
-**/settings.ts
-**/settings.*.js
-**/settings.*.ts
+**/settings.*
 **/*.pem
 cmds.md
+/private
 
 # IDEs and editors
 /.idea
