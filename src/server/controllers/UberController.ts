@@ -82,7 +82,7 @@ export class UberController extends DefaultController {
     }
     
     retrieveRideProductAsync = async (token: string, productId: string): Promise<IRideProduct> => {
-        const productDetails = await http({
+        const productDetails: IRideProduct = await http({
             method: 'GET',
             uri: `https://api.uber.com/v1.2/products/${productId}`,
             json: true,
@@ -104,7 +104,10 @@ export class UberController extends DefaultController {
             headers: UberController.uberHeaders(token)
         }).then((response: any) => {
             console.log('Retrieved ' + response.history.length + ' rides');
-            response.history = response.history.map((r: IRide) => new Ride(r));
+            response.history = response.history.map((r: IRide) => {
+                r.user_id = userId;
+                return new Ride(r);
+            });
             return response;
         }).catch(_ => UberRideHistoryFailureHistoryException.send(res));
     }
@@ -119,7 +122,7 @@ export class UberController extends DefaultController {
         const rides: IRideHistory = await this.retrieveRideHistoryAsync(token, totalRides, ridesArr.length, userId, res);
         console.log(`Successfully retrieved ride history: ${rides.history.length} rides`);
         if (rides.history.length) {
-            ridesArr.push.apply(ridesArr, rides.history);
+            ridesArr = ridesArr.concat(rides.history);
         }
         totalRides -= rides.history.length;
         if (totalRides > 0) {
@@ -132,12 +135,15 @@ export class UberController extends DefaultController {
         // Product IDs are sometimes null
         const allProductIds = uniq(rides.map(r => r.product_id).filter(id => !!id));
         
-        const cachedProducts: IRideProduct[] = await RideProduct.find({ product_id: { $in: allProductIds }}).exec();
+        let cachedProducts: IRideProduct[] = await RideProduct.find({ product_id: { $in: allProductIds }}).exec();
+        cachedProducts = cachedProducts.map(p => new RideProduct(p));
         if (allProductIds.length === cachedProducts.length) {
             // We already have all ride products stored
+            console.log(`All ${cachedProducts.length} products already cached.`);
             return this.filterToValidRidesWithProducts(rides, cachedProducts);
         }
         // Else, return the ones we have plus the ones we now retrieve (and store).
+        console.log('Retrieving new products.');
         const cachedIds = cachedProducts.map(r => r.product_id);
         const notYetStoredIds = difference(allProductIds, cachedIds);
         const retrievedProducts = await this.retrieveRideProducts(token, notYetStoredIds);
@@ -145,11 +151,15 @@ export class UberController extends DefaultController {
     }
     
     storeRides = async (rides: IRide[]): Promise<IRide[]> => {
-        return Ride.insertMany(rides);
+        return Ride.insertMany(rides, { ordered: false }).catch((reason: any) => {
+            return Promise.resolve([]);
+        });
     }
 
     storeProducts = async (rideProducts: IRideProduct[]): Promise<IRideProduct[]> => {
-        return RideProduct.insertMany(rideProducts);
+        return RideProduct.insertMany(rideProducts, { ordered: false }).catch((reason: any) => {
+            return Promise.resolve([]);
+        });
     }
 
     sendAllRideHistoryAndProducts = async (res: Response, token: string, userId: string): Promise<void> => {
@@ -163,8 +173,10 @@ export class UberController extends DefaultController {
     }
 
     filterToValidRidesWithProducts = (rides: IRide[], products: IRideProduct[]): IRidesWithProducts => {
+        console.log('Filtering to valid rides with products');
+        products.forEach(p => p.is_valid = !!p.product_id);
         products = products.filter(p => p.is_valid);
-        let productUsedMap = {};
+        let productUsedMap: { [key: string] : boolean } = {};
         for (let p of products) {
             productUsedMap[p.product_id] = false;
         }
@@ -173,6 +185,7 @@ export class UberController extends DefaultController {
             return productUsedMap[r.product_id];
         });
         const validProducts = products.filter(p => productUsedMap[p.product_id]);
+        console.log('rides', rides.length, 'validRides', validRides.length, 'products', products.length, 'validProducts', validProducts.length);
         return { rides: validRides, products: validProducts };
     }
 
@@ -189,12 +202,14 @@ export class UberController extends DefaultController {
         const totalRideCount = rideHistory.count;
         // If all results are cached, serve them
         if (cachedRideCount === totalRideCount) {
+            console.log('All rides cached.');
             const validRidesWithProducts: IRidesWithProducts = await this.getProductsForRides(token, cachedRides);
             res.send(validRidesWithProducts);
             await this.storeRides(validRidesWithProducts.rides);
             await this.storeProducts(validRidesWithProducts.products);
         } else if (cachedRideCount < totalRideCount) {
             // If we don't have all rides, retrieve them and merge them in
+            console.log('New rides exist, retrieving them.');
             const retrievedRides: IRide[] = await this.retrieveRideHistory(token, totalRideCount - cachedRideCount, [], userId, res);
             const allRides: IRide[] = retrievedRides.concat(cachedRides);
             const validRidesWithProducts: IRidesWithProducts = await this.getProductsForRides(token, allRides);
@@ -209,6 +224,7 @@ export class UberController extends DefaultController {
     }
     
     getUserProfile = async (req: Request, res: Response): Promise<void> => {
+        console.log('Retrieving user profile');
         const token = req.query.accessToken;
         return http({
             method: 'GET',

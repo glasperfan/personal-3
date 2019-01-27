@@ -1,6 +1,6 @@
 import { DefaultController } from "./DefaultController";
 import { Request, Express, Response, NextFunction, RequestHandler } from "express";
-import nodemailer from 'nodemailer';
+import * as nodemailer from 'nodemailer';
 
 export interface IEmailControllerSettings {
     user: string;
@@ -43,6 +43,7 @@ export class EmailController extends DefaultController {
         // send mail with defined transport object
         transporter.sendMail(mailOptions, (error, info) => {
             if (error) {
+                console.error('Email failed to send, error: ', error.message);
                 res.status(404).send('Email failed');
             } else {
                 res.status(200).send('Sent!');

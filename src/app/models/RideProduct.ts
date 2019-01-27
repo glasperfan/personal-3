@@ -24,5 +24,6 @@ export interface IRideProduct {
     short_description: string,
     display_name: string,
     product_group: string,
-    description: string
+    description: string,
+    is_valid: boolean
 }

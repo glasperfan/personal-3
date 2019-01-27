@@ -1,5 +1,6 @@
 import { Schema, model, Model, Document, HookNextFunction } from "mongoose";
 import { STRING, NUMBER, BOOLEAN } from "./types";
+import { domainToASCII } from "url";
 
 export interface IRide extends Document {
     request_id?: string;
@@ -38,15 +39,23 @@ const rideModel: Schema = new Schema({
     user_id: STRING,
 });
 
-// Log any missing 
-rideModel.pre('validate', (next: HookNextFunction) => {
-    if (!this.product_id) {
-        console.log(`Ride id ${this.request_id} has no product_id`);
+const validateRide = (next: HookNextFunction, docs: IRide[]) => validateThenNext(validateRideFn, next, docs);
+
+const validateRideFn = (ride: IRide) => {
+    if (!ride.product_id) {
+        console.log(`Ride id ${ride.request_id} has no product_id`);
     }
-    if (!this.user_id) {
+    if (!ride.user_id) {
         throw new Error('user_id required');
     }
+}
+
+const validateThenNext = <T extends Document>(validateFn: (doc: T) => void, next: HookNextFunction, docs: T[]): void => {
+    docs.map(validateFn);
     next();
-});
+}
+
+// Log any missing 
+rideModel.pre('insertMany', validateRide);
 
 export const Ride: Model<IRide> = model<IRide>('rides', rideModel);

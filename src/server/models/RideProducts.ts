@@ -22,7 +22,7 @@ export interface IRideProduct extends Document {
   display_name: string;
   product_group: string;
   description: string;
-  is_valid: string;
+  is_valid: boolean;
 }
 
 const rideProductsModel: Schema = new Schema({
@@ -54,8 +54,9 @@ const rideProductsModel: Schema = new Schema({
     is_valid: BOOLEAN
 });
 
-rideProductsModel.pre('save', (next) => {
+rideProductsModel.pre('validate', (next) => {
   this.is_valid = !!this.product_id;
+  next();
 });
 
 export const RideProduct: Model<IRideProduct> = model<IRideProduct>('rideProducts', rideProductsModel);
