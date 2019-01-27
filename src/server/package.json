@@ -5,7 +5,8 @@
   "scripts": {
     "tsc": "tsc",
     "dev": "mkdir -p dist && cp -r static ./dist/static && concurrently --kill-others \"tsc -w\" \"nodemon dist/server.js\"",
-    "prod": "tsc && node ./dist/server.js"
+    "prod": "NODE_ENV=production && sudo yarn && sudo tsc && sudo forever start ./dist/server.js -l logfile.log -e err.log -o out.log -a",
+    "ports": "sudo lsof -iTCP -sTCP:LISTEN -P"
   },
   "repository": {
     "type": "git",

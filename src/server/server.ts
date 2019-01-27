@@ -13,8 +13,11 @@ import SettingsProd from './settings.prod';
 import { UberController } from './controllers/UberController';
 import { EmailController } from './controllers/EmailController';
 
-
-const Settings = process.env.NODE_ENV === 'production' ? SettingsProd : SettingsDev;
+const isProduction = process.env.NODE_ENV === 'production';
+const Settings = isProduction ? SettingsProd : SettingsDev;
+if (isProduction) {
+  console.log('Running in production mode');
+}
 
 const app = express();
 
