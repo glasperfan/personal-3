@@ -114,7 +114,10 @@ export class UberController extends DefaultController {
                 return new Ride(r);
             });
             return response;
-        }).catch(_ => UberRideHistoryFailureHistoryException.send(res));
+        }).catch(_ => {
+            console.log('Retrieving ride history failed with args: ', token, limit, offset, userId);
+            UberRideHistoryFailureHistoryException.send(res)
+        });
     }
     
     /**
@@ -129,7 +132,7 @@ export class UberController extends DefaultController {
         if (rides.history.length) {
             ridesArr = ridesArr.concat(rides.history);
         }
-        totalRides -= rides.history.length;
+        totalRides = totalRides - rides.history.length;
         if (totalRides > 0) {
             return this.retrieveRideHistory(token, totalRides, ridesArr, userId, res);
         }
@@ -236,7 +239,7 @@ export class UberController extends DefaultController {
                 code: ErrorType.ERR_CACHE_FAILURE,
                 message: 'Ride cache is in an invalid state, refresh by invalidating the cache.'
             });
-            Ride.remove({ user_id: userId }).exec();
+            Ride.deleteMany({ user_id: userId }).exec();
         }
     }
     
