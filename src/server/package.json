@@ -5,7 +5,7 @@
   "scripts": {
     "tsc": "tsc",
     "dev": "mkdir -p dist && cp -r static ./dist/static && concurrently --kill-others \"tsc -w\" \"nodemon dist/server.js\"",
-    "prod": "sudo forever stopall && sudo yarn && sudo tsc && sudo cp -r static ./dist/static && sudo NODE_ENV=production forever start ./dist/server.js -l logfile.log -e err.log -o out.log -a",
+    "prod": "sudo forever stopall && sudo yarn && sudo tsc && sudo cp -r static ./dist/static && sudo NODE_ENV=production forever start ./dist/server.js && sudo forever list",
     "ports": "sudo lsof -iTCP -sTCP:LISTEN -P"
   },
   "repository": {

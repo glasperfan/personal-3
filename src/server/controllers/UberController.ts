@@ -28,7 +28,8 @@ export interface IRideHistory {
 
 export class UberController extends DefaultController {
     
-    private historyCache: NodeCache;
+    private readonly historyCache: NodeCache;
+    private readonly API_MAX_RIDE_LIMIT = 50;
 
     constructor(private settings: IUberControllerSettings) {
         super();
@@ -101,11 +102,12 @@ export class UberController extends DefaultController {
     }
     
     retrieveRideHistoryAsync = async (token: string, limit: number, offset: number, userId: string, res: Response): Promise<IRideHistory> => {
+        limit = limit || this.API_MAX_RIDE_LIMIT;
         return http({
             method: 'GET', 
             uri: 'https://api.uber.com/v1.2/history',
             json: true, // Automatically parses the JSON string in the response
-            qs: { limit: Math.min(50, limit), offset: offset },
+            qs: { limit: Math.min(this.API_MAX_RIDE_LIMIT, limit), offset: offset },
             headers: UberController.uberHeaders(token)
         }).then((response: any) => {
             console.log('Retrieved ' + response.history.length + ' rides');
@@ -171,7 +173,7 @@ export class UberController extends DefaultController {
     }
 
     sendAllRideHistoryAndProducts = async (res: Response, token: string, userId: string): Promise<void> => {
-        let retrievedRides: IRide[] = await this.retrieveRideHistory(token, undefined, [], userId, res);
+        let retrievedRides: IRide[] = await this.retrieveRideHistory(token, this.API_MAX_RIDE_LIMIT, [], userId, res);
         let validRidesWithProducts: IRidesWithProducts = await this.getProductsForRides(token, retrievedRides);
         
         res.send(validRidesWithProducts);
@@ -213,7 +215,7 @@ export class UberController extends DefaultController {
         if (!cachedRideCount) {
             return await this.sendAllRideHistoryAndProducts(res, token, userId);
         }
-        const testBatchSize = 50;
+        const testBatchSize = this.API_MAX_RIDE_LIMIT;
         const rideHistory: IRideHistory = await this.retrieveRideHistoryAsync(token, testBatchSize, 0, userId, res);
         const totalRideCount = rideHistory.count;
         // If all results are cached, serve them
