@@ -177,7 +177,7 @@ export class UberController extends DefaultController {
     }
 
     sendAllRideHistoryAndProducts = async (res: Response, token: string, userId: string): Promise<void> => {
-        let retrievedRides: IRide[] = await this.retrieveRideHistory(token, -1, [], userId, res);
+        let retrievedRides: IRide[] = await this.retrieveRideHistory(token, undefined, [], userId, res);
         let validRidesWithProducts: IRidesWithProducts = await this.getProductsForRides(token, retrievedRides);
         
         res.send(validRidesWithProducts);
