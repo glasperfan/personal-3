@@ -209,9 +209,11 @@ export class UberController extends DefaultController {
         const localCachedHistory = this.getCachedRideHistory(token);
 
         if (localCachedHistory) {
+            console.log('Returning in-memory cached rides and products.');
             res.send(localCachedHistory);
             return;
         }
+        console.log('Rides and products were not found in the in-memory cache for user ', userId);
 
         const cachedRides: IRide[] = await Ride.find({ user_id: userId }).exec();
         const cachedRideCount = cachedRides.length;
