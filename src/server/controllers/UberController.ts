@@ -173,7 +173,7 @@ export class UberController extends DefaultController {
         
         res.send(validRidesWithProducts);
         
-        this.setCachedRideHistory(token, validRidesWithProducts);
+        this.setCachedRideHistory(userId, validRidesWithProducts);
         await this.storeRides(validRidesWithProducts.rides);
         await this.storeProducts(validRidesWithProducts.products);
     }
@@ -218,7 +218,7 @@ export class UberController extends DefaultController {
             console.log('All rides cached.');
             const validRidesWithProducts: IRidesWithProducts = await this.getProductsForRides(token, cachedRides);
             res.send(validRidesWithProducts);
-            this.setCachedRideHistory(token, validRidesWithProducts);
+            this.setCachedRideHistory(userId, validRidesWithProducts);
             await this.storeRides(validRidesWithProducts.rides);
             await this.storeProducts(validRidesWithProducts.products);
         } else if (cachedRideCount < totalRideCount) {
@@ -228,7 +228,7 @@ export class UberController extends DefaultController {
             const allRides: IRide[] = retrievedRides.concat(cachedRides);
             const validRidesWithProducts: IRidesWithProducts = await this.getProductsForRides(token, allRides);
             res.send(validRidesWithProducts);
-            this.setCachedRideHistory(token, validRidesWithProducts);
+            this.setCachedRideHistory(userId, validRidesWithProducts);
             await this.storeRides(retrievedRides); // cache the uncached rides
             await this.storeProducts(validRidesWithProducts.products);
         } else {
@@ -236,6 +236,7 @@ export class UberController extends DefaultController {
                 code: ErrorType.ERR_CACHE_FAILURE,
                 message: 'Ride cache is in an invalid state, refresh by invalidating the cache.'
             });
+            Ride.remove({ user_id: userId }).exec();
         }
     }
     
@@ -257,14 +258,14 @@ export class UberController extends DefaultController {
         });
     }
 
-    private getCachedRideHistory(accessToken: string): IRidesWithProducts {
-        return this.historyCache.get(accessToken);
+    private getCachedRideHistory(userId: string): IRidesWithProducts {
+        return this.historyCache.get(userId);
     }
     
-    private setCachedRideHistory(accessToken: string, v: IRidesWithProducts): void {
+    private setCachedRideHistory(userId: string, v: IRidesWithProducts): void {
         // Convert from Mongoose docs to POJOs
         v.rides = v.rides.map(v => v.toJSON() as IRide);
         v.products = v.products.map(v => v.toJSON() as IRideProduct);
-        this.historyCache.set(accessToken, v);
+        this.historyCache.set(userId, v);
     }
 }
