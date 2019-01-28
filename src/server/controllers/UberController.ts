@@ -206,7 +206,7 @@ export class UberController extends DefaultController {
     getRideHistory = async (req: Request, res: Response): Promise<void> => {
         const userId = req.query.userId;
         const token = req.query.accessToken;
-        const localCachedHistory = this.getCachedRideHistory(token);
+        const localCachedHistory = this.getCachedRideHistory(userId);
 
         if (localCachedHistory) {
             console.log('Returning in-memory cached rides and products.');
