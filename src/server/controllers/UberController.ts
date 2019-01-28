@@ -246,6 +246,7 @@ export class UberController extends DefaultController {
                 code: ErrorType.ERR_CACHE_FAILURE,
                 message: 'Ride cache is in an invalid state, refresh by invalidating the cache.'
             });
+            console.log('Removing ALL rides from MongoDB for user ', userId);
             Ride.deleteMany({ user_id: userId }).exec();
         }
     }
