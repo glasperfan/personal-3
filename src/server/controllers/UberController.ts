@@ -130,6 +130,9 @@ export class UberController extends DefaultController {
     */
     retrieveRideHistory = async (token: string, totalRides: number, ridesArr: IRide[], userId: string, res: Response) => {
         const rides: IRideHistory = await this.retrieveRideHistoryAsync(token, totalRides, ridesArr.length, userId, res);
+        if (totalRides === undefined) {
+            totalRides = rides.count;
+        }
         console.log(`Successfully retrieved ride history: ${rides.history.length} rides`);
         if (rides.history.length) {
             ridesArr = ridesArr.concat(rides.history);
@@ -140,7 +143,7 @@ export class UberController extends DefaultController {
         }
         return ridesArr;
     }
-    
+
     getProductsForRides = async (token: string, rides: IRide[]): Promise<IRidesWithProducts> => {
         // Product IDs are sometimes null
         const allProductIds = uniq(rides.map(r => r.product_id).filter(id => !!id));
@@ -173,7 +176,7 @@ export class UberController extends DefaultController {
     }
 
     sendAllRideHistoryAndProducts = async (res: Response, token: string, userId: string): Promise<void> => {
-        let retrievedRides: IRide[] = await this.retrieveRideHistory(token, this.API_MAX_RIDE_LIMIT, [], userId, res);
+        let retrievedRides: IRide[] = await this.retrieveRideHistory(token, -1, [], userId, res);
         let validRidesWithProducts: IRidesWithProducts = await this.getProductsForRides(token, retrievedRides);
         
         res.send(validRidesWithProducts);
