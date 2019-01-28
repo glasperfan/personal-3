@@ -129,8 +129,9 @@ export class UberController extends DefaultController {
     * @param {string} token
     */
     retrieveRideHistory = async (token: string, totalRides: number, ridesArr: IRide[], userId: string, res: Response) => {
-        const rides: IRideHistory = await this.retrieveRideHistoryAsync(token, totalRides, ridesArr.length, userId, res);
-        if (totalRides === undefined) {
+        const getAll = !totalRides;
+        const rides: IRideHistory = await this.retrieveRideHistoryAsync(token, totalRides || this.API_MAX_RIDE_LIMIT, ridesArr.length, userId, res);
+        if (getAll) {
             totalRides = rides.count;
         }
         console.log(`Successfully retrieved ride history: ${rides.history.length} rides`);
