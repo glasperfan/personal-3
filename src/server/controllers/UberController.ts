@@ -264,6 +264,7 @@ export class UberController extends DefaultController {
     }
 
     private getCachedRideHistory(userId: string): IRidesWithProducts {
+        console.log('Retrieving from in-memory ride history cache.');
         return this.historyCache.get(userId);
     }
     
