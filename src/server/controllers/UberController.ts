@@ -5,6 +5,8 @@ import { uniq, difference } from 'lodash';
 import { UberTokenAuthenticationException, UberLogoutFailureException, UberRideHistoryFailureHistoryException, ErrorType } from "../models/errors";
 import { IRideProduct, RideProduct } from '../models/RideProducts';
 import { Ride, IRide } from "../models/Rides";
+import * as NodeCache from 'node-cache';
+import { Options } from 'node-cache';
 
 export interface IUberControllerSettings {
     clientId: string;
@@ -26,8 +28,11 @@ export interface IRideHistory {
 
 export class UberController extends DefaultController {
     
+    private historyCache: NodeCache;
+
     constructor(private settings: IUberControllerSettings) {
         super();
+        this.historyCache = new NodeCache();
     }
     
     registerRoutes(subApp: Express) {
@@ -168,6 +173,7 @@ export class UberController extends DefaultController {
         
         res.send(validRidesWithProducts);
         
+        this.setCachedRideHistory(token, validRidesWithProducts);
         await this.storeRides(validRidesWithProducts.rides);
         await this.storeProducts(validRidesWithProducts.products);
     }
@@ -192,6 +198,13 @@ export class UberController extends DefaultController {
     getRideHistory = async (req: Request, res: Response): Promise<void> => {
         const userId = req.query.userId;
         const token = req.query.accessToken;
+        const localCachedHistory = this.getCachedRideHistory(token);
+
+        if (localCachedHistory) {
+            res.send(localCachedHistory);
+            return;
+        }
+
         const cachedRides: IRide[] = await Ride.find({ user_id: userId }).exec();
         const cachedRideCount = cachedRides.length;
         if (!cachedRideCount) {
@@ -205,6 +218,7 @@ export class UberController extends DefaultController {
             console.log('All rides cached.');
             const validRidesWithProducts: IRidesWithProducts = await this.getProductsForRides(token, cachedRides);
             res.send(validRidesWithProducts);
+            this.setCachedRideHistory(token, validRidesWithProducts);
             await this.storeRides(validRidesWithProducts.rides);
             await this.storeProducts(validRidesWithProducts.products);
         } else if (cachedRideCount < totalRideCount) {
@@ -213,6 +227,8 @@ export class UberController extends DefaultController {
             const retrievedRides: IRide[] = await this.retrieveRideHistory(token, totalRideCount - cachedRideCount, [], userId, res);
             const allRides: IRide[] = retrievedRides.concat(cachedRides);
             const validRidesWithProducts: IRidesWithProducts = await this.getProductsForRides(token, allRides);
+            res.send(validRidesWithProducts);
+            this.setCachedRideHistory(token, validRidesWithProducts);
             await this.storeRides(retrievedRides); // cache the uncached rides
             await this.storeProducts(validRidesWithProducts.products);
         } else {
@@ -239,5 +255,16 @@ export class UberController extends DefaultController {
                 message: 'Failed to retrieve rider profile ' + err.message
             });
         });
+    }
+
+    private getCachedRideHistory(accessToken: string): IRidesWithProducts {
+        return this.historyCache.get(accessToken);
+    }
+    
+    private setCachedRideHistory(accessToken: string, v: IRidesWithProducts): void {
+        // Convert from Mongoose docs to POJOs
+        v.rides = v.rides.map(v => v.toJSON() as IRide);
+        v.products = v.products.map(v => v.toJSON() as IRideProduct);
+        this.historyCache.set(accessToken, v);
     }
 }
