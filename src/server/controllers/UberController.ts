@@ -33,7 +33,7 @@ export class UberController extends DefaultController {
 
     constructor(private settings: IUberControllerSettings) {
         super();
-        this.historyCache = new NodeCache();
+        this.historyCache = new NodeCache({ stdTTL: 60 * 10 });
     }
     
     registerRoutes(subApp: Express) {
