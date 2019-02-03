@@ -50,3 +50,11 @@ export interface IRideHistoryResponse {
     count: number;
     history: IHistoricalRide[];
 }
+
+export interface IPlacementRequest extends HttpStringParams {
+    userId: string;
+}
+
+export interface IPlacementResponse {
+    placement: number;
+}

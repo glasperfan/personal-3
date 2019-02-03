@@ -6,7 +6,8 @@ import { UberTokenAuthenticationException, UberLogoutFailureException, UberRideH
 import { IRideProduct, RideProduct } from '../models/RideProducts';
 import { Ride, IRide } from "../models/Rides";
 import * as NodeCache from 'node-cache';
-import { Options } from 'node-cache';
+import { RideStatsService } from "../services/RideStatsService";
+import { Rider, IRider } from "../models/Rider";
 
 export interface IUberControllerSettings {
     clientId: string;
@@ -29,11 +30,13 @@ export interface IRideHistory {
 export class UberController extends DefaultController {
     
     private readonly historyCache: NodeCache;
+    private readonly rideStatsService: RideStatsService;
     private readonly API_MAX_RIDE_LIMIT = 50;
 
     constructor(private settings: IUberControllerSettings) {
         super();
         this.historyCache = new NodeCache({ stdTTL: 60 * 10 });
+        this.rideStatsService = new RideStatsService();
     }
     
     registerRoutes(subApp: Express) {
@@ -41,6 +44,7 @@ export class UberController extends DefaultController {
         subApp.post('/logout', this.revokeToken);
         subApp.get('/me', this.getUserProfile);
         subApp.get('/history', this.getRideHistory);
+        subApp.get('/placement', this.getRiderPlacement);
     }
     
     private static uberHeaders(token: string) {
@@ -261,14 +265,25 @@ export class UberController extends DefaultController {
             uri: 'https://api.uber.com/v1.2/me',
             json: true, // Automatically parses the JSON string in the response
             headers: UberController.uberHeaders(token)
-        }).then(function (profile) {
+        }).then((profile) => {
             res.send(profile);
+            profile._id = profile.uuid;
+            new Rider(profile).save().then((rider: IRider) => {
+                console.log(`Saved profile for ${rider.first_name} ${rider.last_name}`);
+            });
         }).catch(function (err) {
             res.send({
                 code: ErrorType.UBER_AUTH,
                 message: 'Failed to retrieve rider profile ' + err.message
             });
         });
+    }
+
+    getRiderPlacement = async (req: Request, res: Response): Promise<void> => {
+        console.log('Retrieving rider placement');
+        const userId = req.query.userId;
+        console.log('Current userId: ' + userId);
+        res.send({ placement: this.rideStatsService.getRiderPlacement(userId) });
     }
 
     private getCachedRideHistory(userId: string): IRidesWithProducts {

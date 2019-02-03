@@ -2,7 +2,13 @@ import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { Observable } from "rxjs";
 import { UberAuthService } from "./uber-auth.service";
-import { IGetAllRidesResponse, IGetAllRidesRequest, IHistoricalRideWithProduct } from "../models/RideHistory";
+import { 
+    IGetAllRidesResponse,
+    IGetAllRidesRequest,
+    IHistoricalRideWithProduct,
+    IPlacementResponse,
+    IPlacementRequest
+} from "../models/RideHistory";
 import { map } from "rxjs/operators";
 import { keyBy } from "lodash-es";
 import { IRideProduct } from "../models/RideProduct";
@@ -27,5 +33,13 @@ export class UberApiService {
                 return ride;
             });
         }));
+    }
+
+    @Cacheable()
+    getPlacement(): Observable<IPlacementResponse> {
+        const request: IPlacementRequest = {
+            userId: this.authService.currentUserId
+        };
+        return this.http.get<IPlacementResponse>(this.server.GetPlacement, { params: request });
     }
 }

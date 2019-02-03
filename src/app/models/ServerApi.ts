@@ -1,9 +1,10 @@
 
 export class ServerAPI {
     constructor(private baseUrl: string) { }
-    SendEmail: string = `${this.baseUrl}/email`;
-    GetHistory: string = `${this.baseUrl}/uber/history`;
-    GetUserToken: string = `${this.baseUrl}/uber/token`;
-    GetUserProfile: string = `${this.baseUrl}/uber/me`;
-    Logout: string = `${this.baseUrl}/uber/logout`;
+    SendEmail = `${this.baseUrl}/email`;
+    GetHistory = `${this.baseUrl}/uber/history`;
+    GetPlacement = `${this.baseUrl}/uber/placement`;
+    GetUserToken = `${this.baseUrl}/uber/token`;
+    GetUserProfile = `${this.baseUrl}/uber/me`;
+    Logout = `${this.baseUrl}/uber/logout`;
 }

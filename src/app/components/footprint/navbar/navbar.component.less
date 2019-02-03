@@ -1,3 +1,8 @@
+.small-text {
+    font-style: italic;
+    font-size: 11px;
+}
+
 .navbar {
     display: flex;
     justify-content: space-between;
@@ -11,6 +16,34 @@
         
         button {
             font-size: 12px;
+        }
+    }
+
+    .ride-placement {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+
+        @row-size: 24px;
+        .row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            .ride-placement-rank {
+                font-size: 16px;
+            }
+    
+            .ride-placement-icon {
+                margin-left: 6px;
+                width: @row-size;
+                height: @row-size;
+            }
+        }
+
+        .ride-placement-label {
+            .small-text;
+            margin-top: 4px;
         }
     }
 }

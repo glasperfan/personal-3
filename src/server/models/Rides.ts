@@ -1,11 +1,12 @@
 import { Schema, model, Model, Document, HookNextFunction } from "mongoose";
 import { STRING, NUMBER } from "./types";
+import { validateThenNext } from "./validators";
 
 export interface IRide extends Document {
     request_id?: string;
     request_time?: number;
     start_time?: number;
-    start_city: {
+    start_city?: {
         display_name?: string;
         latitude?: string;
         longitude?: string;
@@ -46,11 +47,6 @@ const validateRideFn = (ride: IRide) => {
     if (!ride.user_id) {
         throw new Error('user_id required');
     }
-}
-
-const validateThenNext = <T extends Document>(validateFn: (doc: T) => void, next: HookNextFunction, docs: T[]): void => {
-    docs.map(validateFn);
-    next();
 }
 
 // Log any missing 

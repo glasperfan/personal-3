@@ -4,5 +4,6 @@ export const ICON = {
     TRENDING_DOWN: 'trending_down',
     TRENDING_UP: 'trending_up',
     TRENDING_FLAT: 'trending_flat',
-    DATE: 'date_range'
+    DATE: 'date_range',
+    STARS: 'stars'
 };
