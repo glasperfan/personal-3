@@ -11,6 +11,7 @@ import { ICON } from "../../../models/Icon";
 })
 export class NavbarComponent implements OnInit {
     logoutText = 'Logout';
+    firstName: string;
     placementStatus: string;
     ICON = ICON;
 
@@ -20,6 +21,9 @@ export class NavbarComponent implements OnInit {
         this.uber.getPlacement()
             .pipe(take(1))
             .subscribe(response => this.placementStatus = this.formatPlacement(response.placement));
+        this.uber.getUserProfile()
+            .pipe(take(1))
+            .subscribe(response => this.firstName = response.profile.first_name);
     }
 
     logout() {

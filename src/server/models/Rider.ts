@@ -1,7 +1,7 @@
 import { Schema, model, Model, Document, HookNextFunction } from "mongoose";
 import { STRING, BOOLEAN, NUMBER } from "./types";
 
-export interface IRiderProfile {
+export interface IRider extends Document {
     picture: string;
     first_name: string;
     last_name: string;
@@ -10,11 +10,6 @@ export interface IRiderProfile {
     email: string;
     mobile_verified: boolean;
     promo_code: string;
-}
-
-export interface IRider extends IRiderProfile, Document {
-    totalRides: number;
-    totalEmissions: number;
 }
 
 const riderModel: Schema = new Schema({
@@ -26,9 +21,7 @@ const riderModel: Schema = new Schema({
     email: STRING,
     mobile_verified: BOOLEAN,
     promo_code: STRING,
-    placement: NUMBER,
-    totalRides: NUMBER,
-    totalEmissions: NUMBER
+    placement: NUMBER
 });
 
 export const Rider: Model<IRider> = model<IRider>('riders', riderModel);

@@ -1,12 +1,12 @@
 <nav class="navbar affix navbar-expand-lg navbar-light bg-light" id="navbar">
     <span class="navbar-brand mb-0 h1">Uber Footprint</span>
-    <div class="ride-placement" *ngIf="placementStatus">
+    <div class="ride-placement" *ngIf="placementStatus && firstName">
         <!-- <span class="material-icons ride-placement-icon">{{ICON.STARS}}</span> -->
         <div class="row">
             <div class="ride-placement-rank">{{placementStatus}}</div>
             <img class="ride-placement-icon" src="../../../../assets/trophy.png" />
         </div>
-        <div class="ride-placement-label">Your Emissions Rank</div>
+        <div class="ride-placement-label">{{firstName}}'s Emissions Rank</div>
     </div>
     <div class="nav-links">
         <button class="btn btn-link" (click)="logout()">{{logoutText}}</button>

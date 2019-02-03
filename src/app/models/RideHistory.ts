@@ -58,3 +58,20 @@ export interface IPlacementRequest extends HttpStringParams {
 export interface IPlacementResponse {
     placement: number;
 }
+
+export interface IRiderProfile {
+    picture: string;
+    first_name: string;
+    last_name: string;
+    uuid: string;
+    rider_id: string;
+    email: string;
+    mobile_verified: boolean;
+    promo_code: string;
+}
+
+export interface IRiderProfileRequest extends IAccessToken { }
+
+export interface IRiderProfileResponse {
+    profile: IRiderProfile;
+}

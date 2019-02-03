@@ -266,7 +266,7 @@ export class UberController extends DefaultController {
             json: true, // Automatically parses the JSON string in the response
             headers: UberController.uberHeaders(token)
         }).then((profile) => {
-            res.send(profile);
+            res.send({ profile: profile });
             profile._id = profile.uuid;
             new Rider(profile).save().then((rider: IRider) => {
                 console.log(`Saved profile for ${rider.first_name} ${rider.last_name}`);

@@ -1,13 +1,15 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { Observable } from "rxjs";
-import { UberAuthService } from "./uber-auth.service";
+import { UberAuthService, IRiderProfile } from "./uber-auth.service";
 import { 
     IGetAllRidesResponse,
     IGetAllRidesRequest,
     IHistoricalRideWithProduct,
     IPlacementResponse,
-    IPlacementRequest
+    IPlacementRequest,
+    IRiderProfileRequest,
+    IRiderProfileResponse
 } from "../models/RideHistory";
 import { map } from "rxjs/operators";
 import { keyBy } from "lodash-es";
@@ -41,5 +43,13 @@ export class UberApiService {
             userId: this.authService.currentUserId
         };
         return this.http.get<IPlacementResponse>(this.server.GetPlacement, { params: request });
+    }
+
+    @Cacheable()
+    getUserProfile(): Observable<IRiderProfileResponse> {
+        const request: IRiderProfileRequest = {
+            accessToken: this.authService.currentUserToken
+        };
+        return this.http.get<IRiderProfileResponse>(this.server.GetUserProfile, { params: request });
     }
 }
