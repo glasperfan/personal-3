@@ -218,7 +218,6 @@ export class UberController extends DefaultController {
             res.send(localCachedHistory);
             return;
         }
-        await Ride.deleteMany({ user_id: userId }).exec();
         console.log('Rides and products were not found in the in-memory cache for user ', userId);
 
         const cachedRides: IRide[] = await Ride.find({ user_id: userId }).exec();
