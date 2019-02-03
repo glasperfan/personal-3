@@ -180,9 +180,8 @@ export class UberController extends DefaultController {
         });
     }
 
-    sendAllRideHistoryAndProducts = async (res: Response, token: string, userId: string): Promise<void> => {
-        let retrievedRides: IRide[] = await this.retrieveRideHistory(token, undefined, [], userId, res);
-        let validRidesWithProducts: IRidesWithProducts = await this.getProductsForRides(token, retrievedRides);
+    sendAllRideHistoryAndProducts = async (res: Response, cachedRides: IRide[], token: string, userId: string): Promise<void> => {
+        let validRidesWithProducts: IRidesWithProducts = await this.getProductsForRides(token, cachedRides);
         
         res.send(validRidesWithProducts);
         
@@ -224,7 +223,7 @@ export class UberController extends DefaultController {
         const cachedRides: IRide[] = await Ride.find({ user_id: userId }).exec();
         const cachedRideCount = cachedRides.length;
         if (!cachedRideCount) {
-            return await this.sendAllRideHistoryAndProducts(res, token, userId);
+            return await this.sendAllRideHistoryAndProducts(res, cachedRides, token, userId);
         }
         const testBatchSize = this.API_MAX_RIDE_LIMIT;
         const rideHistory: IRideHistory = await this.retrieveRideHistoryAsync(token, testBatchSize, 0, userId, res);
