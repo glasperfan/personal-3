@@ -1,7 +1,7 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { Observable } from "rxjs";
-import { UberAuthService, IRiderProfile } from "./uber-auth.service";
+import { UberAuthService } from "./uber-auth.service";
 import { 
     IGetAllRidesResponse,
     IGetAllRidesRequest,

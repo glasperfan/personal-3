@@ -25,7 +25,7 @@ export class RideStatsService {
     }
 
     private calculateAllPlacements = async () => {
-        console.log('Refreshing rider cache.');
+        console.log('Refreshing ride cache.');
         const allRides: IRide[] = await Ride.find().exec();
         const allProducts: IRideProduct[] = await RideProduct.find().exec();
         console.log('Current total ride cache size: ' + allRides.length);
